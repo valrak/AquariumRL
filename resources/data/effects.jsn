@@ -1,0 +1,34 @@
+{
+"spawn": {
+  "id": "spawn",
+  "description": "something is coming from this direction",
+  "tile": "0,0",
+  "effect": "spawn",
+  "spawn": "random",
+  "ttl": 0
+  },
+"bubble": {
+  "id": "bubble",
+  "description": "small bubbles",
+  "tile": "0,0",
+  "effect": "None",
+  "ttl": 2
+  },
+"smoke": {
+  "id": "smoke",
+  "description": "smoke",
+  "tile": "1,0",
+  "effect": "novisibility",
+  "flags": ["disperse"],
+  "ttl": 4
+  },
+"explosion": {
+  "id": "explosion",
+  "description": "large underwater explosion",
+  "tile": "2,0",
+  "effect": "explode",
+  "damage": "100",
+  "flags": ["large"],
+  "ttl": 2
+  }
+}

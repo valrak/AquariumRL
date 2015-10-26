@@ -1,0 +1,29 @@
+{
+"#": {
+  "id": "wall",
+  "passable": "false",
+  "clear": "false",
+  "description": "solid rock wall",
+  "tile": "1,0"
+  },
+".": {
+  "id": "water",
+  "passable": "true",
+  "clear": "true",
+  "description": "water",
+  "tile": "0,0"
+  },
+"|": {
+  "id": "algae",
+  "passable": "true",
+  "clear": "false",
+  "description": "algae",
+  "tile": "3,0"
+  },
+",": {
+  "id": "sky",
+  "passable": "false",
+  "description": "surface",
+  "tile": "2,0"
+  }
+}

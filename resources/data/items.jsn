@@ -1,0 +1,58 @@
+{
+"coin": {
+  "id": "coin",
+  "description": "small coin with a strange symbol on it",
+  "tile": "1,0",
+  "flags": ["gravity"],
+  "score": 1,
+  "stackable": "true",
+  "level": 1
+  },
+"harpoon": {
+  "id": "harpoon",
+  "description": "long range underwater projectile",
+  "tile": "0,0",
+  "flags": ["gravity", "delay"],
+  "score": 0,
+  "stackable": "true",
+  "range": 5,
+  "damage": 200,
+  "effect": "bubble"
+  },
+"dynamite": {
+  "id": "dynamite",
+  "description": "stick of dynamite",
+  "tile": "2,0",
+  "flags": ["gravity", "delay"],
+  "score": 0,
+  "stackable": "false",
+  "range": 1,
+  "damage": 5,
+  "effect": "None",
+  "fuse": 5,
+  "fuseeffect": "explosion",
+  "level": 3
+  },
+"thorn": {
+  "id": "thorn",
+  "description": "small thorn projectile",
+  "tile": "0,0",
+  "flags": ["nodrop", "weapon"],
+  "score": 0,
+  "stackable": "false",
+  "range": 5,
+  "damage": 5,
+  "effect": "bubble"
+  },
+"ink": {
+  "id": "ink",
+  "description": "octopus ink",
+  "tile": "0,0",
+  "flags": ["nodrop", "weapon"],
+  "score": 0,
+  "stackable": "false",
+  "range": 3,
+  "damage": 0,
+  "effect": "smoke"
+  }
+}
