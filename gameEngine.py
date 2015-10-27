@@ -42,7 +42,7 @@ class GameEngine(object):
         self.mapinfo = jsonInit.loadjson("resources/data/map.jsn")
         self.effinfo = jsonInit.loadjson("resources/data/effects.jsn")
         self.iteinfo = jsonInit.loadjson("resources/data/items.jsn")
-        self.mapfield = MapField(arenamap, self.mapinfo, self.moninfo, self.effinfo, self.iteinfo)
+        self.mapfield = MapField(arenamap, self.mapinfo, self.moninfo, self.effinfo, self.iteinfo, self)
         #arenamap = self.mapfield.generatelevel(None)
         self.mapfield.terrain = arenamap
         self.messagehandler = MessageHandler()
@@ -95,7 +95,7 @@ class GameEngine(object):
                             self.gameevent.report("Firing cancelled.", None, None, None)
                             break
                         if event.type == pg.KEYDOWN and (event.key == pg.K_i or event.key == pg.K_SPACE):
-                            self.fireinvetory()
+                            self.fireinventory()
                     # Lines
                     if event.type == pg.KEYDOWN and (event.key == pg.K_UP or event.key == pg.K_KP8):
                         coord = (player.x, player.y-1)
@@ -202,7 +202,9 @@ class GameEngine(object):
             ueffect.update()
         self.mapfield.cleanup()
         self.mapfield.generatemonster()
+        self.mapfield.generateitem()
 
+    # debug method
     def spawnmonsters(self):
         self.mapfield.addatrandommonster(Monster(self.moninfo[jsonInit.getrandflagged(self.moninfo, "spawner")], self))
         self.mapfield.addspawn("moray eel")

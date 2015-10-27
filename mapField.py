@@ -1,6 +1,7 @@
 import pathfinder
 import random
 from effect import *
+from item import *
 import csv
 
 WALL = '0'
@@ -15,6 +16,7 @@ GENERATOR_OODDOWN = 30 # chance to spawn lower level thing
 
 
 class MapField(object):
+    gameengine = None
     terrain = None
     terinfo = None
     genmonsters = []
@@ -28,7 +30,8 @@ class MapField(object):
     maxy = -1
     genlast = 0 # number of turns for which was not generated anything new
 
-    def __init__(self, mapfile, mapinfo, moninfo, effinfo, iteinfo):
+    def __init__(self, mapfile, mapinfo, moninfo, effinfo, iteinfo, gameengine):
+        self.gameengine = gameengine
         self.terinfo = mapinfo
         self.moninfo = moninfo
         self.effinfo = effinfo
@@ -205,10 +208,10 @@ class MapField(object):
         return None
 
     def getpassablecling(self, coord, dirc):
-        #neighborsr = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
+        # neighborsr = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
         neighborsr = [(1, -1), (1, 1), (1, 0)]
 
-        #neighborsl = [(1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1)]
+        # neighborsl = [(1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1)]
         neighborsl = [(-1, -1), (-1, 1), (-1, 0)]
 
         if dirc == 1:
@@ -319,11 +322,24 @@ class MapField(object):
             self.monsters.append(monster)
         return coord
 
-    # adds random monster and returns its coordinates
+    # adds specific item on random surface coordinates
     def addatrandomsurfaceitem(self, item):
         coord = self.getrandomsurface()
         item.setposition(coord)
         self.items.append(item)
+
+    # adds random level based item at random surface coordinates
+    def addrandomsurfaceitem(self, level):
+        lvlitems = []
+        coord = self.getrandomsurface()
+        for item in self.genitems:
+            if level >= int(item["level"]):
+                lvlitems.append(item)
+        if len(lvlitems) > 0:
+            ritem = random.randint(0, len(lvlitems)-1)
+            gitem = Item(lvlitems[ritem], self.gameengine)
+            gitem.setposition(coord)
+            self.items.append(gitem)
 
     def generatemonster(self):
         self.genlast += 1
@@ -342,6 +358,25 @@ class MapField(object):
             if playerlvl != 1:
                 playerlvl -= 1
             self.addspawn(self.getmonsteratlevel(playerlvl))
+            self.genlast = 0
+
+    def generateitem(self):
+        self.genlast += 1
+        chance = random.randint(0, GENERATOR_CHANSERISE * self.genlast)
+        playerlvl = int(self.getplayer().getparam("level"))
+        # generate random out of depth thing
+        if chance > GENERATOR_TRESHOLD + GENERATOR_OODUP:
+            self.addrandomsurfaceitem(playerlvl+1)
+            self.genlast = 0
+        # generate normal depth thing
+        elif chance > GENERATOR_TRESHOLD:
+            self.addrandomsurfaceitem(playerlvl)
+            self.genlast = 0
+        # generate lower depth thing
+        elif chance > GENERATOR_TRESHOLD - GENERATOR_OODDOWN:
+            if playerlvl != 1:
+                playerlvl -= 1
+            self.addrandomsurfaceitem(playerlvl)
             self.genlast = 0
 
     def getmonsteratlevel(self, level):
