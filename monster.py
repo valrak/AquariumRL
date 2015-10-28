@@ -9,6 +9,7 @@ class Monster(thing.Thing):
     x = 0
     y = 0
     player = False
+    rangedpreference = None
     mapfield = None
     parameters = {}
     gameengine = None
@@ -243,7 +244,11 @@ class Monster(thing.Thing):
         weapon.setposition(self.getposition())
         weapon = self.throwaway(weapon)
         self.gameengine.mapfield.items.append(weapon)
-        for i in range(0, int(weapon.getparam("range"))):
+        if weapon.getparam("range") is not None:
+            wrange = weapon.getparam("range")
+        else:  # weapon not meant as ranged
+            wrange = 0
+        for i in range(0, wrange):
             newposition = pathfinder.alterposition(weapon.getposition(), direction)
             monsterat = self.gameengine.mapfield.getoccupants(newposition)
             # if weapon hits any monster
@@ -276,6 +281,7 @@ class Monster(thing.Thing):
                     ite.stack -= 1
                 else:
                     self.inventory.remove(ite)
+                    self.rangedpreference = None
                 pos = ite.getposition()
                 ite = item.Item(self.gameengine.iteinfo[ite.getname()], self.gameengine)
                 ite.setposition(pos)

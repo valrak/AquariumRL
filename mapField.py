@@ -229,7 +229,7 @@ class MapField(object):
         for y in range(self.maxy):
             for x in range(self.maxx):
                 if self.ispassable((x, y)) and self.getterrain((x, y + 1))["passable"] == "false":
-                    if self.ispassable((x + 1, y)) and self.ispassable((x - 1, y)):
+                    if self.ispassable((x + 1, y)) and self.ispassable((x - 1, y)) and self.isgrounded((x, y)):
                         choosefrom.append((x, y))
         if len(choosefrom) > 0:
             return choosefrom[random.randint(0, len(choosefrom)-1)]

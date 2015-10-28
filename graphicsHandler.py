@@ -10,6 +10,7 @@ TILESIZE = 32
 MAXLOGLINES = 5
 
 
+
 class GraphicsHandler(object):
     loglines = []
     eventstack = {}
@@ -124,6 +125,37 @@ class GraphicsHandler(object):
             self.loglines.pop(0)
         self.loglines.append(logline)
 
+    def displayitemlist(self, itemlist):
+        stringlist = []
+        i = 0
+        for item in itemlist:
+            if item.isstackable():
+                stringlist.append(self.gameengine.ALPHABET[i]+") "+item.getname()+" (x"+str(item.stack)+")")
+            else:
+                stringlist.append(self.gameengine.ALPHABET[i]+") "+item.getname())
+            i += 1
+        self.displaystringlist(stringlist)
+
+    def displaystringlist(self, stringlist):
+        maxy = len(stringlist) * 30
+        # count maximum x size by maximal length of string to be printed
+        maxx = 100
+        for line in stringlist:
+            if maxx < len(line)*15:
+                maxx = len(line)*15
+
+        invbackgr = pygame.Surface((maxx, maxy), pygame.SRCALPHA)
+        invbackgr.fill((0, 0, 0, 128))
+
+        invadd = 0
+        inv = self.gameengine.mapfield.getplayer().inventory
+        for line in stringlist:
+            text = self.font.render(line, 1, (pygame.Color("grey70")))
+            invbackgr.blit(text, (5, 5+invadd))
+            invadd += 20
+
+        self.screen.blit(invbackgr, (100, 100))
+        pygame.display.flip()
 
 # FIXME: return coordinates to match map position to align to the grid """
 c = lambda coords: (coords[0] + MAPPOSX, coords[1] + MAPPOSX)

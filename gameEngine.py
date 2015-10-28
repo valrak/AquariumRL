@@ -17,6 +17,8 @@ mapmaxy = 0
 PLAYERCREATURE = "diver"
 ARENAMAPFILE = "resources/maps/arena1.csv"
 
+
+
 mapfield = None
 gameevent = None
 moninfo = None
@@ -25,11 +27,17 @@ effinfo = None
 iteminfo = None
 
 class GameEngine(object):
-    SIZE = (1024, 768)
+    ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+                'v', 'w', 'x', 'y', 'z']
+
+    RESOLUTIONX = 1024
+    RESOLUTIONY = 768
+    SIZE = (RESOLUTIONX, RESOLUTIONY)
     SCORETABLE = [100, 300]
     turns = 0
     firingmode = False
     hiscore = 0
+    clock = pygame.time.Clock()
 
     def __init__(self):
         with open(ARENAMAPFILE, 'rb') as csvfile:
@@ -58,8 +66,6 @@ class GameEngine(object):
     def loop(self):
         pygame.init()
         pygame.display.set_caption('Aquarium Arena')
-
-        clock = pygame.time.Clock()
 
         # create list of entities and player entity
         player = Monster(self.moninfo[PLAYERCREATURE], self)
@@ -95,13 +101,18 @@ class GameEngine(object):
                             self.gameevent.report("Firing cancelled.", None, None, None)
                             break
                         if event.type == pg.KEYDOWN and (event.key == pg.K_i or event.key == pg.K_SPACE):
-                            self.fireinventory()
+                            index = self.fireinventory()
+                            if index is not None:
+                                player.rangedpreference = player.inventory[index]
+                                self.gameevent.report("Firing ... " + player.rangedpreference.getname() +
+                                                      " Press i or space to change.", None, None, None)
+
                     # Lines
                     if event.type == pg.KEYDOWN and (event.key == pg.K_UP or event.key == pg.K_KP8):
                         coord = (player.x, player.y-1)
                         if self.firingmode is True:
                             self.firingmode = False
-                            player.fire((0, -1))
+                            player.fire((0, -1), player.rangedpreference)
                         else:
                             player.action(coord)
                         self.passturn()
@@ -109,7 +120,7 @@ class GameEngine(object):
                         coord = (player.x, player.y+1)
                         if self.firingmode is True:
                             self.firingmode = False
-                            player.fire((0, 1))
+                            player.fire((0, 1), player.rangedpreference)
                         else:
                             player.action(coord)
                         self.passturn()
@@ -117,7 +128,7 @@ class GameEngine(object):
                         coord = (player.x-1, player.y)
                         if self.firingmode is True:
                             self.firingmode = False
-                            player.fire((-1, 0))
+                            player.fire((-1, 0), player.rangedpreference)
                         else:
                             player.action(coord)
                         self.passturn()
@@ -125,7 +136,7 @@ class GameEngine(object):
                         coord = (player.x+1, player.y)
                         if self.firingmode is True:
                             self.firingmode = False
-                            player.fire((1, 0))
+                            player.fire((1, 0), player.rangedpreference)
                         else:
                             player.action(coord)
                         self.passturn()
@@ -171,7 +182,12 @@ class GameEngine(object):
                             self.gameevent.report("You have nothing to fire.", None, None, None)
                             break
                         else:
-                            self.gameevent.report("Firing ... "+player.getbestranged().getname()+" Press i or space to change.", None, None, None)
+                            if player.rangedpreference is None:
+                                self.gameevent.report("Firing ... "+player.getbestranged().getname() +
+                                                      " Press i or space to change.", None, None, None)
+                            else:
+                                self.gameevent.report("Firing ... "+player.rangedpreference.getname() +
+                                                      " Press i or space to change.", None, None, None)
                             self.firingmode = True
                             break
                     if event.type == pg.KEYDOWN and event.key == pg.K_COMMA:
@@ -181,9 +197,8 @@ class GameEngine(object):
                             player.pick(item)
                         self.passturn()
 
-            time_passed = clock.tick(30)
+            time_passed = self.clock.tick(30)
             self.graphicshandler.drawboard()
-
 
     def endgame(self):
         pygame.quit()
@@ -218,4 +233,16 @@ class GameEngine(object):
                     self.mapfield.addmonsterat(Monster(self.moninfo[ueffect.getspawn()], self), ueffect.getposition())
 
     def fireinventory(self):
-        None
+        self.graphicshandler.displayitemlist(self.mapfield.getplayer().inventory)
+        loop = True
+        while loop:
+            for event in pygame.event.get():
+                # cancel
+                if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
+                    return None
+                if event.type == pg.KEYDOWN and pygame.key.name(event.key) in self.ALPHABET:
+                    return self.ALPHABET.index(pygame.key.name(event.key)) # returns corresponding key alphabet index
+            self.clock.tick(30)
+
+
+
