@@ -1,6 +1,7 @@
 import gameEngine
 import thing
 import pathfinder
+import copy
 
 class Effect(thing.Thing):
     x = 0
@@ -9,6 +10,7 @@ class Effect(thing.Thing):
     gameengine = None
     ttl = 1
     donotupdate = False
+    flags = []
 
     def __init__(self, parameters, gameengine):
         self.parameters = dict(parameters)
@@ -40,8 +42,8 @@ class Effect(thing.Thing):
     def setparam(self, param, newvalue):
         oldvalue = self.parameters[param]
         self.parameters[param] = newvalue
-        if self.gameengine.gameevent is not None:
-            self.gameengine.gameevent.debug(self, param, newvalue, oldvalue)
+        #if self.gameengine.gameevent is not None:
+            #self.gameengine.gameevent.debug(self, param, newvalue, oldvalue)
 
     def getflag(self, flagname):
         flags = self.parameters.get('flags')
@@ -71,7 +73,9 @@ class Effect(thing.Thing):
                 neweffect = Effect(self.gameengine.effinfo[self.getname()], self.gameengine)
                 neweffect.setposition(ncoord)
                 neweffect.ttl = self.ttl
-                flags = neweffect.getparam("flags")
+                # remove large to prevent flood
+                # copy because we don't want to change the flags in global effects library
+                flags = copy.copy(neweffect.getparam("flags"))
                 for f in flags:
                     if f == "large":
                         flags.remove(f)
