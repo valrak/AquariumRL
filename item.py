@@ -57,12 +57,12 @@ class Item(thing.Thing):
         if self.getflag("delay") and self.delay == 0:
             self.delay = 1
         if self.getparam("fuse") is not None:
-            if int(self.getparam("fuse")) <= 0:
+            if int(self.getparam("fuse")) == 0:
                 neweffect = effect.Effect(self.gameengine.effinfo[self.getparam("fuseeffect")], self.gameengine)
                 neweffect.setposition(self.getposition())
                 self.gameengine.mapfield.effects.append(neweffect)
                 self.gameengine.mapfield.items.remove(self)
-            else:
+            elif int(self.getparam("fuse")) != -1:
                 self.setparam("fuse", int(self.getparam("fuse")) - 1)
 
     def geteffect(self):

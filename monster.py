@@ -234,6 +234,8 @@ class Monster(thing.Thing):
             self.inventory.append(ite)
             if self.gameengine.mapfield.items.__contains__(ite):
                 self.gameengine.mapfield.items.remove(ite)
+                if ite.getparam("fuse") is not None:
+                    ite.setparam("fuse", -1)
 
     def fire(self, direction, what=None):
         weapon = what
@@ -243,6 +245,9 @@ class Monster(thing.Thing):
             return None
         weapon.setposition(self.getposition())
         weapon = self.throwaway(weapon)
+        # set fuse for fused weapons
+        if weapon.getparam("defaultFuse") is not None and weapon.getparam("fuse") is not None:
+            weapon.setparam("fuse", int(weapon.getparam("defaultFuse")))
         self.gameengine.mapfield.items.append(weapon)
         if weapon.getparam("range") is not None:
             wrange = weapon.getparam("range")

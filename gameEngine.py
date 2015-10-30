@@ -18,7 +18,6 @@ PLAYERCREATURE = "diver"
 ARENAMAPFILE = "resources/maps/arena1.csv"
 
 
-
 mapfield = None
 gameevent = None
 moninfo = None
@@ -79,6 +78,10 @@ class GameEngine(object):
         self.gameevent.report("Welcome to Aquarium Arena!", None, None, None)
         self.gameevent.report("Top gladiator score is "+str(self.hiscore)+" points!", None, None, None)
         # main game loop
+
+        player.setparam("level", "3")
+
+
         while True:
             # Main mode
             for event in pygame.event.get():
@@ -103,9 +106,10 @@ class GameEngine(object):
                         if event.type == pg.KEYDOWN and (event.key == pg.K_i or event.key == pg.K_SPACE):
                             index = self.fireinventory()
                             if index is not None:
-                                player.rangedpreference = player.inventory[index]
-                                self.gameevent.report("Firing ... " + player.rangedpreference.getname() +
-                                                      " Press i or space to change.", None, None, None)
+                                if len(player.inventory)-1 >= index:
+                                    player.rangedpreference = player.inventory[index]
+                                    self.gameevent.report("Firing ... " + player.rangedpreference.getname() +
+                                                          " Press i or space to change.", None, None, None)
 
                     # Lines
                     if event.type == pg.KEYDOWN and (event.key == pg.K_UP or event.key == pg.K_KP8):
@@ -243,6 +247,3 @@ class GameEngine(object):
                 if event.type == pg.KEYDOWN and pygame.key.name(event.key) in self.ALPHABET:
                     return self.ALPHABET.index(pygame.key.name(event.key)) # returns corresponding key alphabet index
             self.clock.tick(30)
-
-
-

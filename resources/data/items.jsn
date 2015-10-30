@@ -29,7 +29,8 @@
   "range": 1,
   "damage": 5,
   "effect": "None",
-  "fuse": 5,
+  "fuse": -1,
+  "defaultFuse": 5,
   "fuseeffect": "explosion",
   "level": 3
   },
