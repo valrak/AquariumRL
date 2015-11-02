@@ -6,7 +6,8 @@
   "flags": ["gravity"],
   "score": 1,
   "stackable": "true",
-  "level": 1
+  "level": 1,
+  "weight": 1
   },
 "harpoon": {
   "id": "harpoon",
@@ -17,7 +18,8 @@
   "stackable": "true",
   "range": 5,
   "damage": 200,
-  "effect": "bubble"
+  "effect": "bubble",
+  "weight": 3
   },
 "dynamite": {
   "id": "dynamite",
@@ -32,7 +34,8 @@
   "fuse": -1,
   "defaultFuse": 5,
   "fuseeffect": "explosion",
-  "level": 3
+  "level": 3,
+  "weight": 5
   },
 "thorn": {
   "id": "thorn",

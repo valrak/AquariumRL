@@ -83,7 +83,6 @@ class Monster(thing.Thing):
                     return True
         return False
 
-
     def update(self):
         # update level
         if self.player:
@@ -95,7 +94,17 @@ class Monster(thing.Thing):
                     if nextscore <= self.score:
                         self.setparam("level", level + 1)
                         #self.gameengine.gameevent.report("Diver raised his level to "+str(self.getparam("level"))+"!", None, None, None)
+        # weight management
+        if self.getparam("weightLimit") is not None:
+            totalw = 0
+            for witem in self.inventory:
+                if witem.getparam("weight") is not None:
+                    totalw += int(witem.getparam("weight"))
+            if totalw > int(self.getparam("weightLimit")):
 
+                coord = (self.x, self.y+1)
+                if self.gameengine.mapfield.ispassable(coord):
+                    self.setposition(coord)
         # ai
         if not self.player:
             # not applicable for player
