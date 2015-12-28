@@ -20,6 +20,20 @@
   "description": "algae",
   "tile": "3,0"
   },
+"^": {
+  "id": "algaeTop",
+  "passable": "true",
+  "clear": "false",
+  "description": "algae",
+  "tile": "4,0"
+  },
+"%": {
+  "id": "algaeBottom",
+  "passable": "true",
+  "clear": "false",
+  "description": "algae",
+  "tile": "5,0"
+  },
 ",": {
   "id": "sky",
   "passable": "false",

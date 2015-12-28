@@ -1,6 +1,7 @@
 import gameEngine
 
 from tileEngine import *
+from pygame.locals import *
 
 __author__ = 'Jaroslav'
 
@@ -10,11 +11,11 @@ TILESIZE = 32
 MAXLOGLINES = 5
 
 
-
 class GraphicsHandler(object):
     loglines = []
     eventstack = {}
     gameengine = None
+    size = None
 
     def __init__(self, arenamap, gameengine):
         self.gameengine = gameengine
@@ -26,8 +27,9 @@ class GraphicsHandler(object):
         self.montileeng = TileEngine(self.montiles, gameengine.moninfo, TILESIZE)
         self.efftileeng = TileEngine(self.efftiles, gameengine.effinfo, TILESIZE)
         self.itetileeng = TileEngine(self.itetiles, gameengine.iteinfo, TILESIZE)
-        self.screen = pygame.display.set_mode(gameengine.SIZE)
-
+        self.size = gameengine.SIZE
+        self.finalscreen = pygame.display.set_mode(self.size, HWSURFACE | DOUBLEBUF | RESIZABLE)
+        self.screen = self.finalscreen.copy()
         pygame.font.init()
 
         # TODO: possibly put these to the set arena method
@@ -114,7 +116,7 @@ class GraphicsHandler(object):
             text = self.font.render("Firing", 1, (pygame.Color("grey70")))
             statusbackgr.blit(text, (1, 1))
             self.screen.blit(statusbackgr, (830, 20))
-
+        self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
         pygame.display.flip()
 
     def eraseeventstack(self):
@@ -129,6 +131,8 @@ class GraphicsHandler(object):
         stringlist = []
         i = 0
         for item in itemlist:
+            if i >= len(self.gameengine.ALPHABET):
+                break
             if item.isstackable():
                 stringlist.append(self.gameengine.ALPHABET[i]+") "+item.getname()+" (x"+str(item.stack)+")")
             else:
@@ -155,7 +159,13 @@ class GraphicsHandler(object):
             invadd += 20
 
         self.screen.blit(invbackgr, (100, 100))
+        self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
         pygame.display.flip()
+
+    # window changed its size
+    def resize(self, newsize):
+        self.finalscreen = pygame.display.set_mode(newsize, HWSURFACE | DOUBLEBUF | RESIZABLE)
+        self.size = newsize
 
 # FIXME: return coordinates to match map position to align to the grid """
 c = lambda coords: (coords[0] + MAPPOSX, coords[1] + MAPPOSX)

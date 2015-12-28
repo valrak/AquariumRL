@@ -3,7 +3,7 @@
   "flags": ["nospawn"],
   "id": "diver",
   "type": "human",
-  "hp": "1000",
+  "hp": "100",
   "tile": "3,0",
   "attack": "80",
   "level": 1,

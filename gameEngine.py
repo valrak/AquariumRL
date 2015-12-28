@@ -6,6 +6,7 @@ from item import *
 from mapField import *
 from messageHandler import *
 from eventHandler import *
+from pygame.locals import *
 
 import pygame
 import sys
@@ -87,6 +88,8 @@ class GameEngine(object):
             for event in pygame.event.get():
                 if event.type == pg.QUIT:
                     self.endgame()
+                elif event.type == VIDEORESIZE:
+                    self.graphicshandler.resize(event.dict['size'])
                 else:
                     # Debug
                     if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
@@ -180,7 +183,7 @@ class GameEngine(object):
                         self.passturn()
                     if event.type == pg.KEYDOWN and (event.key == pg.K_SPACE or event.key == pg.K_KP5):
                         self.passturn()
-                    # Commads
+                    # Commands
                     if event.type == pg.KEYDOWN and event.key == pg.K_f:
                         if player.getbestranged() is None:
                             self.gameevent.report("You have nothing to fire.", None, None, None)
@@ -203,6 +206,9 @@ class GameEngine(object):
 
             time_passed = self.clock.tick(30)
             self.graphicshandler.drawboard()
+
+    def resetgame(self):
+        self.__init__()
 
     def endgame(self):
         pygame.quit()

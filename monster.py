@@ -14,7 +14,7 @@ class Monster(thing.Thing):
     parameters = {}
     gameengine = None
     lastseen = None
-    respawntime = 0 # used for spawners only
+    respawntime = 0  # used for spawners only
     home = None
     children = None
     direction = None
@@ -211,6 +211,9 @@ class Monster(thing.Thing):
                     self.respawntime = 0
 
     def destroy(self):
+        # game reset
+        if self.player:
+            self.gameengine.endgame()
         # drop all items
         self.dropall()
         # inform home that I'm not going home any more
@@ -221,7 +224,7 @@ class Monster(thing.Thing):
             if not child.isalive:
                 self.child.home = None
         # increase score for the attacker
-        if self.lastattacker is not None:
+        if self.lastattacker is not None and self.getparam("score") is not None:
             self.lastattacker.score += int(self.getparam("score"))
             #fixme: include score when killed with item (dynamite). Item should have lastused.
             self.gameengine.gameevent.report(self.getname()+" killed by "+self.lastattacker.getname()+"!", None, None, None)

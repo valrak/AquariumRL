@@ -11,8 +11,8 @@ STAIRS = '2'
 ''' random things generator constants '''
 GENERATOR_CHANSERISE = 20  # percentile of random chance rising after not generating anything
 GENERATOR_TRESHOLD = 50
-GENERATOR_OODUP = 10 # out of depth chance to spawn higher level thing
-GENERATOR_OODDOWN = 30 # chance to spawn lower level thing
+GENERATOR_OODUP = 10  # out of depth chance to spawn higher level thing
+GENERATOR_OODDOWN = 30  # chance to spawn lower level thing
 
 
 class MapField(object):
