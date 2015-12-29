@@ -211,9 +211,6 @@ class Monster(thing.Thing):
                     self.respawntime = 0
 
     def destroy(self):
-        # game reset
-        if self.player:
-            self.gameengine.endgame()
         # drop all items
         self.dropall()
         # inform home that I'm not going home any more
@@ -230,6 +227,9 @@ class Monster(thing.Thing):
             self.gameengine.gameevent.report(self.getname()+" killed by "+self.lastattacker.getname()+"!", None, None, None)
         else:
             self.gameengine.gameevent.report(self.getname()+" has been killed! ", None, None, None)
+        # game reset
+        if self.player:
+            self.gameengine.resetflag = True
 
     def removechild(self, child):
         self.children.remove(child)

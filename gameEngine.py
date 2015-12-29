@@ -46,6 +46,7 @@ class GameEngine(object):
 
         # data load part
         # jsons
+        self.resetflag = False
         self.moninfo = jsonInit.loadjson("resources/data/creatures.jsn")
         self.mapinfo = jsonInit.loadjson("resources/data/map.jsn")
         self.effinfo = jsonInit.loadjson("resources/data/effects.jsn")
@@ -63,10 +64,19 @@ class GameEngine(object):
 
         # load hi score
 
-    def loop(self):
+    def initgame(self):
         pygame.init()
         pygame.display.set_caption('Aquarium Arena')
+        player = self.generateplayer()
 
+        # introduction messages
+        self.gameevent.report("Welcome to Aquarium Arena!", None, None, None)
+        self.gameevent.report("Top gladiator score is "+str(self.hiscore)+" points!", None, None, None)
+        # main game loop
+        player.setparam("level", "3")
+        return player
+
+    def generateplayer(self):
         # create list of entities and player entity
         player = Monster(self.moninfo[PLAYERCREATURE], self)
         player.player = True
@@ -75,15 +85,15 @@ class GameEngine(object):
             player.pick(Item(self.iteinfo['harpoon'], self))
         player.pick(Item(self.iteinfo['dynamite'], self))
         self.mapfield.addmonster(player)
-        # introduction messages
-        self.gameevent.report("Welcome to Aquarium Arena!", None, None, None)
-        self.gameevent.report("Top gladiator score is "+str(self.hiscore)+" points!", None, None, None)
-        # main game loop
+        return player
 
-        player.setparam("level", "3")
-
-
+    def loop(self):
+        player = self.initgame()
         while True:
+            if self.resetflag:
+                self.resetflag = False
+                self.resetgame()
+                break
             # Main mode
             for event in pygame.event.get():
                 if event.type == pg.QUIT:
@@ -208,7 +218,11 @@ class GameEngine(object):
             self.graphicshandler.drawboard()
 
     def resetgame(self):
-        self.__init__()
+        with open(ARENAMAPFILE, 'rb') as csvfile:
+            csvread = csv.reader(csvfile, delimiter=';', quotechar='"')
+            arenamap = list(csvread)
+        self.mapfield = MapField(arenamap, self.mapinfo, self.moninfo, self.effinfo, self.iteinfo, self)
+        self.loop()
 
     def endgame(self):
         pygame.quit()

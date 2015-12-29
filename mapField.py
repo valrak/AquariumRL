@@ -342,6 +342,8 @@ class MapField(object):
             self.items.append(gitem)
 
     def generatemonster(self):
+        if self.gameengine.resetflag:
+            return
         self.genlast += 1
         chance = random.randint(0, GENERATOR_CHANSERISE * self.genlast)
         playerlvl = int(self.getplayer().getparam("level"))
@@ -361,6 +363,8 @@ class MapField(object):
             self.genlast = 0
 
     def generateitem(self):
+        if self.gameengine.resetflag:
+            return
         self.genlast += 1
         chance = random.randint(0, GENERATOR_CHANSERISE * self.genlast)
         playerlvl = int(self.getplayer().getparam("level"))

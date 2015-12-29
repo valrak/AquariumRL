@@ -47,6 +47,8 @@ class GraphicsHandler(object):
             self.newlogline(thing)
 
     def drawboard(self):
+        if self.gameengine.resetflag is True:
+            return
         self.screen.fill(pygame.Color('grey50'))
         self.screen.blit(self.maplayer, (MAPPOSX, MAPPOSY))
 
