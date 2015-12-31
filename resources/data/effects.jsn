@@ -22,12 +22,19 @@
   "flags": ["disperse"],
   "ttl": 4
   },
+"repair": {
+  "id": "repair",
+  "description": "",
+  "tile": "0,0",
+  "effect": "repair",
+  "ttl": 0
+  },
 "explosion": {
   "id": "explosion",
   "description": "large underwater explosion",
   "tile": "2,0",
   "effect": "explode",
-  "damage": "100",
+  "damage": "20",
   "flags": ["large"],
   "ttl": 2
   }

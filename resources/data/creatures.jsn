@@ -3,17 +3,17 @@
   "flags": ["nospawn"],
   "id": "diver",
   "type": "human",
-  "hp": "100",
+  "hp": "205",
   "tile": "3,0",
-  "attack": "80",
+  "attack": "1",
   "level": 1,
   "speed": "1",
-  "weightLimit": "10"
+  "weightLimit": "30"
   },
 "catfish": {
   "id": "catfish",
   "type": "fish",
-  "hp": "40",
+  "hp": "1",
   "tile": "2,0",
   "attack": "0",
   "speed": "1",
@@ -24,40 +24,39 @@
   "id": "octopus",
   "type": "cephalopod",
   "flags": ["ranged"],
-  "hp": "110",
+  "hp": "5",
   "tile": "5,0",
-  "attack": "0",
+  "attack": "2",
   "speed": "2",
   "fire": "ink",
   "level": 3,
-  "score": 30
+  "score": 50
   },
 "crab": {
   "flags": ["nospawn", "ground", "collector"],
   "id": "crab",
   "type": "crustacean",
-  "hp": "200",
+  "hp": "2",
   "tile": "0,0",
-  "attack": "0",
+  "attack": "1",
   "speed": "1",
-  "score": 10
+  "score": 20
   },
 "moray eel": {
   "flags": ["ranged"],
   "id": "moray eel",
   "type": "fish",
-  "hp": "150",
+  "hp": "2",
   "tile": "1,0",
-  "attack": "0",
-  "speed": "1",
-  "fire": "thorn",
+  "attack": "2",
+  "speed": "2",
   "level": 2,
-  "score": 15
+  "score": 30
   },
 "shell": {
   "id": "shell",
   "type": "spawner",
-  "hp": "500",
+  "hp": "5",
   "tile": "4,0",
   "attack": "0",
   "spawn": "crab",
@@ -68,5 +67,16 @@
   "level": 1,
   "limit": 2,
   "score": 50
+  },
+ "tritonspear": {
+  "id": "tritonspear",
+  "type": "triton",
+  "hp": "5",
+  "tile": "6,0",
+  "attack": "2",
+  "speed": "1",
+  "level": 4,
+  "fire": "thorn",
+  "score": 100
   }
 }
