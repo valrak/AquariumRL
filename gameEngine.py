@@ -40,10 +40,10 @@ class GameEngine(object):
     clock = pygame.time.Clock()
 
     def __init__(self):
-        with open(ARENAMAPFILE, 'rb') as csvfile:
-            csvread = csv.reader(csvfile, delimiter=';', quotechar='"')
-            arenamap = list(csvread)
-
+        # with open(ARENAMAPFILE, 'rb') as csvfile:
+        #     csvread = csv.reader(csvfile, delimiter=';', quotechar='"')
+        #     arenamap = list(csvread)
+        arenamap = None
         # data load part
         # jsons
         self.resetflag = False
@@ -51,9 +51,11 @@ class GameEngine(object):
         self.mapinfo = jsonInit.loadjson("resources/data/map.jsn")
         self.effinfo = jsonInit.loadjson("resources/data/effects.jsn")
         self.iteinfo = jsonInit.loadjson("resources/data/items.jsn")
+        #arenamap = generatelevel(25, 15)
         self.mapfield = MapField(arenamap, self.mapinfo, self.moninfo, self.effinfo, self.iteinfo, self)
+        self.mapfield.generatelevel(25, 15)
         #arenamap = self.mapfield.generatelevel(None)
-        self.mapfield.terrain = arenamap
+        arenamap = self.mapfield.terrain
         self.messagehandler = MessageHandler()
         self.graphicshandler = GraphicsHandler(arenamap, self)
 
@@ -218,10 +220,14 @@ class GameEngine(object):
             self.graphicshandler.drawboard()
 
     def resetgame(self):
+        del self.mapfield
+        del self.graphicshandler
         with open(ARENAMAPFILE, 'rb') as csvfile:
             csvread = csv.reader(csvfile, delimiter=';', quotechar='"')
             arenamap = list(csvread)
         self.mapfield = MapField(arenamap, self.mapinfo, self.moninfo, self.effinfo, self.iteinfo, self)
+        self.graphicshandler = GraphicsHandler(arenamap, self)
+
         self.loop()
 
     def endgame(self):

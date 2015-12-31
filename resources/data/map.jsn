@@ -39,5 +39,11 @@
   "passable": "false",
   "description": "surface",
   "tile": "2,0"
+  },
+"0": {
+  "id": "glass",
+  "passable": "false",
+  "description": "glass tile",
+  "tile": "6,0"
   }
 }

@@ -3,6 +3,7 @@ import random
 from effect import *
 from item import *
 import csv
+import utils
 
 WALL = '0'
 FREE = '1'
@@ -13,7 +14,6 @@ GENERATOR_CHANSERISE = 20  # percentile of random chance rising after not genera
 GENERATOR_TRESHOLD = 50
 GENERATOR_OODUP = 10  # out of depth chance to spawn higher level thing
 GENERATOR_OODDOWN = 30  # chance to spawn lower level thing
-
 
 class MapField(object):
     gameengine = None
@@ -30,17 +30,25 @@ class MapField(object):
     maxy = -1
     genlast = 0 # number of turns for which was not generated anything new
 
+    def __del__(self):
+        del self.monsters[:]
+        del self.items[:]
+        del self.gameengine
+        del self.terrain[:]
+        del self.effects[:]
+
     def __init__(self, mapfile, mapinfo, moninfo, effinfo, iteinfo, gameengine):
         self.gameengine = gameengine
         self.terinfo = mapinfo
         self.moninfo = moninfo
         self.effinfo = effinfo
         self.iteinfo = iteinfo
-        self.terrain = list(mapfile)
-        for row in self.terrain:
-            self.maxy += 1
-        self.maxx = len(row)-1
-        self.passablemap = self.generatepassablemap()
+        if mapfile != None:
+            self.terrain = list(mapfile)
+            for row in self.terrain:
+                self.maxy += 1
+            self.maxx = len(row)-1
+            self.passablemap = self.generatepassablemap()
 
         # load database of level based creatures
         for dthing in self.moninfo:
@@ -57,6 +65,82 @@ class MapField(object):
             cthing = self.iteinfo[dthing]
             if "level" in cthing:
                 self.genitems.append(cthing)
+
+    def generatelevel(self, maxx, maxy):
+        self.maxx = maxx
+        self.maxy = maxy
+        self.terrain = []
+        rockamount = maxx*maxy/80
+        rockamountrand = maxx*maxy/95
+        rocksize = 7
+        rocksizerand = 5
+
+        coralamount = maxx*maxy/60
+        coralamountrand = maxx*maxy/70
+        coralsize = 1
+        coralsizerand = 3
+
+        level = []
+        for y in range(0, maxy):
+            row = []
+            if y == 0:
+                for x in range(0, maxx):
+                    row.append(",")
+            elif y == maxy-1:
+                for x in range(0, maxx):
+                    row.append("#")
+            else:
+                for x in range(0, maxx):
+                    if x == 0 or x == maxx-1:
+                        row.append('0')
+                    else:
+                        row.append('.')
+            self.terrain.append(row)
+        for rock in range(0, rockamount + random.randint(0, rockamountrand)):
+            x = random.randint(0, maxx-1)
+            y = random.randint(0, maxy-1)
+            if self.terrain[y][x] == '.':
+                self.terrain[y][x] = '#'
+            for fuzz in range(0, rocksize + random.randint(0, rocksizerand)):
+                x += utils.getrandomdelta(1)
+                y += utils.getrandomdelta(1)
+                if y >= maxy:
+                    y -= 1
+                if x >= maxx:
+                    x -= 1
+                if y <= 0:
+                    y += 1
+                if x <= 0:
+                    x += 1
+                if self.terrain[y][x] == '.':
+                    self.terrain[y][x] = '#'
+
+        # corals
+        coord = None
+        for coral in range(0, coralamount + random.randint(0, coralamountrand)):
+            # if coord is None or random.randint(0, 1) == 1:
+            #     coord = self.getrandomground()
+            # else:
+            #     if self.isgrounded((coord[0]+1, coord[1])):
+            #         coord = (coord[0]+1, coord[1])
+            #     elif self.isgrounded((coord[0]-1, coord[1])):
+            #         coord = (coord[0]-1, coord[1])
+            #     else:
+            #         coord = self.getrandomground()
+            coord = self.getrandomground()
+            coralgrowth = coralsize + random.randint(0, coralsizerand)
+            for grow in range(0, coralgrowth):
+                if self.ispassable(coord):
+                    if grow == 0 and self.ispassable((coord[0], coord[1]-1)) and coralgrowth > 1:
+                        self.terrain[coord[1]][coord[0]] = "%"
+                    elif grow == coralgrowth-1 or not self.ispassable((coord[0], coord[1]-1)):
+                        self.terrain[coord[1]][coord[0]] = "^"
+                        break
+                    else:
+                        self.terrain[coord[1]][coord[0]] = "|"
+                coord = (coord[0], coord[1]-1)
+        self.passablemap = self.generatepassablemap()
+
 
     def getplayer(self):
         for monster in self.monsters:
