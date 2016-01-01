@@ -199,6 +199,15 @@ class MapField(object):
                 return False
         return False
 
+    def isnonsolid(self, coord):
+        if coord is not None and coord[0] < self.maxx and coord[1] < self.maxy and coord[0] >= 0 and coord[1] >= 0:
+            cell = self.getterrain(coord)
+            if (cell["passable"]) == "true":
+                return True
+            else:
+                return False
+        return False
+
     def istransparent(self, coord):
         if coord is not None and coord[0] < self.maxx and coord[1] < self.maxy and coord[0] >= 0 and coord[1] >= 0:
             cell = self.getterrain(coord)
@@ -253,6 +262,18 @@ class MapField(object):
         choose = []
         for n in neighbors:
             if self.ispassable((coord[0] + n[0], coord[1] + n[1])):
+                choose.append(n)
+        if len(choose) > 0:
+            pos = choose[random.randint(0, len(choose)-1)]
+            return coord[0] + pos[0], coord[1] + pos[1]
+        return None
+
+    # returns random field in neigbors of given location without considering occupants
+    def getrandomoccnearby(self, coord):
+        neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+        choose = []
+        for n in neighbors:
+            if self.isnonsolid((coord[0] + n[0], coord[1] + n[1])):
                 choose.append(n)
         if len(choose) > 0:
             pos = choose[random.randint(0, len(choose)-1)]

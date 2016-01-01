@@ -56,5 +56,13 @@
   "damage": "1",
   "flags": ["random", "electric"],
   "ttl": 10
+  },
+"blood": {
+  "id": "blood",
+  "description": "patch of blood",
+  "tile": "6,0",
+  "effect": "None",
+  "damage": "0",
+  "ttl": 4
   }
 }

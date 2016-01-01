@@ -239,10 +239,9 @@ class GameEngine(object):
     def resetgame(self):
         del self.mapfield
         del self.graphicshandler
-        with open(ARENAMAPFILE, 'rb') as csvfile:
-            csvread = csv.reader(csvfile, delimiter=';', quotechar='"')
-            arenamap = list(csvread)
+        arenamap = None
         self.mapfield = MapField(arenamap, self.mapinfo, self.moninfo, self.effinfo, self.iteinfo, self)
+        self.mapfield.generatelevel(25, 15)
         self.graphicshandler = GraphicsHandler(arenamap, self)
 
         self.loop()

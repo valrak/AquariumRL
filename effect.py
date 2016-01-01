@@ -59,7 +59,7 @@ class Effect(thing.Thing):
             self.ttl -= 1
             return False
         if self.getflag("random") and self.ttl > 1:
-            randcoord = self.gameengine.mapfield.getrandomnearby(self.getposition())
+            randcoord = self.gameengine.mapfield.getrandomoccnearby(self.getposition())
             if randcoord is not None:
                 self.setposition(randcoord)
         if self.getflag("disperse") and self.ttl > 1:

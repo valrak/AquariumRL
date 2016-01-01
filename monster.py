@@ -175,7 +175,6 @@ class Monster(thing.Thing):
                                         if self.getparam("firelimit") is not None:
                                             self.firetime = int(self.getparam("firelimit"))
 
-
                 # if can move then move to player
                 if not self.getflag("nomove") and not self.getflag("ground") and self.canact(actions):
                     if not self.player:
@@ -247,6 +246,10 @@ class Monster(thing.Thing):
                     self.respawntime = 0
 
     def destroy(self):
+        # draw blood
+        neweffect = effect.Effect(self.gameengine.effinfo["blood"], self.gameengine)
+        neweffect.setposition(self.getposition())
+        self.gameengine.mapfield.effects.append(neweffect)
         # drop all items
         self.dropall()
         # inform home that I'm not going home any more
