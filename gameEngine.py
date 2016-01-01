@@ -36,6 +36,7 @@ class GameEngine(object):
     SCORETABLE = [100, 300]
     turns = 0
     firingmode = False
+    usemode = False
     hiscore = 0
     clock = pygame.time.Clock()
 
@@ -111,15 +112,27 @@ class GameEngine(object):
                     if event.type == pg.KEYDOWN and event.key == pg.K_END:
                         self.mapfield.addatrandomsurfaceitem(Item(self.iteinfo['coin'], self))
 
+                    if self.usemode is True:
+                        # cancel
+                        if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
+                            self.usemode = False
+                            self.gameevent.report("Item use cancelled.", None, None, None)
+                            break
+                        index = self.displayinventory("usable")
+                        if index is None:
+                            self.gameevent.report("You have nothing usable.", None, None, None)
+                        self.usemode = False
+                        if index is not None:
+                            if len(player.getinventory("usable"))-1 >= index:
+                                self.gameevent.report("Using ... " +
+                                                      player.getinventory("usable")[index].getname(), None, None, None)
+                                player.useitem(player.getinventory("usable")[index])
+                                self.passturn()
+
                     # Firing mode toggles
                     if self.firingmode is True:
-                        # cancel
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE or event.key == pg.K_f):
-                            self.firingmode = False
-                            self.gameevent.report("Firing cancelled.", None, None, None)
-                            break
                         if event.type == pg.KEYDOWN and (event.key == pg.K_i or event.key == pg.K_SPACE):
-                            index = self.fireinventory()
+                            index = self.displayinventory()
                             if index is not None:
                                 if len(player.inventory)-1 >= index:
                                     player.rangedpreference = player.inventory[index]
@@ -196,6 +209,7 @@ class GameEngine(object):
                     if event.type == pg.KEYDOWN and (event.key == pg.K_SPACE or event.key == pg.K_KP5):
                         self.passturn()
                     # Commands
+                    # fire
                     if event.type == pg.KEYDOWN and event.key == pg.K_f:
                         if player.getbestranged() is None:
                             self.gameevent.report("You have nothing to fire.", None, None, None)
@@ -209,6 +223,9 @@ class GameEngine(object):
                                                       " Press i or space to change.", None, None, None)
                             self.firingmode = True
                             break
+                    # use
+                    if event.type == pg.KEYDOWN and event.key == pg.K_u:
+                        self.usemode = True
                     if event.type == pg.KEYDOWN and event.key == pg.K_COMMA:
                         # pick up item
                         citems = self.mapfield.getitems(player.getposition())
@@ -262,8 +279,11 @@ class GameEngine(object):
                 else:
                     self.mapfield.addmonsterat(Monster(self.moninfo[ueffect.getspawn()], self), ueffect.getposition())
 
-    def fireinventory(self):
-        self.graphicshandler.displayitemlist(self.mapfield.getplayer().inventory)
+    def displayinventory(self, requiredflag=None):
+        items = self.mapfield.getplayer().getinventory(requiredflag)
+        if len(items) == 0:
+            return None
+        self.graphicshandler.displayitemlist(items)
         loop = True
         while loop:
             for event in pygame.event.get():
@@ -271,5 +291,5 @@ class GameEngine(object):
                 if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                     return None
                 if event.type == pg.KEYDOWN and pygame.key.name(event.key) in self.ALPHABET:
-                    return self.ALPHABET.index(pygame.key.name(event.key)) # returns corresponding key alphabet index
+                    return self.ALPHABET.index(pygame.key.name(event.key))  # returns corresponding key alphabet index
             self.clock.tick(30)

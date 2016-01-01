@@ -25,9 +25,10 @@
 "repair": {
   "id": "repair",
   "description": "",
-  "tile": "0,0",
+  "tile": "4,0",
   "effect": "repair",
-  "ttl": 0
+  "amount": "1",
+  "ttl": 2
   },
 "explosion": {
   "id": "explosion",

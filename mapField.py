@@ -118,19 +118,21 @@ class MapField(object):
         # corals
         coord = None
         for coral in range(0, coralamount + random.randint(0, coralamountrand)):
-            # if coord is None or random.randint(0, 1) == 1:
-            #     coord = self.getrandomground()
-            # else:
-            #     if self.isgrounded((coord[0]+1, coord[1])):
-            #         coord = (coord[0]+1, coord[1])
-            #     elif self.isgrounded((coord[0]-1, coord[1])):
-            #         coord = (coord[0]-1, coord[1])
-            #     else:
-            #         coord = self.getrandomground()
-            coord = self.getrandomground()
+            if coord is None or random.randint(0, 1) == 1:
+                coord = self.getrandomground()
+            else:
+                if self.isgrounded((coord[0]+1, coord[1])):
+                    coord = (coord[0]+1, coord[1])
+                elif self.isgrounded((coord[0]-1, coord[1])):
+                    coord = (coord[0]-1, coord[1])
+                else:
+                    coord = self.getrandomground()
+            # coord = self.getrandomground()
             coralgrowth = coralsize + random.randint(0, coralsizerand)
             for grow in range(0, coralgrowth):
                 if self.ispassable(coord):
+                    if self.terrain[coord[1]][coord[0]] == "%":
+                        continue
                     if grow == 0 and self.ispassable((coord[0], coord[1]-1)) and coralgrowth > 1:
                         self.terrain[coord[1]][coord[0]] = "%"
                     elif grow == coralgrowth-1 or not self.ispassable((coord[0], coord[1]-1)):
@@ -140,7 +142,7 @@ class MapField(object):
                         self.terrain[coord[1]][coord[0]] = "|"
                 coord = (coord[0], coord[1]-1)
         self.passablemap = self.generatepassablemap()
-
+        # todo: remove isolated places
 
     def getplayer(self):
         for monster in self.monsters:
@@ -264,8 +266,7 @@ class MapField(object):
             if not oldcoord == tempcoord:
                 occupant = self.getoccupants(tempcoord)
                 if occupant is None or occupant.getflag("nomove"):
-                    if not self.ispassable(tempcoord) and \
-                        not self.getterrain(tempcoord)["id"] == "sky":
+                    if not self.ispassable(tempcoord) and not self.getterrain(tempcoord)["id"] == "sky":
                         return True
         return False
 

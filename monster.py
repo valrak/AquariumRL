@@ -20,6 +20,7 @@ class Monster(thing.Thing):
     direction = None
     inventory = None
     lastattacker = None
+    maxhp = 0
     score = 0
 
     def __init__(self, parameters, gameengine):
@@ -27,6 +28,8 @@ class Monster(thing.Thing):
         self.gameengine = gameengine
         self.children = []
         self.inventory = []
+        if self.parameters.has_key("hp"):
+            self.maxhp = int(self.parameters["hp"])
 
     def setposition(self, coord):
         self.x = coord[0]
@@ -59,6 +62,13 @@ class Monster(thing.Thing):
 
     def lowerhealth(self, amount):
         self.setparam("hp", int(self.getparam("hp")) - int(amount))
+
+    def raisehealth(self, amount):
+        if (int(self.getparam("hp")) + amount) > self.maxhp:
+            newhp = self.maxhp
+        else:
+            newhp = int(self.getparam("hp")) + amount
+        self.setparam("hp", newhp)
 
     def combat(self, attacker):
         self.lastattacker = attacker
@@ -191,7 +201,12 @@ class Monster(thing.Thing):
                             if goto is None:
                                 self.direction *= -1
                             self.action(goto)
-                        # todo: check isgrounded, if not fall down
+                # check isgrounded, if not fall down
+                if self.getflag("ground") and not self.gameengine.mapfield.isgrounded(self.getposition()):
+                    coord = (self.x, self.y+1)
+                    if self.gameengine.mapfield.ispassable(coord):
+                        self.setposition(coord)
+
                 actions += 1
         # manage spawners, applicable for player
         if self.getflag("spawner"):
@@ -252,7 +267,10 @@ class Monster(thing.Thing):
     def fire(self, direction, what=None):
         weapon = what
         if what is None:
-            weapon = self.getbestranged()
+            if self.rangedpreference is None:
+                weapon = self.getbestranged()
+            else:
+                weapon = self.rangedpreference
         if weapon is None:
             return None
         weapon.setposition(self.getposition())
@@ -285,6 +303,26 @@ class Monster(thing.Thing):
             #self.gameengine.gameevent.report("fire", )
         if weapon.getflag("nodrop"):
             self.gameengine.mapfield.items.remove(weapon)
+
+    def useitem(self, ite):
+        if ite.getflag("usable") and ite.geteffect() is not None:
+            neweffect = effect.Effect(self.gameengine.effinfo[ite.geteffect()], self.gameengine)
+            neweffect.setposition(self.getposition())
+            self.gameengine.mapfield.effects.append(neweffect)
+            if ite.isstackable() and ite.stack > 1:
+                ite.stack -= 1
+            else:
+                self.inventory.remove(ite)
+
+    def getinventory(self, flag):
+        if flag is None:
+            return self.inventory
+        else:
+            itemlist = []
+            for ite in self.inventory:
+                if ite.getflag(flag):
+                    itemlist.append(ite)
+            return itemlist
 
     def drop(self, ite):
         ite.setposition(self.getposition())

@@ -86,6 +86,10 @@ class Effect(thing.Thing):
             occupant = self.gameengine.mapfield.getoccupants(self.getposition())
             if occupant is not None:
                 occupant.lowerhealth(self.getparam("damage"))
+        if self.getparam("effect") == "repair":
+            occupant = self.gameengine.mapfield.getoccupants(self.getposition())
+            if occupant is not None:
+                occupant.raisehealth(int(self.getparam("amount")))
 
         self.ttl -= 1
 
