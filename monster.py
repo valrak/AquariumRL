@@ -15,6 +15,7 @@ class Monster(thing.Thing):
     gameengine = None
     lastseen = None
     respawntime = 0  # used for spawners only
+    firetime = 0  # used for ranged combatants
     home = None
     children = None
     direction = None
@@ -28,8 +29,10 @@ class Monster(thing.Thing):
         self.gameengine = gameengine
         self.children = []
         self.inventory = []
-        if self.parameters.has_key("hp"):
-            self.maxhp = int(self.parameters["hp"])
+        if self.getparam("hp") is not None:
+            self.maxhp = int(self.getparam("hp"))
+        if self.getparam("firelimit") is not None:
+            self.firetime = int(self.getparam("firelimit"))
 
     def setposition(self, coord):
         self.x = coord[0]
@@ -134,11 +137,22 @@ class Monster(thing.Thing):
                         for witem in localitems:
                             self.pick(witem)
                         actions += 1
+                # I shoot random things
+                if self.getflag("randomshot") and self.gameengine.mapfield.cansee(position, playerpos) and self.canact(actions):
+                    bestranged = self.getbestranged()
+                    if bestranged is not None and self.firetime == 0:
+                        vector = self.gameengine.mapfield.getrandomnearby(self.getposition())
+                        vector = (vector[0] - self.getposition()[0], vector[1])
+                        vector = (vector[0], vector[1] - self.getposition()[1])
+                        self.fire(vector, bestranged)
+                        actions += 1
+                        if self.getparam("firelimit") is not None:
+                            self.firetime = int(self.getparam("firelimit"))
 
                 # I have ranged capability and see the target
-                if self.getflag("ranged") and self.gameengine.mapfield.cansee(position, playerpos):
+                if self.getflag("ranged") and self.gameengine.mapfield.cansee(position, playerpos) and self.canact(actions):
                     bestranged = self.getbestranged()
-                    if bestranged is not None:
+                    if bestranged is not None and self.firetime == 0:
                         # if the player is near me and I have better attack than ranged weapon, then bash him
                         if pathfinder.isnear(playerpos, position) and int(bestranged.getparam("damage")) < int(self.getparam("attack")):
                             False
@@ -157,6 +171,10 @@ class Monster(thing.Thing):
                                             canshoot = False
                                     if canshoot:
                                         self.fire(direct, bestranged)
+                                        actions += 1
+                                        if self.getparam("firelimit") is not None:
+                                            self.firetime = int(self.getparam("firelimit"))
+
 
                 # if can move then move to player
                 if not self.getflag("nomove") and not self.getflag("ground") and self.canact(actions):
@@ -169,7 +187,7 @@ class Monster(thing.Thing):
                             goto = self.gameengine.mapfield.findpath(position, playerpos)
                             if goto is not None:
                                 self.action(goto)
-                            else: # wander randomly
+                            else:  # wander randomly
                                 self.action(self.gameengine.mapfield.getrandomnearby(position))
                         # if I can't see player, I will go to place where I've last seen target
                         elif self.lastseen is not None:
@@ -209,6 +227,9 @@ class Monster(thing.Thing):
 
                 actions += 1
         # manage spawners, applicable for player
+        if self.getparam("firelimit") is not None:
+            if self.firetime > 0:
+                self.firetime -= 1
         if self.getflag("spawner"):
             # spawn children if there are less than should be
             if len(self.children) < int(self.getparam("spawnlimit")):

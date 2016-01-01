@@ -48,6 +48,17 @@
   "damage": 1,
   "effect": "bubble"
   },
+"discharge": {
+  "id": "discharge",
+  "description": "",
+  "tile": "0,0",
+  "flags": ["weapon","nodrop"],
+  "score": 0,
+  "stackable": "false",
+  "range": 1,
+  "damage": 0,
+  "effect": "volt"
+  },
 "dart": {
   "id": "dart",
   "description": "small projectile",

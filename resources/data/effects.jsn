@@ -30,6 +30,15 @@
   "amount": "1",
   "ttl": 2
   },
+"gate": {
+  "id": "gate",
+  "description": "strange gate",
+  "tile": "3,0",
+  "effect": "lvlup",
+  "flags": ["eachturn", "delete"],
+  "eachturn": 100,
+  "ttl": 20
+  },
 "explosion": {
   "id": "explosion",
   "description": "large underwater explosion",
@@ -38,5 +47,14 @@
   "damage": "20",
   "flags": ["large"],
   "ttl": 2
+  },
+"volt": {
+  "id": "volt",
+  "description": "electric discharge",
+  "tile": "5,0",
+  "effect": "volt",
+  "damage": "1",
+  "flags": ["random", "electric"],
+  "ttl": 10
   }
 }

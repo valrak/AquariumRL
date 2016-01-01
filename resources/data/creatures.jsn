@@ -43,7 +43,7 @@
   "score": 20
   },
 "moray eel": {
-  "flags": ["ranged"],
+  "flags": ["ranged", "relectric"],
   "id": "moray eel",
   "type": "fish",
   "hp": "2",
@@ -67,6 +67,19 @@
   "level": 1,
   "limit": 2,
   "score": 50
+  },
+ "medusa": {
+  "id": "medusa",
+  "type": "medusa",
+  "hp": "1",
+  "tile": "7,0",
+  "attack": "0",
+  "speed": "1",
+  "level": 1,
+  "flags": ["randomshot", "relectric"],
+  "firelimit": 5,
+  "fire": "discharge",
+  "score": 20
   },
  "tritonspear": {
   "id": "tritonspear",

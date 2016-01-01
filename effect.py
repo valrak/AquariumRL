@@ -58,6 +58,10 @@ class Effect(thing.Thing):
             self.donotupdate = False
             self.ttl -= 1
             return False
+        if self.getflag("random") and self.ttl > 1:
+            randcoord = self.gameengine.mapfield.getrandomnearby(self.getposition())
+            if randcoord is not None:
+                self.setposition(randcoord)
         if self.getflag("disperse") and self.ttl > 1:
             dispcoord = self.gameengine.mapfield.getrandomnearby(self.getposition())
             if dispcoord is not None:
@@ -85,7 +89,8 @@ class Effect(thing.Thing):
         if self.getparam("damage") and self.ttl > 1:
             occupant = self.gameengine.mapfield.getoccupants(self.getposition())
             if occupant is not None:
-                occupant.lowerhealth(self.getparam("damage"))
+                if not (occupant.getflag("relectric") and self.getflag("electric")):
+                    occupant.lowerhealth(self.getparam("damage"))
         if self.getparam("effect") == "repair":
             occupant = self.gameengine.mapfield.getoccupants(self.getposition())
             if occupant is not None:
