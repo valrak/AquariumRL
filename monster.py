@@ -80,6 +80,10 @@ class Monster(thing.Thing):
     def rangedcombat(self, weapon, attacker):
         if int(weapon.getparam("damage") > 0):
             self.lastattacker = attacker
+        effects = self.gameengine.mapfield.geteffects(self.getposition())
+        for eff in effects:
+            if eff.getflag("novisibility"):
+                return False
         self.setparam("hp", int(self.getparam("hp")) - int(weapon.getparam("damage")))
 
     def getparam(self, name):
@@ -260,9 +264,9 @@ class Monster(thing.Thing):
             if not child.isalive:
                 self.child.home = None
         # increase score for the attacker
-        if self.lastattacker is not None and self.getparam("score") is not None:
+        if self.lastattacker is not None and self.getparam("score") is not None and not self.gameengine.noscore:
             self.lastattacker.score += int(self.getparam("score"))
-            #fixme: include score when killed with item (dynamite). Item should have lastused.
+            # fixme: include score when killed with item (dynamite). Item should have lastused.
             self.gameengine.gameevent.report(self.getname()+" killed by "+self.lastattacker.getname()+"!", None, None, None)
         else:
             self.gameengine.gameevent.report(self.getname()+" has been killed! ", None, None, None)

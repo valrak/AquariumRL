@@ -95,6 +95,15 @@ class Effect(thing.Thing):
             occupant = self.gameengine.mapfield.getoccupants(self.getposition())
             if occupant is not None:
                 occupant.raisehealth(int(self.getparam("amount")))
+        if self.getparam("effect") == "gate":
+            occupant = self.gameengine.mapfield.getoccupants(self.getposition())
+            if occupant is not None and occupant.player:
+                occupant.setparam("level", int(occupant.getparam("level")) + 1)
+                self.gameengine.noscore = False
+                self.gameengine.newmap()
+                # todo: make new map
+                # todo: remove gold and add score
+                # todo: choose lvl up reward
 
         self.ttl -= 1
 

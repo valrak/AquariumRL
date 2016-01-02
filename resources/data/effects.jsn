@@ -16,11 +16,11 @@
   },
 "smoke": {
   "id": "smoke",
-  "description": "smoke",
+  "description": "smoke renders ranged combat innefective",
   "tile": "1,0",
   "effect": "novisibility",
-  "flags": ["disperse"],
-  "ttl": 4
+  "flags": ["disperse", "novisibility"],
+  "ttl": 5
   },
 "repair": {
   "id": "repair",
@@ -34,9 +34,8 @@
   "id": "gate",
   "description": "strange gate",
   "tile": "3,0",
-  "effect": "lvlup",
+  "effect": "gate",
   "flags": ["eachturn", "delete"],
-  "eachturn": 100,
   "ttl": 20
   },
 "explosion": {

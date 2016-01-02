@@ -26,6 +26,16 @@ mapinfo = None
 effinfo = None
 iteminfo = None
 
+# todo: item/monster rarity
+# todo: level up - portal and upgrades
+# todo: melee weapons
+# todo: move and shoot traces graphics
+# todo: small damage number bubbles in map
+# todo: scoring and hiscore
+# todo: ui
+# todo: config file
+# todo: dynamite fuse setting
+
 class GameEngine(object):
     ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
                 'v', 'w', 'x', 'y', 'z']
@@ -38,6 +48,7 @@ class GameEngine(object):
     firingmode = False
     usemode = False
     hiscore = 0
+    noscore = False
     clock = pygame.time.Clock()
 
     def __init__(self):
@@ -58,7 +69,7 @@ class GameEngine(object):
         #arenamap = self.mapfield.generatelevel(None)
         arenamap = self.mapfield.terrain
         self.messagehandler = MessageHandler()
-        self.graphicshandler = GraphicsHandler(arenamap, self)
+        self.graphicshandler = GraphicsHandler(self)
 
         self.gameevent = EventHandler()
         self.gameevent.register(self.messagehandler)
@@ -234,7 +245,10 @@ class GameEngine(object):
                         self.passturn()
 
             time_passed = self.clock.tick(30)
-            self.graphicshandler.drawboard()
+            self.graphicshandler.drawboard(self.mapfield.terrain)
+
+    def newmap(self):
+        self.mapfield.replacemap()
 
     def resetgame(self):
         del self.mapfield
@@ -242,7 +256,7 @@ class GameEngine(object):
         arenamap = None
         self.mapfield = MapField(arenamap, self.mapinfo, self.moninfo, self.effinfo, self.iteinfo, self)
         self.mapfield.generatelevel(25, 15)
-        self.graphicshandler = GraphicsHandler(arenamap, self)
+        self.graphicshandler = GraphicsHandler(self)
 
         self.loop()
 
@@ -263,7 +277,12 @@ class GameEngine(object):
             ueffect.update()
         self.mapfield.cleanup()
         self.mapfield.generatemonster()
-        self.mapfield.generateitem()
+        if not self.noscore:
+            self.mapfield.generateitem()
+        # next level trigger
+        if self.turns % 100 == 0:
+            self.noscore = True
+            self.mapfield.generategate()
 
     # debug method
     def spawnmonsters(self):

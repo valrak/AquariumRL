@@ -224,7 +224,7 @@ class MapField(object):
     def isfree(self, coord):
         if coord is not None and coord[0] < self.maxx and coord[1] < self.maxy and coord[0] >= 0 and coord[1] >= 0:
             cell = self.getterrain(coord)
-            if (cell["passable"]) == "true" and self.getoccupants(coord) and self.geteffects(coord) is None:
+            if (cell["passable"]) == "true" and self.getoccupants(coord) is None and len(self.geteffects(coord)) == 0:
                 return True
             else:
                 return False
@@ -489,6 +489,17 @@ class MapField(object):
             self.addrandomsurfaceitem(playerlvl)
             self.genlast = 0
 
+    def generategate(self):
+        neweffect = effect.Effect(self.gameengine.effinfo["gate"], self.gameengine)
+        neweffect.setposition(self.getrandompassable())
+        self.gameengine.mapfield.effects.append(neweffect)
+
+    def gategenerated(self):
+        for eff in self.effects:
+            if eff.getid() == "gate":
+                return True
+        return False
+
     def getmonsteratlevel(self, level):
         lvlmonsters = []
         for mon in self.genmonsters:
@@ -515,3 +526,14 @@ class MapField(object):
                 found.append(effect)
         for fdel in found:
             self.effects.remove(fdel)
+
+    def replacemap(self):
+        player = self.getplayer()
+        del self.effects[:]
+        del self.items[:]
+        del self.monsters[:]
+        del self.terrain[:]
+        self.generatelevel(self.maxx, self.maxy)
+        player.setposition(self.getrandomfree())
+        self.monsters.append(player)
+

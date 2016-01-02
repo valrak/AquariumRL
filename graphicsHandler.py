@@ -17,7 +17,7 @@ class GraphicsHandler(object):
     gameengine = None
     size = None
 
-    def __init__(self, arenamap, gameengine):
+    def __init__(self, gameengine):
         self.gameengine = gameengine
         self.maptiles = pygame.image.load("resources/img/MapTiles.png")
         self.montiles = pygame.image.load("resources/img/CreatureTiles.png")
@@ -32,10 +32,6 @@ class GraphicsHandler(object):
         self.screen = self.finalscreen.copy()
         pygame.font.init()
 
-        # TODO: possibly put these to the set arena method
-        self.arenamap = arenamap
-        self.maplayer = self.maptileeng.getmapsurface(self.arenamap)
-
     def event(self, thing, name=None, newvalue=None, oldvalue=None):
         if thing == "error":
             self.newlogline(name)
@@ -46,9 +42,10 @@ class GraphicsHandler(object):
         if name is None and newvalue is None and oldvalue is None:
             self.newlogline(thing)
 
-    def drawboard(self):
+    def drawboard(self, arenamap):
         if self.gameengine.resetflag is True:
             return
+        self.maplayer = self.maptileeng.getmapsurface(arenamap)
         self.screen.fill(pygame.Color('grey50'))
         self.screen.blit(self.maplayer, (MAPPOSX, MAPPOSY))
 
@@ -77,7 +74,7 @@ class GraphicsHandler(object):
             text = self.font.render(line, 1, (120+logposadd, 120+logposadd, 120+logposadd))
             logbackgr.blit(text, (10, 0+logposadd))
             logposadd += 20
-        self.screen.blit(logbackgr, (10, 630))
+        self.screen.blit(logbackgr, (10, 530))
 
         # Status
         self.font = pygame.font.Font("./resources/fonts/pixelmix.ttf", 14)
