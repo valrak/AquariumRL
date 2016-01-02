@@ -36,7 +36,7 @@
   "tile": "3,0",
   "effect": "gate",
   "flags": ["eachturn", "delete"],
-  "ttl": 20
+  "ttl": 40
   },
 "explosion": {
   "id": "explosion",
@@ -63,5 +63,15 @@
   "effect": "None",
   "damage": "0",
   "ttl": 4
-  }
+  },
+"strength": {
+  "id": "strength",
+  "description": "",
+  "tile": "0,0",
+  "effect": "change",
+  "changeattributesname": ["attack"],
+  "changeattributesvalue": ["1"],
+  "damage": "0",
+  "ttl": 0
+}
 }

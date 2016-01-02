@@ -100,11 +100,19 @@ class Effect(thing.Thing):
             if occupant is not None and occupant.player:
                 occupant.setparam("level", int(occupant.getparam("level")) + 1)
                 self.gameengine.noscore = False
+                occupant.goldscore()
                 self.gameengine.newmap()
-                # todo: make new map
-                # todo: remove gold and add score
-                # todo: choose lvl up reward
-
+                self.gameengine.state = "upgrade"
+        if self.getparam("effect") == "change":
+            occupant = self.gameengine.mapfield.getoccupants(self.getposition())
+            if occupant is not None:
+                if self.getparam("changeattributesname") is not None and self.getparam("changeattributesvalue") is not None:
+                    i = 0
+                    values = self.getparam("changeattributesvalue")
+                    for attname in self.getparam("changeattributesname"):
+                        paramvalue = int(occupant.getparam(attname))
+                        occupant.setparam(attname, paramvalue + int(values[i]))
+                        i += 1
         self.ttl -= 1
 
     def getspawn(self):

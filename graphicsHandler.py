@@ -43,7 +43,7 @@ class GraphicsHandler(object):
             self.newlogline(thing)
 
     def drawboard(self, arenamap):
-        if self.gameengine.resetflag is True:
+        if self.gameengine.state == "reset":
             return
         self.maplayer = self.maptileeng.getmapsurface(arenamap)
         self.screen.fill(pygame.Color('grey50'))
@@ -109,7 +109,7 @@ class GraphicsHandler(object):
             self.screen.blit(self.eventstack[key], key)
 
         # Special modes
-        if self.gameengine.firingmode is True:
+        if self.gameengine.state == "fire":
             statusbackgr = pygame.Surface((100, 20))
             statusbackgr = statusbackgr.convert()
             text = self.font.render("Firing", 1, (pygame.Color("grey70")))

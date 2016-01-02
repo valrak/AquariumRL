@@ -3,11 +3,12 @@
   "id": "coin",
   "description": "small coin with a strange symbol",
   "tile": "1,0",
-  "flags": ["gravity"],
+  "flags": ["gravity", "remove"],
   "score": 100,
   "stackable": "true",
   "level": 1,
   "weight": 1
+  "rarity": 1
   },
 "harpoon": {
   "id": "harpoon",
@@ -36,6 +37,7 @@
   "fuseeffect": "explosion",
   "level": 3,
   "weight": 5
+  "rarity": 4
   },
 "thorn": {
   "id": "thorn",
@@ -70,6 +72,7 @@
   "damage": 1,
   "level": 1,
   "effect": "bubble"
+  "rarity": 2
   },
 "repairkit": {
   "id": "repairkit",
@@ -80,6 +83,7 @@
   "stackable": "true",
   "level": 2,
   "effect": "repair"
+  "rarity": 4
   },
 "ink": {
   "id": "ink",
@@ -91,5 +95,15 @@
   "range": 10,
   "damage": 0,
   "effect": "smoke"
+  },
+"strenght": {
+  "id": "strenght",
+  "description": "strenght crystal",
+  "tile": "5,0",
+  "flags": ["upgrade", "gravity", "usable"],
+  "score": 0,
+  "stackable": "false",
+  "damage": 0,
+  "effect": "strength"
   }
 }

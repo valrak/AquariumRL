@@ -272,7 +272,7 @@ class Monster(thing.Thing):
             self.gameengine.gameevent.report(self.getname()+" has been killed! ", None, None, None)
         # game reset
         if self.player:
-            self.gameengine.resetflag = True
+            self.gameengine.state = "reset"
 
     def removechild(self, child):
         self.children.remove(child)
@@ -387,6 +387,8 @@ class Monster(thing.Thing):
         return None
 
     def canact(self, currentmoves):
+        if self.getparam("hp") <= 0:
+            return False
         if currentmoves < int(self.getparam("speed")):
             return True
         return False
@@ -410,3 +412,9 @@ class Monster(thing.Thing):
                 bestdamage = bestitem.getparam("damage")
         return bestitem
 
+    # change coins and score items for score at the end of level
+    def goldscore(self):
+        for ite in self.inventory:
+            if ite.getflag("remove"):
+                self.score += int(ite.getparam("score"))
+                self.inventory.remove(ite)
