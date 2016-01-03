@@ -442,10 +442,24 @@ class MapField(object):
             if level >= int(item["level"]):
                 lvlitems.append(item)
         if len(lvlitems) > 0:
-            ritem = random.randint(0, len(lvlitems)-1)
-            gitem = Item(lvlitems[ritem], self.gameengine)
-            gitem.setposition(coord)
-            self.items.append(gitem)
+            # rarity
+            raritems = []
+            for item in lvlitems:
+                if item["rarity"]:
+                    rarity = random.randint(1, 10)
+                    if int(item["rarity"]) <= rarity:
+                        raritems.append(item)
+                else:
+                    raritems.append(item)
+
+            if len(raritems) >= 1:
+                if len(raritems) == 1:
+                    ritem = 0
+                else:
+                    ritem = random.randint(0, len(raritems)-1)
+                gitem = Item(raritems[ritem], self.gameengine)
+                gitem.setposition(coord)
+                self.items.append(gitem)
 
     def generatemonster(self):
         if self.gameengine.state == "reset":
@@ -505,8 +519,24 @@ class MapField(object):
         for mon in self.genmonsters:
             if level >= int(mon["level"]):
                 lvlmonsters.append(mon)
-        moni = random.randint(0, len(lvlmonsters)-1)
-        return lvlmonsters[moni]["id"]
+        if len(lvlmonsters) > 0:
+            # rarity
+            rarmons = []
+            for mon in lvlmonsters:
+                if mon["rarity"]:
+                    rarity = random.randint(1, 10)
+                    if int(mon["rarity"]) <= rarity:
+                        rarmons.append(mon)
+                else:
+                    rarmons.append(mon)
+
+            if len(rarmons) >= 1:
+                if len(rarmons) == 1:
+                    moni = 0
+                else:
+                    moni = random.randint(0, len(rarmons)-1)
+                return lvlmonsters[moni]["id"]
+        return None
 
     # after each turn, clean the mess
     def cleanup(self):

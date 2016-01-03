@@ -292,7 +292,7 @@ class GameEngine(object):
         if not self.noscore:
             self.mapfield.generateitem()
         # next level trigger
-        if self.turns % 10 == 0:
+        if self.turns % 200 == 0:
             self.noscore = True
             self.mapfield.generategate()
 

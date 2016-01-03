@@ -18,7 +18,7 @@
   "attack": "0",
   "speed": "1",
   "level": 1,
-  "score": 10
+  "score": 10,
   "rarity": 1
   },
 "octopus": {
@@ -32,7 +32,7 @@
   "fire": "ink",
   "firelimit": 4,
   "level": 3,
-  "score": 50
+  "score": 50,
   "rarity": 2
   },
 "crab": {
@@ -54,7 +54,7 @@
   "attack": "2",
   "speed": "2",
   "level": 2,
-  "score": 30
+  "score": 30,
   "rarity": 1
   },
 "shell": {
@@ -70,7 +70,7 @@
   "speed": "1",
   "level": 2,
   "limit": 2,
-  "score": 50
+  "score": 50,
   "rarity": 2
   },
  "medusa": {
@@ -84,7 +84,7 @@
   "flags": ["randomshot", "relectric"],
   "firelimit": 5,
   "fire": "discharge",
-  "score": 20
+  "score": 20,
   "rarity": 2
   },
  "tritonspear": {
@@ -96,7 +96,7 @@
   "speed": "1",
   "level": 4,
   "fire": "thorn",
-  "score": 100
+  "score": 100,
   "rarity": 4
   }
 }

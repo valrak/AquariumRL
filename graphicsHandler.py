@@ -43,6 +43,8 @@ class GraphicsHandler(object):
             self.newlogline(thing)
 
     def drawboard(self, arenamap):
+        if self.gameengine.mapfield.getplayer is None:
+            self.gameengine.state = "reset"
         if self.gameengine.state == "reset":
             return
         self.maplayer = self.maptileeng.getmapsurface(arenamap)
