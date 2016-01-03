@@ -27,6 +27,7 @@ mapinfo = None
 effinfo = None
 iteminfo = None
 
+# todo: look mode
 # todo: melee weapons ?
 # todo: pickup interface
 # todo: drop interface
@@ -39,6 +40,7 @@ iteminfo = None
 # todo: dynamite destroys blocks
 # todo: remove loop in loop in loop
 # todo: map generator - remove isolated caves
+# todo: fix repair ttl effect 1 - not displayed
 # todo: AI - when fired upon, go to the point where fire comes
 # todo: AI - recon in corals
 
@@ -184,7 +186,7 @@ class GameEngine(object):
                         # Commands
                         # look
                         if event.type == pg.KEYDOWN and (event.key == pg.K_l):
-                            self.cursorcoord = self.mapfield.getplayer().getcoord()
+                            self.cursorcoord = self.mapfield.getplayer().getposition()
                             self.state = "look"
                         # fire
                         if event.type == pg.KEYDOWN and event.key == pg.K_f:

@@ -23,10 +23,12 @@ class GraphicsHandler(object):
         self.montiles = pygame.image.load("resources/img/CreatureTiles.png")
         self.efftiles = pygame.image.load("resources/img/EffectTiles.png")
         self.itetiles = pygame.image.load("resources/img/ItemTiles.png")
+        self.uitiles = pygame.image.load("resources/img/UI.png")
         self.maptileeng = TileEngine(self.maptiles, gameengine.mapinfo, TILESIZE)
         self.montileeng = TileEngine(self.montiles, gameengine.moninfo, TILESIZE)
         self.efftileeng = TileEngine(self.efftiles, gameengine.effinfo, TILESIZE)
         self.itetileeng = TileEngine(self.itetiles, gameengine.iteinfo, TILESIZE)
+        self.uitileeng = TileEngine(self.uitiles, gameengine.iteinfo, TILESIZE)
         self.size = gameengine.SIZE
         self.finalscreen = pygame.display.set_mode(self.size, HWSURFACE | DOUBLEBUF | RESIZABLE)
         self.screen = self.finalscreen.copy()
@@ -117,6 +119,15 @@ class GraphicsHandler(object):
             text = self.font.render("Firing", 1, (pygame.Color("grey70")))
             statusbackgr.blit(text, (1, 1))
             self.screen.blit(statusbackgr, (830, 20))
+        if self.gameengine.state == "look":
+            statusbackgr = pygame.Surface((100, 20))
+            statusbackgr = statusbackgr.convert()
+            text = self.font.render("Looking", 1, (pygame.Color("grey70")))
+            statusbackgr.blit(text, (1, 1))
+            self.screen.blit(statusbackgr, (830, 20))
+            cursorimage = self.uitileeng.getcustomtile(0, 0, 32, 32)
+            self.screen.blit(cursorimage, (self.gameengine.cursorcoord[0]*TILESIZE+MAPPOSX,
+                                           self.gameengine.cursorcoord[1]*TILESIZE+MAPPOSY))
         self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
         pygame.display.flip()
 

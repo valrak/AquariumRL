@@ -23,6 +23,15 @@ class TileEngine(object):
         tile.set_colorkey(pygame.Color("black"))
         return tile
 
+    # get custom tile
+    def getcustomtile(self, posx, posy, sizex, sizey):
+        # create new surface
+        tile = pygame.Surface((sizex - posx, sizey - posy))
+        # paste to (0,0 top left corner)
+        tile.blit(self.tileSet, (0, 0), (posx, posy, sizex, sizey))
+        tile.set_colorkey(pygame.Color("black"))
+        return tile
+
     # get whole map
     def getmapsurface(self, mapfile):
         y = 0
