@@ -10,7 +10,8 @@ FREE = '1'
 STAIRS = '2'
 
 ''' random things generator constants '''
-GENERATOR_CHANSERISE = 20  # percentile of random chance rising after not generating anything
+GENERATOR_CHANCERISEITEM = 20  # percentile of random chance rising after not generating anything
+GENERATOR_CHANCERISEMONSTER = 20
 GENERATOR_TRESHOLD = 50
 GENERATOR_OODUP = 10  # out of depth chance to spawn higher level thing
 GENERATOR_OODDOWN = 30  # chance to spawn lower level thing
@@ -29,6 +30,7 @@ class MapField(object):
     maxx = 0
     maxy = -1
     genlast = 0 # number of turns for which was not generated anything new
+    genlastmonster = 0 # for monsters
 
     def __del__(self):
         del self.monsters[:]
@@ -445,7 +447,7 @@ class MapField(object):
             # rarity
             raritems = []
             for item in lvlitems:
-                if item["rarity"]:
+                if item.has_key("rarity") and item["rarity"]:
                     rarity = random.randint(1, 10)
                     if int(item["rarity"]) <= rarity:
                         raritems.append(item)
@@ -464,29 +466,29 @@ class MapField(object):
     def generatemonster(self):
         if self.gameengine.state == "reset":
             return
-        self.genlast += 1
-        chance = random.randint(0, GENERATOR_CHANSERISE * self.genlast)
+        self.genlastmonster += 1
+        chance = random.randint(0, GENERATOR_CHANCERISEMONSTER * self.genlastmonster)
         playerlvl = int(self.getplayer().getparam("level"))
         # generate random out of depth thing
         if chance > GENERATOR_TRESHOLD + GENERATOR_OODUP:
             self.addspawn(self.getmonsteratlevel(playerlvl+1))
-            self.genlast = 0
+            self.genlastmonster = 0
         # generate normal depth thing
         elif chance > GENERATOR_TRESHOLD:
             self.addspawn(self.getmonsteratlevel(playerlvl))
-            self.genlast = 0
+            self.genlastmonster = 0
         # generate lower depth thing
         elif chance > GENERATOR_TRESHOLD - GENERATOR_OODDOWN:
             if playerlvl != 1:
                 playerlvl -= 1
             self.addspawn(self.getmonsteratlevel(playerlvl))
-            self.genlast = 0
+            self.genlastmonster = 0
 
     def generateitem(self):
         if self.gameengine.state == "reset":
             return
         self.genlast += 1
-        chance = random.randint(0, GENERATOR_CHANSERISE * self.genlast)
+        chance = random.randint(0, GENERATOR_CHANCERISEITEM * self.genlast)
         playerlvl = int(self.getplayer().getparam("level"))
         # generate random out of depth thing
         if chance > GENERATOR_TRESHOLD + GENERATOR_OODUP:

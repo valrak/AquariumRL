@@ -28,7 +28,7 @@
   "tile": "4,0",
   "effect": "repair",
   "amount": "1",
-  "ttl": 2
+  "ttl": 1
   },
 "gate": {
   "id": "gate",

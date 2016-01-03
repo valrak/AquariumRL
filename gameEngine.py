@@ -11,6 +11,7 @@ from pygame.locals import *
 import pygame
 import sys
 import pygame.locals as pg
+from utils import *
 
 mapmaxx = 0
 mapmaxy = 0
@@ -26,14 +27,20 @@ mapinfo = None
 effinfo = None
 iteminfo = None
 
-# todo: item/monster rarity
 # todo: melee weapons ?
+# todo: pickup interface
+# todo: drop interface
 # todo: move and shoot traces graphics
 # todo: small damage number bubbles in map
 # todo: scoring and hiscore
 # todo: ui
 # todo: config file
 # todo: dynamite fuse setting
+# todo: dynamite destroys blocks
+# todo: remove loop in loop in loop
+# todo: map generator - remove isolated caves
+# todo: AI - when fired upon, go to the point where fire comes
+# todo: AI - recon in corals
 
 class GameEngine(object):
     ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
@@ -54,6 +61,7 @@ class GameEngine(object):
         #     csvread = csv.reader(csvfile, delimiter=';', quotechar='"')
         #     arenamap = list(csvread)
         arenamap = None
+        self.cursorcoord = (1, 1)
         # data load part
         # jsons
         self.moninfo = jsonInit.loadjson("resources/data/creatures.jsn")
@@ -111,6 +119,14 @@ class GameEngine(object):
                         self.state = "game"
                         self.resetgame()
                         break
+
+                    elif self.state == "look":
+                        coord = utils.getcoordsbyevent(event)
+                        if coord is not None:
+                            self.cursorcoord = (self.cursorcoord[0]+coord[0], self.cursorcoord[1]+coord[1])
+                        if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
+                            self.state = "game"
+                            break
                     elif self.state == "use":
                         # cancel
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
@@ -134,41 +150,11 @@ class GameEngine(object):
                             self.state = "game"
                             self.gameevent.report("Firing cancelled.", None, None, None)
                             break
-                        # Lines
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_UP or event.key == pg.K_KP8):
-                            player.fire((0, -1), player.rangedpreference)
+                        coord = utils.getcoordsbyevent(event)
+                        if coord is not None:
+                            player.fire(coord, player.rangedpreference)
                             self.passturn()
                             self.state = "game"
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_DOWN or event.key == pg.K_KP2):
-                            player.fire((0, 1), player.rangedpreference)
-                            self.passturn()
-                            self.state = "game"
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_LEFT or event.key == pg.K_KP4):
-                            player.fire((-1, 0), player.rangedpreference)
-                            self.passturn()
-                            self.state = "game"
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_RIGHT or event.key == pg.K_KP6):
-                            player.fire((1, 0), player.rangedpreference)
-                            self.passturn()
-                            self.state = "game"
-                        # Diagonals
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_PAGEUP or event.key == pg.K_KP9):
-                            player.fire((1, -1))
-                            self.passturn()
-                            self.state = "game"
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_HOME or event.key == pg.K_KP7):
-                            player.fire((-1, -1))
-                            self.passturn()
-                            self.state = "game"
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_END or event.key == pg.K_KP1):
-                            player.fire((-1, 1))
-                            self.passturn()
-                            self.state = "game"
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_PAGEDOWN or event.key == pg.K_KP3):
-                            player.fire((1, 1))
-                            self.passturn()
-                            self.state = "game"
-
                         if event.type == pg.KEYDOWN and (event.key == pg.K_i or event.key == pg.K_SPACE):
                             index = self.displayinventory()
                             if index is not None:
@@ -187,58 +173,37 @@ class GameEngine(object):
                     # Main mode
                     elif self.state == "game":
                         # Lines
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_UP or event.key == pg.K_KP8):
-                            coord = (player.x, player.y-1)
-                            player.action(coord)
-                            self.passturn()
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_DOWN or event.key == pg.K_KP2):
-                            coord = (player.x, player.y+1)
-                            player.action(coord)
-                            self.passturn()
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_LEFT or event.key == pg.K_KP4):
-                            coord = (player.x-1, player.y)
-                            player.action(coord)
-                            self.passturn()
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_RIGHT or event.key == pg.K_KP6):
-                            coord = (player.x+1, player.y)
-                            player.action(coord)
-                            self.passturn()
-
-                        # Diagonals
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_PAGEUP or event.key == pg.K_KP9):
-                            coord = (player.x+1, player.y-1)
-                            player.action(coord)
-                            self.passturn()
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_HOME or event.key == pg.K_KP7):
-                            coord = (player.x-1, player.y-1)
-                            player.action(coord)
-                            self.passturn()
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_END or event.key == pg.K_KP1):
-                            coord = (player.x-1, player.y+1)
-                            player.action(coord)
-                            self.passturn()
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_PAGEDOWN or event.key == pg.K_KP3):
-                            coord = (player.x+1, player.y+1)
+                        coord = utils.getcoordsbyevent(event)
+                        if coord is not None:
+                            coord = (player.x+coord[0], player.y+coord[1])
                             player.action(coord)
                             self.passturn()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_SPACE or event.key == pg.K_KP5):
                             self.passturn()
 
                         # Commands
+                        # look
+                        if event.type == pg.KEYDOWN and (event.key == pg.K_l):
+                            self.cursorcoord = self.mapfield.getplayer().getcoord()
+                            self.state = "look"
                         # fire
                         if event.type == pg.KEYDOWN and event.key == pg.K_f:
-                            if player.getbestranged() is None:
-                                self.gameevent.report("You have nothing to fire.", None, None, None)
-                                break
-                            else:
-                                if player.rangedpreference is None:
-                                    self.gameevent.report("Firing ... "+player.getbestranged().getname() +
+                            if len(player.inventory) == 0:
+                                self.gameevent.report("You have nothing to fire", None, None, None)
+                                self.state = "game"
+                            if player.rangedpreference is None:
+                                if player.getbestranged() is None:
+                                    player.rangedpreference = player.inventory[0]
+                                    self.gameevent.report("Firing ... " + player.rangedpreference.getname() +
                                                           " Press i or space to change.", None, None, None)
                                 else:
-                                    self.gameevent.report("Firing ... "+player.rangedpreference.getname() +
+                                    self.gameevent.report("Firing ... "+player.getbestranged().getname() +
                                                           " Press i or space to change.", None, None, None)
-                                self.state = "fire"
-                                break
+                            else:
+                                self.gameevent.report("Firing ... "+player.rangedpreference.getname() +
+                                                      " Press i or space to change.", None, None, None)
+                            self.state = "fire"
+                            break
                         # use
                         if event.type == pg.KEYDOWN and event.key == pg.K_u:
                             self.state = "use"
@@ -259,8 +224,6 @@ class GameEngine(object):
 
     def resetgame(self):
         self.turns = 0
-        self.firingmode = False
-        self.usemode = False
         self.noscore = False
 
         del self.mapfield
@@ -316,7 +279,11 @@ class GameEngine(object):
             if params.has_key("flags"):
                 for flag in params["flags"]:
                     if flag == "upgrade":
-                        items.append(Item(self.iteinfo[ite], self))
+                        if params.has_key("upgradelevel"):
+                            if int(params["upgradelevel"]) <= int(self.mapfield.getplayer().getparam("upgradelevel")):
+                                items.append(Item(self.iteinfo[ite], self))
+                        else:
+                            items.append(Item(self.iteinfo[ite], self))
         if len(items) == 0:
             return None
         self.graphicshandler.displayitemlist(items)
