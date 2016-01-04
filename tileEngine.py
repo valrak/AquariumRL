@@ -26,7 +26,7 @@ class TileEngine(object):
     # get custom tile
     def getcustomtile(self, posx, posy, sizex, sizey):
         # create new surface
-        tile = pygame.Surface((sizex - posx, sizey - posy))
+        tile = pygame.Surface((sizex, sizey))
         # paste to (0,0 top left corner)
         tile.blit(self.tileSet, (0, 0), (posx, posy, sizex, sizey))
         tile.set_colorkey(pygame.Color("black"))

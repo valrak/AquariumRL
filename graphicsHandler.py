@@ -128,6 +128,9 @@ class GraphicsHandler(object):
             cursorimage = self.uitileeng.getcustomtile(0, 0, 32, 32)
             self.screen.blit(cursorimage, (self.gameengine.cursorcoord[0]*TILESIZE+MAPPOSX,
                                            self.gameengine.cursorcoord[1]*TILESIZE+MAPPOSY))
+            infotext = self.infoview(self.gameengine.cursorcoord)
+            if infotext is not None:
+                self.drawwindow(infotext, self.gameengine.cursorcoord)
         self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
         pygame.display.flip()
 
@@ -174,10 +177,73 @@ class GraphicsHandler(object):
         self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
         pygame.display.flip()
 
+    def infoview(self, coord):
+        monster = self.gameengine.mapfield.getoccupants(coord)
+        if monster is None:
+            return None
+        surface = pygame.Surface((1, 1), pygame.SRCALPHA)
+        ystep = 20
+        if monster is not None:
+            name = self.font.render(monster.getname(), 1, (pygame.Color("red")))
+            damagetile = self.uitileeng.getcustomtile(0, 32, 16, 16)
+            healthtile = self.uitileeng.getcustomtile(16, 32, 16, 16)
+            arrowtile = self.uitileeng.getcustomtile(0, 32+16, 16, 16)
+            attackface = self.font.render(monster.getparam("attack"), 1, (pygame.Color("grey70")))
+            tempsurface = self.glueleft(damagetile, attackface, 2)
+            healthface = self.font.render(str(monster.getparam("hp")), 1, (pygame.Color("grey70")))
+            healthface = self.glueleft(healthtile, healthface, 2)
+            tempsurface = self.glueleft(healthface, tempsurface, 10)
+            if monster.getbestranged() is not None:
+                rangedsurface = self.font.render(str(monster.getbestranged().getparam("damage")), 1, (pygame.Color("grey70")))
+                rangedsurface = self.glueleft(arrowtile, rangedsurface, 2)
+                tempsurface = self.glueleft(tempsurface, rangedsurface, 10)
+            surface = self.gluebelow(name, tempsurface, 2)
+
+        return surface
+
+    def gluebelow(self, surface1, surface2, step=0):
+        surface1size = surface1.get_size()
+        surface2size = surface2.get_size()
+        surfacesize = (surface1size[0] + surface2size[0],
+                       surface1size[1] + surface2size[1] + step)
+        surface = pygame.Surface(surfacesize, pygame.SRCALPHA)
+        surface.blit(surface1, (0, 0))
+        surface.blit(surface2, (0, surface1size[1] + step))
+        return surface
+
+    def glueleft(self, surface1, surface2, step=0):
+        surface1size = surface1.get_size()
+        surface2size = surface2.get_size()
+        surfacesize = (surface1size[0] + surface2size[0] + step,
+                       surface2size[1])
+        surface = pygame.Surface(surfacesize, pygame.SRCALPHA)
+        surface.blit(surface1, (0, 0))
+        surface.blit(surface2, (surface1size[0] + step, 0))
+        return surface
     # window changed its size
     def resize(self, newsize):
         self.finalscreen = pygame.display.set_mode(newsize, HWSURFACE | DOUBLEBUF | RESIZABLE)
         self.size = newsize
+
+    def drawwindow(self, drawing, coord):
+        step = 50
+        size = drawing.get_size()
+        size = (size[0] + 6, size[1] + 6)
+        x = coord[0] * TILESIZE
+        y = coord[1] * TILESIZE
+        if size[0] + x > self.size[0]:
+            x = x - size[0] - step
+        else:
+            x += step
+        if size[1] + y > self.size[1]:
+            y = y - size[1] - step
+        else:
+            y += step
+        coord = (x, y)
+        backgr = pygame.Surface((size[0], size[1]))
+        backgr = backgr.convert()
+        backgr.blit(drawing, (3, 3))
+        self.screen.blit(backgr, coord)
 
 # FIXME: return coordinates to match map position to align to the grid """
 c = lambda coords: (coords[0] + MAPPOSX, coords[1] + MAPPOSX)
