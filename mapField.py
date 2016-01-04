@@ -554,7 +554,7 @@ class MapField(object):
         # remove effects with overdo ttl
         found = []
         for effect in self.effects:
-            if effect.ttl <= 0:
+            if effect.ttl is not None and effect.ttl <= 0:
                 found.append(effect)
         for fdel in found:
             self.effects.remove(fdel)

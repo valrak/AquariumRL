@@ -86,6 +86,8 @@ class GraphicsHandler(object):
         statusbackgr = statusbackgr.convert()
         statusbackgr.fill(pygame.Color("black"))
         statusadd = 0
+        if self.gameengine.mapfield.getplayer() is None:
+            return
         params = self.gameengine.mapfield.getplayer().parameters
         for param in params:
             text = self.font.render(param+" "+str(params[param]), 1, (pygame.Color("grey70")))

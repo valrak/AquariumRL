@@ -40,9 +40,9 @@ iteminfo = None
 # todo: dynamite destroys blocks
 # todo: remove loop in loop in loop
 # todo: map generator - remove isolated caves
-# todo: fix repair ttl effect 1 - not displayed
 # todo: AI - when fired upon, go to the point where fire comes
 # todo: AI - recon in corals
+
 
 class GameEngine(object):
     ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
@@ -56,6 +56,7 @@ class GameEngine(object):
     state = "game"
     hiscore = 0
     noscore = False
+    itemsgenerated = 0
     clock = pygame.time.Clock()
 
     def __init__(self):
@@ -70,11 +71,10 @@ class GameEngine(object):
         self.mapinfo = jsonInit.loadjson("resources/data/map.jsn")
         self.effinfo = jsonInit.loadjson("resources/data/effects.jsn")
         self.iteinfo = jsonInit.loadjson("resources/data/items.jsn")
-        #arenamap = generatelevel(25, 15)
+
         self.mapfield = MapField(arenamap, self.mapinfo, self.moninfo, self.effinfo, self.iteinfo, self)
         self.mapfield.generatelevel(25, 15)
-        #arenamap = self.mapfield.generatelevel(None)
-        arenamap = self.mapfield.terrain
+
         self.messagehandler = MessageHandler()
         self.graphicshandler = GraphicsHandler(self)
 
@@ -226,6 +226,7 @@ class GameEngine(object):
 
     def resetgame(self):
         self.turns = 0
+        self.itemsgenerated = 0
         self.noscore = False
 
         del self.mapfield
@@ -254,12 +255,17 @@ class GameEngine(object):
             ueffect.update()
         self.mapfield.cleanup()
         self.mapfield.generatemonster()
-        if not self.noscore:
-            self.mapfield.generateitem()
-        # next level trigger
-        if self.turns % 200 == 0:
-            self.noscore = True
-            self.mapfield.generategate()
+        if self.mapfield.getplayer() is not None:
+            if self.mapfield.getplayer().killcount > self.itemsgenerated:
+                self.mapfield.generateitem()
+                self.itemsgenerated += 1
+            # endlevel - no score for kills but more monsters
+            if self.noscore is True:
+                self.mapfield.generatemonster()
+            # next level trigger
+            if self.mapfield.getplayer().killcount > 20 and self.noscore is not True:
+                self.noscore = True
+                self.mapfield.generategate()
 
     # debug method
     def spawnmonsters(self):

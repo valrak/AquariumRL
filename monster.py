@@ -21,6 +21,7 @@ class Monster(thing.Thing):
     direction = None
     inventory = None
     lastattacker = None
+    killcount = 0
     maxhp = 0
     score = 0
 
@@ -268,6 +269,8 @@ class Monster(thing.Thing):
             self.lastattacker.score += int(self.getparam("score"))
             # fixme: include score when killed with item (dynamite). Item should have lastused.
             self.gameengine.gameevent.report(self.getname()+" killed by "+self.lastattacker.getname()+"!", None, None, None)
+
+            self.lastattacker.killcount += 1
         else:
             self.gameengine.gameevent.report(self.getname()+" has been killed! ", None, None, None)
         # game reset

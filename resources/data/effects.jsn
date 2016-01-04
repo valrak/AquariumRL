@@ -28,7 +28,7 @@
   "tile": "4,0",
   "effect": "repair",
   "amount": "1",
-  "ttl": 1
+  "ttl": 2
   },
 "gate": {
   "id": "gate",
@@ -36,7 +36,7 @@
   "tile": "3,0",
   "effect": "gate",
   "flags": ["eachturn", "delete"],
-  "ttl": 40
+  "ttl": -1
   },
 "explosion": {
   "id": "explosion",
