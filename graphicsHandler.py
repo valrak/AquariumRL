@@ -181,15 +181,20 @@ class GraphicsHandler(object):
 
     def infoview(self, coord):
         monster = self.gameengine.mapfield.getoccupants(coord)
-        if monster is None:
+        items = self.gameengine.mapfield.getitems(coord)
+        effects = self.gameengine.mapfield.geteffects(coord)
+        damagetile = self.uitileeng.getcustomtile(0, 32, 16, 16)
+        weighttile = self.uitileeng.getcustomtile(0, 64, 16, 16)
+        timetile = self.uitileeng.getcustomtile(16, 32+16, 16, 16)
+        healthtile = self.uitileeng.getcustomtile(16, 32, 16, 16)
+        arrowtile = self.uitileeng.getcustomtile(0, 32+16, 16, 16)
+        if monster is None and len(items) == 0 and len(effects) == 0:
             return None
         surface = pygame.Surface((1, 1), pygame.SRCALPHA)
-        ystep = 20
+        step = 0
         if monster is not None:
+            step = 8
             name = self.font.render(monster.getname(), 1, (pygame.Color("red")))
-            damagetile = self.uitileeng.getcustomtile(0, 32, 16, 16)
-            healthtile = self.uitileeng.getcustomtile(16, 32, 16, 16)
-            arrowtile = self.uitileeng.getcustomtile(0, 32+16, 16, 16)
             attackface = self.font.render(monster.getparam("attack"), 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(damagetile, attackface, 2)
             healthface = self.font.render(str(monster.getparam("hp")), 1, (pygame.Color("grey70")))
@@ -199,14 +204,45 @@ class GraphicsHandler(object):
                 rangedsurface = self.font.render(str(monster.getbestranged().getparam("damage")), 1, (pygame.Color("grey70")))
                 rangedsurface = self.glueleft(arrowtile, rangedsurface, 2)
                 tempsurface = self.glueleft(tempsurface, rangedsurface, 10)
-            surface = self.gluebelow(name, tempsurface, 2)
-
+            surface = self.gluebelow(name, tempsurface, 4)
+        for item in items:
+            name = self.font.render(item.getname(), 1, (pygame.Color("blue")))
+            belowname = pygame.Surface((1, 1), pygame.SRCALPHA)
+            if item.getparam("damage") is not None:
+                damageface = self.font.render(str(item.getparam("damage")), 1, (pygame.Color("grey70")))
+                tempsurface = self.glueleft(damagetile, damageface, 2)
+                belowname = self.glueleft(belowname, tempsurface)
+            if item.getparam("weight") is not None:
+                weightface = self.font.render(str(item.getparam("weight")), 1, (pygame.Color("grey70")))
+                tempsurface = self.glueleft(weighttile, weightface, 2)
+                belowname = self.glueleft(belowname, tempsurface)
+            tempsurface = self.gluebelow(name, belowname, 2)
+            surface = self.gluebelow(surface, tempsurface, step)
+            step = 8
+        for effect in effects:
+            name = self.font.render(effect.getname(), 1, (pygame.Color("green")))
+            belowname = pygame.Surface((1, 1), pygame.SRCALPHA)
+            if effect.getparam("damage") is not None:
+                damageface = self.font.render(str(effect.getparam("damage")), 1, (pygame.Color("grey70")))
+                tempsurface = self.glueleft(damagetile, damageface, 2)
+                belowname = self.glueleft(belowname, tempsurface)
+            if effect.ttl is not None:
+                ttl = effect.ttl
+                timeface = self.font.render(str(ttl), 1, (pygame.Color("grey70")))
+                tempsurface = self.glueleft(timetile, timeface, 2)
+                belowname = self.glueleft(belowname, tempsurface)
+            tempsurface = self.gluebelow(name, belowname, 2)
+            surface = self.gluebelow(surface, tempsurface, step)
         return surface
 
     def gluebelow(self, surface1, surface2, step=0):
         surface1size = surface1.get_size()
         surface2size = surface2.get_size()
-        surfacesize = (surface1size[0] + surface2size[0],
+        if surface1size[0] > surface2size[0]:
+            xsurfacesize = surface1size[0]
+        else:
+            xsurfacesize = surface2size[0]
+        surfacesize = (xsurfacesize,
                        surface1size[1] + surface2size[1] + step)
         surface = pygame.Surface(surfacesize, pygame.SRCALPHA)
         surface.blit(surface1, (0, 0))
