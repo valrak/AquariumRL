@@ -83,7 +83,8 @@
   "stackable": "true",
   "level": 2,
   "effect": "repair",
-  "rarity": 4
+  "rarity": 4,
+  "weight": 5
   },
 "ink": {
   "id": "ink",
@@ -100,7 +101,7 @@
   "id": "strenght",
   "description": "strenght crystal",
   "tile": "5,0",
-  "flags": ["nodrop", "upgrade", "gravity", "usable"],
+  "flags": ["upgrade", "gravity", "usable"],
   "upgradelevel": 1,
   "score": 0,
   "stackable": "false",

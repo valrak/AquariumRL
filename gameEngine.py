@@ -43,6 +43,10 @@ iteminfo = None
 # todo: AI - recon in corals
 # todo: optimize: redraw only when something changed
 
+# fixme: when firing harpoon after firing pearl  File "/home/jaroslav/PyCharm Projects/Arena/gameEngine.py", line 305, in displayinventory
+#    items = self.mapfield.getplayer().getinventory(requiredflag)
+#AttributeError: 'NoneType' object has no attribute 'getinventory'
+
 class GameEngine(object):
     ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
                 'v', 'w', 'x', 'y', 'z']
@@ -155,7 +159,8 @@ class GameEngine(object):
                         if coord is not None:
                             player.fire(coord, player.rangedpreference)
                             self.passturn()
-                            self.state = "game"
+                            if self.state != "reset":
+                                self.state = "game"
                         if event.type == pg.KEYDOWN and (event.key == pg.K_i or event.key == pg.K_SPACE):
                             index = self.displayinventory()
                             if index is not None:
@@ -192,7 +197,7 @@ class GameEngine(object):
                             if len(player.inventory) == 0:
                                 self.gameevent.report("You have nothing to fire", None, None, None)
                                 self.state = "game"
-                            if player.rangedpreference is None:
+                            elif player.rangedpreference is None:
                                 if player.getbestranged() is None:
                                     player.rangedpreference = player.inventory[0]
                                     self.gameevent.report("Firing ... " + player.rangedpreference.getname() +
@@ -287,7 +292,7 @@ class GameEngine(object):
                 for flag in params["flags"]:
                     if flag == "upgrade":
                         if params.has_key("upgradelevel"):
-                            if int(params["upgradelevel"]) <= int(self.mapfield.getplayer().getparam("upgradelevel")):
+                            if int(params["upgradelevel"]) <= int(self.mapfield.getplayer().getparam("level")):
                                 items.append(Item(self.iteinfo[ite], self))
                         else:
                             items.append(Item(self.iteinfo[ite], self))

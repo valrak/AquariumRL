@@ -179,6 +179,28 @@ class GraphicsHandler(object):
         self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
         pygame.display.flip()
 
+    def pickupview(self, coord):
+        items = self.gameengine.mapfield.getitems(coord)
+        stringlist = []
+        # weighttile = self.uitileeng.getcustomtile(0, 64, 16, 16)
+        # surface = pygame.Surface((1, 1), pygame.SRCALPHA)
+        i = 0
+        for item in items:
+            if i >= len(self.gameengine.ALPHABET):
+                break
+            if item.isstackable():
+                stringlist.append(self.gameengine.ALPHABET[i]+") "+item.getname()+" (x"+str(item.stack)+")")
+            else:
+                stringlist.append(self.gameengine.ALPHABET[i]+") "+item.getname())
+            i += 1
+
+            # itemsurface = self.font.render(item.getname(), 1, (pygame.Color("blue")))
+            # if item.getparam("weight") is not None:
+            #     weightface = self.font.render(str(item.getparam("weight")), 1, (pygame.Color("grey70")))
+            #     itemsurface = self.glueleft(surface, weightface, 4)
+            # surface = self.gluebelow(surface, itemsurface, 2)
+        return stringlist
+
     def infoview(self, coord):
         monster = self.gameengine.mapfield.getoccupants(coord)
         items = self.gameengine.mapfield.getitems(coord)
@@ -195,7 +217,7 @@ class GraphicsHandler(object):
         if monster is not None:
             step = 8
             name = self.font.render(monster.getname(), 1, (pygame.Color("red")))
-            attackface = self.font.render(monster.getparam("attack"), 1, (pygame.Color("grey70")))
+            attackface = self.font.render(str(monster.getparam("attack")), 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(damagetile, attackface, 2)
             healthface = self.font.render(str(monster.getparam("hp")), 1, (pygame.Color("grey70")))
             healthface = self.glueleft(healthtile, healthface, 2)

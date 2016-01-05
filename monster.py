@@ -129,8 +129,9 @@ class Monster(thing.Thing):
             actions = 0
             while self.canact(actions):
                 # I like to collect various things, if there are any under me, take them!
-                if self.gameengine.mapfield.getplayer() is not None:
-                    playerpos = self.gameengine.mapfield.getplayer().getposition()
+                if self.gameengine.mapfield.getplayer() is None:
+                    return
+                playerpos = self.gameengine.mapfield.getplayer().getposition()
                 position = self.getposition()
                 if self.getflag("collector"):
                     # if I am near home, I'll put there my items

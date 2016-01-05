@@ -61,7 +61,6 @@
   "description": "patch of blood",
   "tile": "6,0",
   "effect": "None",
-  "damage": "0",
   "ttl": 4
   },
 "strength": {
@@ -71,7 +70,6 @@
   "effect": "change",
   "changeattributesname": ["attack"],
   "changeattributesvalue": ["1"],
-  "damage": "0",
-  "ttl": 0
+  "ttl": 2
 }
 }

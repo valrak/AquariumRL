@@ -106,6 +106,8 @@ class Effect(thing.Thing):
                     self.gameengine.noscore = False
                     occupant.goldscore()
                     self.gameengine.newmap()
+                    self.gameengine.itemsgenerated = 0
+                    self.gameengine.mapfield.getplayer().killcount = 0
                     self.gameengine.state = "upgrade"
             if self.getparam("effect") == "change":
                 occupant = self.gameengine.mapfield.getoccupants(self.getposition())
