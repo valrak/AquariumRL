@@ -145,17 +145,20 @@ class GraphicsHandler(object):
         self.loglines.append(logline)
 
     def displayitemlist(self, itemlist):
-        stringlist = []
+        allitemsface = pygame.Surface((1, 1), pygame.SRCALPHA)
         i = 0
         for item in itemlist:
             if i >= len(self.gameengine.ALPHABET):
                 break
             if item.isstackable():
-                stringlist.append(self.gameengine.ALPHABET[i]+") "+item.getname()+" (x"+str(item.stack)+")")
+                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i], " (x"+str(item.stack)+")")
             else:
-                stringlist.append(self.gameengine.ALPHABET[i]+") "+item.getname())
+                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i])
             i += 1
-        self.displaystringlist(stringlist)
+            allitemsface = self.gluebelow(allitemsface, itemface)
+        self.drawwindow(allitemsface, (1, 1))
+        self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
+        pygame.display.flip()
 
     def displaystringlist(self, stringlist):
         maxy = len(stringlist) * 30
@@ -180,6 +183,7 @@ class GraphicsHandler(object):
         pygame.display.flip()
 
     def pickupview(self, coord):
+        #todo
         items = self.gameengine.mapfield.getitems(coord)
         stringlist = []
         # weighttile = self.uitileeng.getcustomtile(0, 64, 16, 16)
@@ -201,12 +205,30 @@ class GraphicsHandler(object):
             # surface = self.gluebelow(surface, itemsurface, 2)
         return stringlist
 
+    def itemdisplay(self, item, letter=None, stack=None):
+        damagetile = self.uitileeng.getcustomtile(0, 32, 16, 16)
+        weighttile = self.uitileeng.getcustomtile(0, 64, 16, 16)
+        name = self.font.render(item.getname(), 1, (pygame.Color("lightblue")))
+        belowname = pygame.Surface((1, 1), pygame.SRCALPHA)
+        if item.getparam("damage") is not None:
+            damageface = self.font.render(str(item.getparam("damage")), 1, (pygame.Color("grey70")))
+            tempsurface = self.glueleft(damagetile, damageface, 2)
+            belowname = self.glueleft(belowname, tempsurface)
+        if item.getparam("weight") is not None:
+            weightface = self.font.render(str(item.getparam("weight")), 1, (pygame.Color("grey70")))
+            tempsurface = self.glueleft(weighttile, weightface, 2)
+            belowname = self.glueleft(belowname, tempsurface)
+        tempsurface = self.gluebelow(name, belowname, 2)
+        if letter is not None:
+            letterface = self.font.render(letter+") ", 1, (pygame.Color("grey70")))
+            tempsurface = self.glueleft(letterface, tempsurface)
+        return tempsurface
+
     def infoview(self, coord):
         monster = self.gameengine.mapfield.getoccupants(coord)
         items = self.gameengine.mapfield.getitems(coord)
         effects = self.gameengine.mapfield.geteffects(coord)
         damagetile = self.uitileeng.getcustomtile(0, 32, 16, 16)
-        weighttile = self.uitileeng.getcustomtile(0, 64, 16, 16)
         timetile = self.uitileeng.getcustomtile(16, 32+16, 16, 16)
         healthtile = self.uitileeng.getcustomtile(16, 32, 16, 16)
         arrowtile = self.uitileeng.getcustomtile(0, 32+16, 16, 16)
@@ -228,17 +250,7 @@ class GraphicsHandler(object):
                 tempsurface = self.glueleft(tempsurface, rangedsurface, 10)
             surface = self.gluebelow(name, tempsurface, 4)
         for item in items:
-            name = self.font.render(item.getname(), 1, (pygame.Color("blue")))
-            belowname = pygame.Surface((1, 1), pygame.SRCALPHA)
-            if item.getparam("damage") is not None:
-                damageface = self.font.render(str(item.getparam("damage")), 1, (pygame.Color("grey70")))
-                tempsurface = self.glueleft(damagetile, damageface, 2)
-                belowname = self.glueleft(belowname, tempsurface)
-            if item.getparam("weight") is not None:
-                weightface = self.font.render(str(item.getparam("weight")), 1, (pygame.Color("grey70")))
-                tempsurface = self.glueleft(weighttile, weightface, 2)
-                belowname = self.glueleft(belowname, tempsurface)
-            tempsurface = self.gluebelow(name, belowname, 2)
+            tempsurface = self.itemdisplay(item)
             surface = self.gluebelow(surface, tempsurface, step)
             step = 8
         for effect in effects:

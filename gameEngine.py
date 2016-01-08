@@ -33,7 +33,7 @@ iteminfo = None
 # todo: move and shoot traces graphics
 # todo: small damage number bubbles in map
 # todo: scoring and hiscore
-# todo: ui
+# todo: ui - one liner and diver clock
 # todo: config file
 # todo: dynamite fuse setting
 # todo: dynamite destroys blocks
@@ -132,6 +132,15 @@ class GameEngine(object):
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
                             break
+                    elif self.state == "inventory":
+                        citem = self.displayinventory()
+                        if citem is not None:
+                            None
+                        else:
+                            self.state = "game"
+                        if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
+                            self.state = "game"
+                            break
                     elif self.state == "use":
                         # cancel
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
@@ -170,11 +179,11 @@ class GameEngine(object):
                                                           " Press i or space to change.", None, None, None)
                     # Upgrade mode toggles
                     elif self.state == "upgrade":
-                        item = self.displayupgrades()
+                        citem = self.displayupgrades()
                         self.state = "game"
-                        if item is not None:
-                            item.setposition(self.mapfield.getrandompassable())
-                            self.mapfield.items.append(item)
+                        if citem is not None:
+                            citem.setposition(self.mapfield.getrandompassable())
+                            self.mapfield.items.append(citem)
 
                     # Main mode
                     elif self.state == "game":
@@ -192,6 +201,9 @@ class GameEngine(object):
                         if event.type == pg.KEYDOWN and (event.key == pg.K_l):
                             self.cursorcoord = self.mapfield.getplayer().getposition()
                             self.state = "look"
+                        # inventory
+                        if event.type == pg.KEYDOWN and (event.key == pg.K_i):
+                            self.state = "inventory"
                         # fire
                         if event.type == pg.KEYDOWN and event.key == pg.K_f:
                             if len(player.inventory) == 0:
