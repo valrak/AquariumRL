@@ -113,12 +113,14 @@ class GameEngine(object):
 
     def loop(self):
         player = self.initgame()
+        self.draw()
         while True:
             for event in pygame.event.get():
                 if event.type == pg.QUIT:
                     self.endgame()
                 elif event.type == VIDEORESIZE:
                     self.graphicshandler.resize(event.dict['size'])
+                    self.draw()
                 else:
                     if self.state == "reset":
                         self.state = "game"
@@ -129,8 +131,10 @@ class GameEngine(object):
                         coord = utils.getcoordsbyevent(event)
                         if coord is not None:
                             self.cursorcoord = (self.cursorcoord[0]+coord[0], self.cursorcoord[1]+coord[1])
+                            self.draw()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
+                            self.draw()
                             break
                     elif self.state == "inventory":
                         citem = self.displayinventory()
@@ -138,18 +142,22 @@ class GameEngine(object):
                             None
                         else:
                             self.state = "game"
+                            self.draw()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
+                            self.draw()
                             break
                     elif self.state == "use":
                         # cancel
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
                             self.gameevent.report("Item use cancelled.", None, None, None)
+                            self.draw()
                             break
                         index = self.displayinventory("usable")
                         if index is None:
                             self.gameevent.report("You have nothing usable.", None, None, None)
+                            self.draw()
                         self.state = "game"
                         if index is not None:
                             if len(player.getinventory("usable"))-1 >= index:
@@ -163,6 +171,7 @@ class GameEngine(object):
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
                             self.gameevent.report("Firing cancelled.", None, None, None)
+                            self.draw()
                             break
                         coord = utils.getcoordsbyevent(event)
                         if coord is not None:
@@ -170,6 +179,7 @@ class GameEngine(object):
                             self.passturn()
                             if self.state != "reset":
                                 self.state = "game"
+                                self.draw()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_i or event.key == pg.K_SPACE):
                             index = self.displayinventory()
                             if index is not None:
@@ -177,16 +187,21 @@ class GameEngine(object):
                                     player.rangedpreference = player.inventory[index]
                                     self.gameevent.report("Firing ... " + player.rangedpreference.getname() +
                                                           " Press i or space to change.", None, None, None)
+                                    self.draw()
                     # Upgrade mode toggles
                     elif self.state == "upgrade":
                         citem = self.displayupgrades()
                         self.state = "game"
+                        self.draw()
                         if citem is not None:
                             citem.setposition(self.mapfield.getrandompassable())
                             self.mapfield.items.append(citem)
+                            self.draw()
 
                     # Main mode
                     elif self.state == "game":
+                        if event.type == pg.KEYDOWN:
+                            self.draw()
                         # Lines
                         coord = utils.getcoordsbyevent(event)
                         if coord is not None:
@@ -220,6 +235,7 @@ class GameEngine(object):
                             else:
                                 self.gameevent.report("Firing ... "+player.rangedpreference.getname() +
                                                       " Press i or space to change.", None, None, None)
+                            self.draw()
                             self.state = "fire"
                             break
                         # use
@@ -235,7 +251,6 @@ class GameEngine(object):
                         if event.type == pg.KEYDOWN and event.key == pg.K_z:
                             self.state = "upgrade"
             time_passed = self.clock.tick(30)
-            self.graphicshandler.drawboard(self.mapfield.terrain)
 
     def newmap(self):
         self.mapfield.replacemap()
@@ -253,6 +268,9 @@ class GameEngine(object):
         self.graphicshandler = GraphicsHandler(self)
 
         self.loop()
+
+    def draw(self):
+        self.graphicshandler.drawboard(self.mapfield.terrain)
 
     def endgame(self):
         pygame.quit()
@@ -282,6 +300,7 @@ class GameEngine(object):
             if self.mapfield.getplayer().killcount > 20 and self.noscore is not True:
                 self.noscore = True
                 self.mapfield.generategate()
+        self.draw()
 
     # debug method
     def spawnmonsters(self):

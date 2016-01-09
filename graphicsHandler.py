@@ -208,6 +208,7 @@ class GraphicsHandler(object):
     def itemdisplay(self, item, letter=None, stack=None):
         damagetile = self.uitileeng.getcustomtile(0, 32, 16, 16)
         weighttile = self.uitileeng.getcustomtile(0, 64, 16, 16)
+        arrowtile = self.uitileeng.getcustomtile(0, 32+16, 16, 16)
         name = self.font.render(item.getname(), 1, (pygame.Color("lightblue")))
         belowname = pygame.Surface((1, 1), pygame.SRCALPHA)
         if item.getparam("damage") is not None:
@@ -217,6 +218,10 @@ class GraphicsHandler(object):
         if item.getparam("weight") is not None:
             weightface = self.font.render(str(item.getparam("weight")), 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(weighttile, weightface, 2)
+            belowname = self.glueleft(belowname, tempsurface)
+        if item.getparam("range") is not None:
+            rangeface = self.font.render(str(item.getparam("range")), 1, (pygame.Color("grey70")))
+            tempsurface = self.glueleft(arrowtile, rangeface, 2)
             belowname = self.glueleft(belowname, tempsurface)
         tempsurface = self.gluebelow(name, belowname, 2)
         if letter is not None:
