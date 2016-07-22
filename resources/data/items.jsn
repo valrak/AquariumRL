@@ -97,9 +97,9 @@
   "damage": 0,
   "effect": "smoke"
   },
-"strenght": {
-  "id": "strenght",
-  "description": "strenght crystal",
+"strength": {
+  "id": "strength",
+  "description": "use crystal to +1 melee damage",
   "tile": "5,0",
   "flags": ["upgrade", "gravity", "usable"],
   "upgradelevel": 1,
@@ -107,5 +107,38 @@
   "stackable": "false",
   "damage": 0,
   "effect": "strength"
+  },
+"health": {
+  "id": "health",
+  "description": "use crystal to +1 max HP",
+  "tile": "5,0",
+  "flags": ["upgrade", "gravity", "usable"],
+  "upgradelevel": 1,
+  "score": 0,
+  "stackable": "false",
+  "damage": 0,
+  "effect": "health"
+  },
+"harpoon voucher": {
+  "id": "harpoon voucher",
+  "description": "use voucher for 5 harpoons thrown in aquarium",
+  "tile": "5,0",
+  "flags": ["upgrade", "gravity", "usable"],
+  "upgradelevel": 1,
+  "score": 0,
+  "stackable": "false",
+  "damage": 0,
+  "effect": "giveHarpoons"
+  },
+"sealing crystal": {
+  "id": "sealing crystal",
+  "description": "use crystal to heal yourself completely",
+  "tile": "5,0",
+  "flags": ["upgrade", "gravity", "usable"],
+  "upgradelevel": 1,
+  "score": 0,
+  "stackable": "false",
+  "damage": 0,
+  "effect": "bigrepair"
   }
 }

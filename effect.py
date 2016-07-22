@@ -1,5 +1,6 @@
 import gameEngine
 import thing
+import item
 import pathfinder
 import copy
 
@@ -109,6 +110,14 @@ class Effect(thing.Thing):
                     self.gameengine.itemsgenerated = 0
                     self.gameengine.mapfield.getplayer().killcount = 0
                     self.gameengine.state = "upgrade"
+            if self.getparam("effect") == "give":
+                amount = 1
+                if self.getparam("amount") is not None:
+                    amount = int(self.getparam("amount"))
+                if self.getparam("itemname") is not None:
+                    for i in range(amount):
+                        self.gameengine.mapfield.addatrandomsurfaceitem(
+                            item.Item(self.gameengine.iteinfo[self.getparam("itemname")], self.gameengine))
             if self.getparam("effect") == "change":
                 occupant = self.gameengine.mapfield.getoccupants(self.getposition())
                 if occupant is not None:

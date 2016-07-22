@@ -30,6 +30,14 @@
   "amount": "1",
   "ttl": 2
   },
+"bigrepair": {
+  "id": "repair",
+  "description": "",
+  "tile": "4,0",
+  "effect": "repair",
+  "amount": "100",
+  "ttl": 2
+  },
 "gate": {
   "id": "gate",
   "description": "strange gate",
@@ -70,6 +78,24 @@
   "effect": "change",
   "changeattributesname": ["attack"],
   "changeattributesvalue": ["1"],
+  "ttl": 2
+},
+"health": {
+  "id": "health",
+  "description": "",
+  "tile": "0,0",
+  "effect": "change",
+  "changeattributesname": ["hp"],
+  "changeattributesvalue": ["1"],
+  "ttl": 2
+},
+"giveHarpoons": {
+  "id": "giveHarpoons",
+  "description": "",
+  "tile": "0,0",
+  "effect": "give",
+  "itemname": "harpoon",
+  "amount": 5,
   "ttl": 2
 }
 }

@@ -24,11 +24,13 @@ class GraphicsHandler(object):
         self.efftiles = pygame.image.load("resources/img/EffectTiles.png")
         self.itetiles = pygame.image.load("resources/img/ItemTiles.png")
         self.uitiles = pygame.image.load("resources/img/UI.png")
+        self.uiparts = pygame.image.load("resources/img/watch.png")
         self.maptileeng = TileEngine(self.maptiles, gameengine.mapinfo, TILESIZE)
         self.montileeng = TileEngine(self.montiles, gameengine.moninfo, TILESIZE)
         self.efftileeng = TileEngine(self.efftiles, gameengine.effinfo, TILESIZE)
         self.itetileeng = TileEngine(self.itetiles, gameengine.iteinfo, TILESIZE)
         self.uitileeng = TileEngine(self.uitiles, gameengine.iteinfo, TILESIZE)
+        self.uiparttileeng = TileEngine(self.uiparts, gameengine.iteinfo, TILESIZE)
         self.size = gameengine.SIZE
         self.finalscreen = pygame.display.set_mode(self.size, HWSURFACE | DOUBLEBUF | RESIZABLE)
         self.screen = self.finalscreen.copy()
@@ -50,7 +52,7 @@ class GraphicsHandler(object):
         if self.gameengine.state == "reset":
             return
         self.maplayer = self.maptileeng.getmapsurface(arenamap)
-        self.screen.fill(pygame.Color('grey50'))
+        self.screen.fill(pygame.Color('black'))
         self.screen.blit(self.maplayer, (MAPPOSX, MAPPOSY))
 
         # display all items
@@ -82,33 +84,23 @@ class GraphicsHandler(object):
 
         # Status
         self.font = pygame.font.Font("./resources/fonts/pixelmix.ttf", 14)
-        statusbackgr = pygame.Surface((200, 300))
-        statusbackgr = statusbackgr.convert()
-        statusbackgr.fill(pygame.Color("black"))
-        statusadd = 0
-        if self.gameengine.mapfield.getplayer() is None:
-            return
-        params = self.gameengine.mapfield.getplayer().parameters
-        for param in params:
-            text = self.font.render(param+" "+str(params[param]), 1, (pygame.Color("grey70")))
-            statusbackgr.blit(text, (5, 5+statusadd))
-            statusadd += 20
-        self.screen.blit(statusbackgr, (830, 100))
+        watchimage = self.uiparttileeng.getcustomtile(0, 0, 119, 224)
 
-        # Inventory
-        invbackgr = pygame.Surface((200, 300))
-        invbackgr = invbackgr.convert()
-        invbackgr.fill(pygame.Color("black"))
-        invadd = 0
-        inv = self.gameengine.mapfield.getplayer().inventory
-        for item in inv:
-            if item.isstackable():
-                text = self.font.render(item.getname()+" (x"+str(item.stack)+")", 1, (pygame.Color("grey70")))
-            else:
-                text = self.font.render(item.getname(), 1, (pygame.Color("grey70")))
-            invbackgr.blit(text, (5, 5+invadd))
-            invadd += 20
-        self.screen.blit(invbackgr, (830, 500))
+        player = self.gameengine.mapfield.getplayer()
+        maxhp = str(player.maxhp)
+        curhp = str(player.getparam("hp"))
+        score = str(player.score)
+        level = str(player.getparam("level"))
+
+        text = self.font.render("H "+curhp+" / "+maxhp, 1, (pygame.Color("green")))
+        watchimage.blit(text, (28, 87))
+        text = self.font.render("S "+score, 1, (pygame.Color("green")))
+        watchimage.blit(text, (28, 107))
+        text = self.font.render("L " + level + " / " +
+                                str(self.gameengine.getrequiredkillcount() - player.killcount),
+                                1, (pygame.Color("green")))
+        watchimage.blit(text, (28, 127))
+        self.screen.blit(watchimage, (830, 100))
 
         # Events
         for key in self.eventstack:

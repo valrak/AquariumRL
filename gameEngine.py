@@ -297,7 +297,7 @@ class GameEngine(object):
             if self.noscore is True:
                 self.mapfield.generatemonster()
             # next level trigger
-            if self.mapfield.getplayer().killcount > 20 and self.noscore is not True:
+            if self.mapfield.getplayer().killcount > self.getrequiredkillcount() and self.noscore is not True:
                 self.noscore = True
                 self.mapfield.generategate()
         self.draw()
@@ -333,8 +333,10 @@ class GameEngine(object):
         loop = True
         while loop:
             for event in pygame.event.get():
-                if event.type == pg.KEYDOWN and pygame.key.name(event.key) in self.ALPHABET:
-                    return items[self.ALPHABET.index(pygame.key.name(event.key))]  # returns corresponding key alphabet index
+                keypressed = pygame.key.name(event.key)
+                if event.type == pg.KEYDOWN and keypressed in self.ALPHABET:
+                    if len(items) > self.ALPHABET.index(keypressed):
+                        return items[self.ALPHABET.index(keypressed)]  # returns corresponding key alphabet index
                 self.clock.tick(30)
 
     def displayinventory(self, requiredflag=None):
@@ -351,3 +353,6 @@ class GameEngine(object):
                 if event.type == pg.KEYDOWN and pygame.key.name(event.key) in self.ALPHABET:
                     return self.ALPHABET.index(pygame.key.name(event.key))  # returns corresponding key alphabet index
             self.clock.tick(30)
+
+    def getrequiredkillcount(self):
+        return 20
