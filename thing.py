@@ -1,4 +1,3 @@
-__author__ = 'Jaroslav'
 
 # interface
 class Thing(object):

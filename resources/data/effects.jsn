@@ -85,7 +85,7 @@
   "description": "",
   "tile": "0,0",
   "effect": "change",
-  "changeattributesname": ["hp"],
+  "changeattributesname": ["maxhp"],
   "changeattributesvalue": ["1"],
   "ttl": 2
 },

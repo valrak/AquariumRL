@@ -22,7 +22,6 @@ class Monster(thing.Thing):
     inventory = None
     lastattacker = None
     killcount = 0
-    maxhp = 0
     score = 0
 
     def __init__(self, parameters, gameengine):
@@ -31,7 +30,8 @@ class Monster(thing.Thing):
         self.children = []
         self.inventory = []
         if self.getparam("hp") is not None:
-            self.maxhp = int(self.getparam("hp"))
+            maxhp = ({"maxhp": self.getparam("hp")})
+            self.parameters.update(maxhp)
         if self.getparam("firelimit") is not None:
             self.firetime = int(self.getparam("firelimit"))
 
@@ -63,13 +63,20 @@ class Monster(thing.Thing):
         oldvalue = self.parameters[param]
         self.parameters[param] = newvalue
         self.gameengine.gameevent.report(self, param, newvalue, oldvalue)
+        if param == "hp":
+            text = str(abs(int(oldvalue) - int(newvalue)))
+            if int(oldvalue) < int(newvalue):
+                text = "+" + text
+            else:
+                text = "-" + text
+            self.gameengine.graphicshandler.addpop(text, self.getposition(), "red")
 
     def lowerhealth(self, amount):
         self.setparam("hp", int(self.getparam("hp")) - int(amount))
 
     def raisehealth(self, amount):
-        if (int(self.getparam("hp")) + amount) > self.maxhp:
-            newhp = self.maxhp
+        if (int(self.getparam("hp")) + amount) > int(self.getparam("maxhp")):
+            newhp = int(self.getparam("maxhp"))
         else:
             newhp = int(self.getparam("hp")) + amount
         self.setparam("hp", newhp)

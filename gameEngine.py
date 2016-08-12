@@ -176,10 +176,11 @@ class GameEngine(object):
                         coord = utils.getcoordsbyevent(event)
                         if coord is not None:
                             player.fire(coord, player.rangedpreference)
-                            self.passturn()
+
                             if self.state != "reset":
                                 self.state = "game"
                                 self.draw()
+                            self.passturn()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_i or event.key == pg.K_SPACE):
                             index = self.displayinventory()
                             if index is not None:
@@ -280,6 +281,7 @@ class GameEngine(object):
         self.turns += 1
 
         self.graphicshandler.eraseeventstack()
+
         self.processeffects()
         for monster in self.mapfield.monsters:
             monster.update()
@@ -301,6 +303,7 @@ class GameEngine(object):
                 self.noscore = True
                 self.mapfield.generategate()
         self.draw()
+        self.graphicshandler.pops = []
 
     # debug method
     def spawnmonsters(self):

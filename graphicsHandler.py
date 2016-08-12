@@ -3,8 +3,6 @@ import gameEngine
 from tileEngine import *
 from pygame.locals import *
 
-__author__ = 'Jaroslav'
-
 MAPPOSX = 10
 MAPPOSY = 10
 TILESIZE = 32
@@ -14,6 +12,7 @@ MAXLOGLINES = 5
 class GraphicsHandler(object):
     loglines = []
     eventstack = {}
+    pops = []
     gameengine = None
     size = None
 
@@ -84,22 +83,22 @@ class GraphicsHandler(object):
 
         # Status
         self.font = pygame.font.Font("./resources/fonts/pixelmix.ttf", 14)
-        watchimage = self.uiparttileeng.getcustomtile(0, 0, 119, 224)
+        watchimage = self.uiparttileeng.getcustomtile(0, 0, 168, 315)
 
         player = self.gameengine.mapfield.getplayer()
-        maxhp = str(player.maxhp)
+        maxhp = str(player.getparam("maxhp"))
         curhp = str(player.getparam("hp"))
         score = str(player.score)
         level = str(player.getparam("level"))
 
         text = self.font.render("H "+curhp+" / "+maxhp, 1, (pygame.Color("green")))
-        watchimage.blit(text, (28, 87))
+        watchimage.blit(text, (34, 126))
         text = self.font.render("S "+score, 1, (pygame.Color("green")))
-        watchimage.blit(text, (28, 107))
+        watchimage.blit(text, (34, 146))
         text = self.font.render("L " + level + " / " +
                                 str(self.gameengine.getrequiredkillcount() - player.killcount),
                                 1, (pygame.Color("green")))
-        watchimage.blit(text, (28, 127))
+        watchimage.blit(text, (34, 166))
         self.screen.blit(watchimage, (830, 100))
 
         # Events
@@ -125,6 +124,9 @@ class GraphicsHandler(object):
             infotext = self.infoview(self.gameengine.cursorcoord)
             if infotext is not None:
                 self.drawwindow(infotext, self.gameengine.cursorcoord)
+
+        self.displaypops()
+
         self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
         pygame.display.flip()
 
@@ -289,6 +291,7 @@ class GraphicsHandler(object):
         surface.blit(surface1, (0, 0))
         surface.blit(surface2, (surface1size[0] + step, 0))
         return surface
+
     # window changed its size
     def resize(self, newsize):
         self.finalscreen = pygame.display.set_mode(newsize, HWSURFACE | DOUBLEBUF | RESIZABLE)
@@ -313,6 +316,22 @@ class GraphicsHandler(object):
         backgr = backgr.convert()
         backgr.blit(drawing, (3, 3))
         self.screen.blit(backgr, coord)
+
+    def addpop(self, text, coord, tcolor):
+        self.pops.append([text, coord, tcolor])
+
+    def displaypops(self):
+        for pop in self.pops:
+            coord = pop[1]
+            x = coord[0] * TILESIZE + TILESIZE
+            y = coord[1] * TILESIZE
+            text = pop[0]
+            tcolor = pop[2]
+
+            poptext = self.font.render(text, 1, (pygame.Color(tcolor)))
+            self.screen.blit(poptext, (x, y))
+
+
 
 # FIXME: return coordinates to match map position to align to the grid """
 c = lambda coords: (coords[0] + MAPPOSX, coords[1] + MAPPOSX)
