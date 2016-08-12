@@ -112,12 +112,12 @@ class Monster(thing.Thing):
         # update level
         if self.player:
             scorelevel = 1
-            for nextscore in self.gameengine.SCORETABLE:
-                scorelevel += 1
-                level = int(self.getparam("level"))
-                if level < scorelevel:
-                    if nextscore <= self.score:
-                        self.setparam("level", level + 1)
+            #for nextscore in self.gameengine.SCORETABLE:
+            #    scorelevel += 1
+            #    level = int(self.getparam("level"))
+            #    if level < scorelevel:
+            #        if nextscore <= self.score:
+            #            self.setparam("level", level + 1)
                         #self.gameengine.gameevent.report("Diver raised his level to "+str(self.getparam("level"))+"!", None, None, None)
         # weight management
         if self.getparam("weightLimit") is not None:

@@ -46,13 +46,6 @@ class GraphicsHandler(object):
             self.newlogline(thing)
 
     def drawboard(self, arenamap):
-        if self.gameengine.mapfield.getplayer is None:
-            self.gameengine.state = "reset"
-        if self.gameengine.state == "reset":
-            self.displaydeath(str(self.gameengine.lastscore))
-            self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
-            pygame.display.flip()
-            return
         self.maplayer = self.maptileeng.getmapsurface(arenamap)
         self.screen.fill(pygame.Color('black'))
         self.screen.blit(self.maplayer, (MAPPOSX, MAPPOSY))
@@ -83,6 +76,14 @@ class GraphicsHandler(object):
             logbackgr.blit(text, (10, 0+logposadd))
             logposadd += 20
         self.screen.blit(logbackgr, (10, 530))
+
+        if self.gameengine.mapfield.getplayer is None:
+            self.gameengine.state = "reset"
+        if self.gameengine.state == "reset":
+            self.displaydeath(str(self.gameengine.lastscore))
+            self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
+            pygame.display.flip()
+            return
 
         # Status
         self.font = pygame.font.Font("./resources/fonts/pixelmix.ttf", 14)
@@ -129,7 +130,7 @@ class GraphicsHandler(object):
                 self.drawwindow(infotext, self.gameengine.cursorcoord)
 
         self.displaypops()
-
+        self.displayhelp()
         self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
         pygame.display.flip()
 
@@ -321,6 +322,10 @@ class GraphicsHandler(object):
         self.screen.blit(backgr, coord)
 
     def addpop(self, text, coord, tcolor):
+        for pop in self.pops:
+            if coord == pop[1]:
+                pop[0] = pop[0] + text
+                return True
         self.pops.append([text, coord, tcolor])
 
     def displaypops(self):
@@ -352,6 +357,28 @@ class GraphicsHandler(object):
             logposadd += 20
         self.screen.blit(logbackgr, (200, 100))
 
+    def displayhelp(self):
+        helplines = []
+        helplines.append("_f_ire")
+        helplines.append("_i_nventory")
+        helplines.append("_u_se")
+        helplines.append("_l_ook")
+        helplines.append("_,_pick")
+        helplines.append("")
+        helplines.append("move by numpad")
+        helplines.append("fire by numpad")
+        logposadd = 0
+        logbackgr = pygame.Surface((200, 200))
+        logbackgr = logbackgr.convert()
+        logbackgr.fill(pygame.Color("black"))
+        for line in helplines:
+            text = self.font.render(line, 1, (200, 200, 200))
+            logbackgr.blit(text, (10, 0 + logposadd))
+            logposadd += 20
+        self.screen.blit(logbackgr, (830, 500))
+
+    def eraseloglines(self):
+        self.loglines = []
 
 # FIXME: return coordinates to match map position to align to the grid """
 c = lambda coords: (coords[0] + MAPPOSX, coords[1] + MAPPOSX)
