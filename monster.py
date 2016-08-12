@@ -283,6 +283,7 @@ class Monster(thing.Thing):
             self.gameengine.gameevent.report(self.getname()+" has been killed! ", None, None, None)
         # game reset
         if self.player:
+            self.gameengine.lastscore = self.score
             self.gameengine.state = "reset"
 
     def removechild(self, child):
@@ -332,14 +333,13 @@ class Monster(thing.Thing):
             # if weapon hits obstacle
             elif not self.gameengine.mapfield.ispassable(newposition):
                 break
-            # if not, it flies to its range
+            # if not, it flies to its maximum range
             else:
                 weapon.setposition(newposition)
                 if weapon.geteffect() is not None:
                     neweffect = effect.Effect(self.gameengine.effinfo[weapon.geteffect()], self.gameengine)
                     neweffect.setposition(weapon.getposition())
                     self.gameengine.mapfield.effects.append(neweffect)
-            #self.gameengine.gameevent.report("fire", )
         if weapon.getflag("nodrop"):
             self.gameengine.mapfield.items.remove(weapon)
 

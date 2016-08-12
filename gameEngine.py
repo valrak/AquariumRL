@@ -59,6 +59,7 @@ class GameEngine(object):
     state = "game"
     hiscore = 0
     noscore = False
+    lastscore = 0
     itemsgenerated = 0
     clock = pygame.time.Clock()
 
@@ -123,6 +124,7 @@ class GameEngine(object):
                     self.draw()
                 else:
                     if self.state == "reset":
+                        self.deathscreen()
                         self.state = "game"
                         self.resetgame()
                         break
@@ -272,6 +274,15 @@ class GameEngine(object):
 
     def draw(self):
         self.graphicshandler.drawboard(self.mapfield.terrain)
+
+    def deathscreen(self):
+        loop = True
+        while loop:
+            for event in pygame.event.get():
+                # cancel
+                if event.type == pg.KEYDOWN:
+                    return None
+            self.clock.tick(30)
 
     def endgame(self):
         pygame.quit()

@@ -49,6 +49,9 @@ class GraphicsHandler(object):
         if self.gameengine.mapfield.getplayer is None:
             self.gameengine.state = "reset"
         if self.gameengine.state == "reset":
+            self.displaydeath(str(self.gameengine.lastscore))
+            self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
+            pygame.display.flip()
             return
         self.maplayer = self.maptileeng.getmapsurface(arenamap)
         self.screen.fill(pygame.Color('black'))
@@ -331,6 +334,23 @@ class GraphicsHandler(object):
             poptext = self.font.render(text, 1, (pygame.Color(tcolor)))
             self.screen.blit(poptext, (x, y))
 
+    def displaydeath(self, score):
+        deathlines = []
+        deathlines.append("")
+        deathlines.append(" You are dead.")
+        deathlines.append("")
+        deathlines.append(" Score: " + score)
+        deathlines.append("")
+        deathlines.append(" Press any key to continue.")
+        logposadd = 0
+        logbackgr = pygame.Surface((400, 150))
+        logbackgr = logbackgr.convert()
+        logbackgr.fill(pygame.Color("black"))
+        for line in deathlines:
+            text = self.font.render(line, 1, (120, 120, 120))
+            logbackgr.blit(text, (10, 0 + logposadd))
+            logposadd += 20
+        self.screen.blit(logbackgr, (200, 100))
 
 
 # FIXME: return coordinates to match map position to align to the grid """
