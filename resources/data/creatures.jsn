@@ -13,6 +13,7 @@
 "catfish": {
   "id": "catfish",
   "type": "fish",
+  "description": "harmless fish",
   "hp": "1",
   "tile": "2,0",
   "attack": "0",
@@ -24,6 +25,7 @@
 "octopus": {
   "id": "octopus",
   "type": "cephalopod",
+  "description": "generates black ink",
   "flags": ["ranged"],
   "hp": "5",
   "tile": "5,0",
@@ -38,6 +40,7 @@
 "crab": {
   "flags": ["nospawn", "ground", "collector"],
   "id": "crab",
+  "description": "collects stuff on ground",
   "type": "crustacean",
   "hp": "2",
   "tile": "0,0",
@@ -60,6 +63,7 @@
 "shell": {
   "id": "shell",
   "type": "spawner",
+  "description": "home of a crab",
   "hp": "5",
   "tile": "4,0",
   "attack": "0",
@@ -76,6 +80,7 @@
  "medusa": {
   "id": "medusa",
   "type": "medusa",
+  "description": "throws electric bolts",
   "hp": "1",
   "tile": "7,0",
   "attack": "0",
@@ -87,7 +92,7 @@
   "score": 20,
   "rarity": 2
   },
- "tritonspear": {
+ "triton": {
   "id": "tritonspear",
   "type": "triton",
   "hp": "5",

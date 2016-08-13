@@ -207,8 +207,14 @@ class GraphicsHandler(object):
         damagetile = self.uitileeng.getcustomtile(0, 32, 16, 16)
         weighttile = self.uitileeng.getcustomtile(0, 64, 16, 16)
         arrowtile = self.uitileeng.getcustomtile(0, 32+16, 16, 16)
-        name = self.font.render(item.getname(), 1, (pygame.Color("lightblue")))
+        textname = item.getname()
+        textdesc = item.getparam("description")
+
+        if stack is not None:
+            textname = textname + stack
+        name = self.font.render(textname, 1, (pygame.Color("lightblue")))
         belowname = pygame.Surface((1, 1), pygame.SRCALPHA)
+
         if item.getparam("damage") is not None:
             damageface = self.font.render(str(item.getparam("damage")), 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(damagetile, damageface, 2)
@@ -222,6 +228,9 @@ class GraphicsHandler(object):
             tempsurface = self.glueleft(arrowtile, rangeface, 2)
             belowname = self.glueleft(belowname, tempsurface)
         tempsurface = self.gluebelow(name, belowname, 2)
+        if textdesc is not None:
+            desc = self.font.render(textdesc, 1, (pygame.Color("grey40")))
+            tempsurface = self.gluebelow(tempsurface, desc)
         if letter is not None:
             letterface = self.font.render(letter+") ", 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(letterface, tempsurface)
@@ -251,6 +260,10 @@ class GraphicsHandler(object):
                 rangedsurface = self.font.render(str(monster.getbestranged().getparam("damage")), 1, (pygame.Color("grey70")))
                 rangedsurface = self.glueleft(arrowtile, rangedsurface, 2)
                 tempsurface = self.glueleft(tempsurface, rangedsurface, 10)
+            textdesc = monster.getparam("description")
+            if textdesc is not None:
+                descsurface = self.font.render(textdesc, 1, (pygame.Color("grey40")))
+                tempsurface = self.gluebelow(tempsurface, descsurface)
             surface = self.gluebelow(name, tempsurface, 4)
         for item in items:
             tempsurface = self.itemdisplay(item)
@@ -268,7 +281,11 @@ class GraphicsHandler(object):
                 timeface = self.font.render(str(ttl), 1, (pygame.Color("grey70")))
                 tempsurface = self.glueleft(timetile, timeface, 2)
                 belowname = self.glueleft(belowname, tempsurface)
+            textdesc = effect.getparam("description")
             tempsurface = self.gluebelow(name, belowname, 2)
+            if textdesc is not None:
+                descsurface = self.font.render(textdesc, 1, (pygame.Color("grey40")))
+                tempsurface = self.gluebelow(tempsurface, descsurface)
             surface = self.gluebelow(surface, tempsurface, step)
         return surface
 
@@ -338,6 +355,9 @@ class GraphicsHandler(object):
 
             poptext = self.font.render(text, 1, (pygame.Color(tcolor)))
             self.screen.blit(poptext, (x, y))
+
+    def erasepops(self):
+        self.pops = []
 
     def displaydeath(self, score):
         deathlines = []

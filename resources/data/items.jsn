@@ -1,13 +1,35 @@
 {
 "coin": {
   "id": "coin",
-  "description": "small coin with a strange symbol",
+  "description": "+100 score",
   "tile": "1,0",
   "flags": ["gravity", "remove"],
   "score": 100,
   "stackable": "true",
   "level": 1,
-  "weight": 1,
+  "weight": 2,
+  "rarity": 1
+  },
+"bar": {
+  "id": "bar",
+  "description": "+500 score",
+  "tile": "9,0",
+  "flags": ["gravity", "remove"],
+  "score": 500,
+  "stackable": "true",
+  "level": 2,
+  "weight": 10,
+  "rarity": 1
+  },
+"chalice": {
+  "id": "chalice",
+  "description": "+1000 score",
+  "tile": "10,0",
+  "flags": ["gravity", "remove"],
+  "score": 1000,
+  "stackable": "true",
+  "level": 3,
+  "weight": 15,
   "rarity": 1
   },
 "harpoon": {
@@ -24,7 +46,7 @@
   },
 "dynamite": {
   "id": "dynamite",
-  "description": "stick of dynamite",
+  "description": "timed explosive",
   "tile": "2,0",
   "flags": ["gravity", "delay"],
   "score": 0,
@@ -41,7 +63,7 @@
   },
 "thorn": {
   "id": "thorn",
-  "description": "small thorn projectile",
+  "description": "small thorn",
   "tile": "0,0",
   "flags": ["weapon","nodrop"],
   "score": 0,
@@ -63,27 +85,39 @@
   },
 "dart": {
   "id": "dart",
-  "description": "small projectile",
+  "description": "will break after firing",
   "tile": "3,0",
   "flags": ["gravity","delay","weapon","nodrop"],
   "score": 0,
   "stackable": "true",
   "range": 5,
-  "damage": 1,
+  "damage": 2,
   "level": 1,
   "effect": "bubble",
   "rarity": 2
   },
+"raygun": {
+  "id": "raygun",
+  "description": "one use ray-beam",
+  "tile": "11,0",
+  "flags": ["gravity","delay","weapon","nodrop","beam"],
+  "score": 0,
+  "stackable": "true",
+  "range": 10,
+  "level": 1,
+  "effect": "weak ray",
+  "rarity": 1
+  },
 "repairkit": {
   "id": "repairkit",
-  "description": "repair kit",
+  "description": "+1 HP",
   "tile": "4,0",
   "flags": ["gravity","delay","usable"],
   "score": 0,
   "stackable": "true",
   "level": 2,
   "effect": "repair",
-  "rarity": 4,
+  "rarity": 2,
   "weight": 5
   },
 "ink": {
@@ -99,7 +133,7 @@
   },
 "strength": {
   "id": "strength",
-  "description": "use crystal to +1 melee damage",
+  "description": "+1 melee damage",
   "tile": "5,0",
   "flags": ["upgrade", "gravity", "usable"],
   "upgradelevel": 1,
@@ -110,8 +144,8 @@
   },
 "health": {
   "id": "health",
-  "description": "use crystal to +1 max HP",
-  "tile": "5,0",
+  "description": "+5 max HP",
+  "tile": "6,0",
   "flags": ["upgrade", "gravity", "usable"],
   "upgradelevel": 1,
   "score": 0,
@@ -121,8 +155,8 @@
   },
 "harpoon voucher": {
   "id": "harpoon voucher",
-  "description": "use voucher for 5 harpoons thrown in aquarium",
-  "tile": "5,0",
+  "description": "5 harpoons will be given",
+  "tile": "7,0",
   "flags": ["upgrade", "gravity", "usable"],
   "upgradelevel": 1,
   "score": 0,
@@ -132,8 +166,8 @@
   },
 "sealing crystal": {
   "id": "sealing crystal",
-  "description": "use crystal to heal yourself completely",
-  "tile": "5,0",
+  "description": "heal yourself completely",
+  "tile": "8,0",
   "flags": ["upgrade", "gravity", "usable"],
   "upgradelevel": 1,
   "score": 0,

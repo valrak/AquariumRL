@@ -11,6 +11,7 @@ class Effect(thing.Thing):
     gameengine = None
     ttl = 1
     donotupdate = False
+    owner = None
     flags = []
 
     def __init__(self, parameters, gameengine):
@@ -41,6 +42,12 @@ class Effect(thing.Thing):
             return self.parameters[name]
         except KeyError:
             return None
+
+    def getowner(self):
+        return self.owner
+
+    def setowner(self, owner):
+        self.owner = owner
 
     def setparam(self, param, newvalue):
         oldvalue = self.parameters[param]
@@ -96,6 +103,8 @@ class Effect(thing.Thing):
                 if occupant is not None:
                     if not (occupant.getflag("relectric") and self.getflag("electric")):
                         occupant.lowerhealth(self.getparam("damage"))
+                        if self.owner is not None:
+                            occupant.lastattacker = self.owner
             if self.getparam("effect") == "repair":
                 occupant = self.gameengine.mapfield.getoccupants(self.getposition())
                 if occupant is not None:
@@ -105,6 +114,7 @@ class Effect(thing.Thing):
                 if occupant is not None and occupant.player:
                     occupant.setparam("level", int(occupant.getparam("level")) + 1)
                     self.gameengine.noscore = False
+                    self.gameengine.graphicshandler.erasepops()
                     occupant.goldscore()
                     self.gameengine.newmap()
                     self.gameengine.itemsgenerated = 0

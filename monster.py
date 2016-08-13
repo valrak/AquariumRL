@@ -109,16 +109,6 @@ class Monster(thing.Thing):
         return False
 
     def update(self):
-        # update level
-        if self.player:
-            scorelevel = 1
-            #for nextscore in self.gameengine.SCORETABLE:
-            #    scorelevel += 1
-            #    level = int(self.getparam("level"))
-            #    if level < scorelevel:
-            #        if nextscore <= self.score:
-            #            self.setparam("level", level + 1)
-                        #self.gameengine.gameevent.report("Diver raised his level to "+str(self.getparam("level"))+"!", None, None, None)
         # weight management
         if self.getparam("weightLimit") is not None:
             totalw = 0
@@ -324,22 +314,35 @@ class Monster(thing.Thing):
         else:  # weapon not meant as ranged
             wrange = 0
         for i in range(0, wrange):
-            newposition = pathfinder.alterposition(weapon.getposition(), direction)
-            monsterat = self.gameengine.mapfield.getoccupants(newposition)
-            # if weapon hits any monster
-            if monsterat is not None:
-                monsterat.rangedcombat(weapon, self)
-                break
-            # if weapon hits obstacle
-            elif not self.gameengine.mapfield.ispassable(newposition):
-                break
-            # if not, it flies to its maximum range
-            else:
-                weapon.setposition(newposition)
+            if weapon.getflag("beam"):
                 if weapon.geteffect() is not None:
+                    newposition = pathfinder.alterposition(weapon.getposition(), direction)
+                    # if weapon hits obstacle
+                    if not self.gameengine.mapfield.isnonsolid(newposition):
+                        break
+                    weapon.setposition(newposition)
                     neweffect = effect.Effect(self.gameengine.effinfo[weapon.geteffect()], self.gameengine)
                     neweffect.setposition(weapon.getposition())
+                    neweffect.setowner(self)
                     self.gameengine.mapfield.effects.append(neweffect)
+            else:
+                newposition = pathfinder.alterposition(weapon.getposition(), direction)
+                monsterat = self.gameengine.mapfield.getoccupants(newposition)
+                # if weapon hits any monster
+                if monsterat is not None:
+                    monsterat.rangedcombat(weapon, self)
+                    break
+                # if weapon hits obstacle
+                elif not self.gameengine.mapfield.ispassable(newposition):
+                    break
+                # if not, it flies to its maximum range
+                else:
+                    weapon.setposition(newposition)
+                    if weapon.geteffect() is not None:
+                        neweffect = effect.Effect(self.gameengine.effinfo[weapon.geteffect()], self.gameengine)
+                        neweffect.setposition(weapon.getposition())
+                        neweffect.setowner(self)
+                        self.gameengine.mapfield.effects.append(neweffect)
         if weapon.getflag("nodrop"):
             self.gameengine.mapfield.items.remove(weapon)
 

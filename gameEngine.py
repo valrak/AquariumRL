@@ -103,6 +103,7 @@ class GameEngine(object):
         for x in range(0, 5):
             player.pick(Item(self.iteinfo['harpoon'], self))
         player.pick(Item(self.iteinfo['dynamite'], self))
+        player.pick(Item(self.iteinfo['raygun'], self))
         self.mapfield.addmonster(player)
         return player
 
@@ -123,7 +124,6 @@ class GameEngine(object):
                         savehiscore(self.lastscore, self.hiscore)
                         self.resetgame()
                         break
-
                     elif self.state == "look":
                         coord = utils.getcoordsbyevent(event)
                         if coord is not None:
@@ -215,6 +215,7 @@ class GameEngine(object):
                         if event.type == pg.KEYDOWN and (event.key == pg.K_l):
                             self.cursorcoord = self.mapfield.getplayer().getposition()
                             self.state = "look"
+                            self.draw()
                         # inventory
                         if event.type == pg.KEYDOWN and (event.key == pg.K_i):
                             self.state = "inventory"

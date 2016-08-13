@@ -1,7 +1,7 @@
 {
 "spawn": {
   "id": "spawn",
-  "description": "something is coming from this direction",
+  "description": "something is coming!",
   "tile": "0,0",
   "effect": "spawn",
   "spawn": "random",
@@ -9,14 +9,13 @@
   },
 "bubble": {
   "id": "bubble",
-  "description": "small bubbles",
   "tile": "0,0",
   "effect": "None",
   "ttl": 2
   },
 "smoke": {
   "id": "smoke",
-  "description": "smoke renders ranged combat innefective",
+  "description": "fired things will always miss",
   "tile": "1,0",
   "effect": "novisibility",
   "flags": ["disperse", "novisibility"],
@@ -40,19 +39,25 @@
   },
 "gate": {
   "id": "gate",
-  "description": "strange gate",
   "tile": "3,0",
+  "description": "gate to next level",
   "effect": "gate",
   "flags": ["eachturn", "delete"],
   "ttl": -1
   },
 "explosion": {
   "id": "explosion",
-  "description": "large underwater explosion",
   "tile": "2,0",
   "effect": "explode",
   "damage": "20",
   "flags": ["large"],
+  "ttl": 2
+  },
+"weak ray": {
+  "id": "weak ray",
+  "tile": "7,0",
+  "effect": "explode",
+  "damage": "2",
   "ttl": 2
   },
 "volt": {
@@ -66,7 +71,6 @@
   },
 "blood": {
   "id": "blood",
-  "description": "patch of blood",
   "tile": "6,0",
   "effect": "None",
   "ttl": 4
@@ -86,7 +90,7 @@
   "tile": "0,0",
   "effect": "change",
   "changeattributesname": ["maxhp"],
-  "changeattributesvalue": ["1"],
+  "changeattributesvalue": ["5"],
   "ttl": 2
 },
 "giveHarpoons": {
