@@ -31,7 +31,6 @@ iteminfo = None
 # todo: melee weapons ?
 # todo: pickup interface
 # todo: drop interface
-# todo: ui - one liner and diver clock
 # todo: config file
 # todo: dynamite fuse setting
 # todo: dynamite destroys blocks
@@ -47,9 +46,10 @@ class GameEngine(object):
                 'v', 'w', 'x', 'y', 'z']
 
     RESOLUTIONX = 1024
-    RESOLUTIONY = 768
+    RESOLUTIONY = 660
     SIZE = (RESOLUTIONX, RESOLUTIONY)
     SCORETABLE = [100, 300]
+    COMBO_ITEM = 3
     turns = 0
     state = "game"
     hiscore = loadhiscore()
@@ -101,9 +101,8 @@ class GameEngine(object):
         player.player = True
         player.setposition(self.mapfield.getrandompassable())
         for x in range(0, 5):
-            player.pick(Item(self.iteinfo['harpoon'], self))
+            player.pick(Item(self.iteinfo['bar'], self))
         player.pick(Item(self.iteinfo['dynamite'], self))
-        player.pick(Item(self.iteinfo['raygun'], self))
         self.mapfield.addmonster(player)
         return player
 
@@ -118,6 +117,11 @@ class GameEngine(object):
                     self.graphicshandler.resize(event.dict['size'])
                     self.draw()
                 else:
+                    if self.state == "help":
+                        self.deathscreen()
+                        self.state = "game"
+                        self.draw()
+                        break
                     if self.state == "reset":
                         self.deathscreen()
                         self.state = "game"
@@ -211,6 +215,10 @@ class GameEngine(object):
                             self.passturn()
 
                         # Commands
+                        # help
+                        if event.type == pg.KEYDOWN and (event.key == pg.K_h):
+                            self.state = "help"
+                            self.draw()
                         # look
                         if event.type == pg.KEYDOWN and (event.key == pg.K_l):
                             self.cursorcoord = self.mapfield.getplayer().getposition()
@@ -248,9 +256,6 @@ class GameEngine(object):
                                 player.pick(item)
                                 self.gameevent.report("picked up a " + item.getname(), None, None, None)
                             self.passturn()
-                        # todo: delete debug
-                        if event.type == pg.KEYDOWN and event.key == pg.K_z:
-                            self.state = "upgrade"
             time_passed = self.clock.tick(30)
 
     def newmap(self):
@@ -288,9 +293,7 @@ class GameEngine(object):
 
     def passturn(self):
         self.turns += 1
-
         self.graphicshandler.eraseeventstack()
-
         self.processeffects()
         for monster in self.mapfield.monsters:
             monster.update()
@@ -304,6 +307,8 @@ class GameEngine(object):
             if self.mapfield.getplayer().killcount > self.itemsgenerated:
                 self.mapfield.generateitem()
                 self.itemsgenerated += 1
+            if self.mapfield.getplayer().combo >= self.COMBO_ITEM:
+                self.mapfield.generateitem(True)
             # endlevel - no score for kills but more monsters
             if self.noscore is True:
                 self.mapfield.generatemonster()
@@ -368,4 +373,8 @@ class GameEngine(object):
             self.clock.tick(30)
 
     def getrequiredkillcount(self):
-        return 20
+        base = 5
+        if self.mapfield.getplayer() is not None:
+            if self.mapfield.getplayer().getparam("level") is not None:
+                base += int(self.mapfield.getplayer().getparam("level")) * 10
+        return base

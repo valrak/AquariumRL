@@ -8,7 +8,7 @@
   "attack": "1",
   "level": 1,
   "speed": "1",
-  "weightLimit": "30"
+  "weightLimit": "3330"
   },
 "catfish": {
   "id": "catfish",
@@ -93,7 +93,7 @@
   "rarity": 2
   },
  "triton": {
-  "id": "tritonspear",
+  "id": "triton",
   "type": "triton",
   "hp": "5",
   "tile": "6,0",

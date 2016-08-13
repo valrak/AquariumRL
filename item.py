@@ -10,6 +10,7 @@ class Item(thing.Thing):
     mapfield = None
     parameters = {}
     gameengine = None
+    lastuser = None
     stack = 1
 
     def __init__(self, parameters, gameengine):
@@ -26,6 +27,12 @@ class Item(thing.Thing):
 
     def getposition(self):
         return self.x, self.y
+
+    def setlastuser(self, user):
+        self.lastuser = user
+
+    def getlastuser(self):
+        return self.lastuser
 
     def getvisualpos(self, tilesize):
         return self.x*tilesize, self.y*tilesize
@@ -59,6 +66,7 @@ class Item(thing.Thing):
         if self.getparam("fuse") is not None:
             if int(self.getparam("fuse")) == 0:
                 neweffect = effect.Effect(self.gameengine.effinfo[self.getparam("fuseeffect")], self.gameengine)
+                neweffect.setowner(self.lastuser)
                 neweffect.setposition(self.getposition())
                 self.gameengine.mapfield.effects.append(neweffect)
                 self.gameengine.mapfield.items.remove(self)

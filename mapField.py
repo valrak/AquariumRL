@@ -484,11 +484,14 @@ class MapField(object):
             self.addspawn(self.getmonsteratlevel(playerlvl))
             self.genlastmonster = 0
 
-    def generateitem(self):
+    def generateitem(self, now=False):
         if self.gameengine.state == "reset":
             return
-        self.genlast += 1
-        chance = random.randint(0, GENERATOR_CHANCERISEITEM * self.genlast)
+        if now:
+            chance = 1000
+        else:
+            self.genlast += 1
+            chance = random.randint(0, GENERATOR_CHANCERISEITEM * self.genlast)
         playerlvl = int(self.getplayer().getparam("level"))
         # generate random out of depth thing
         if chance > GENERATOR_TRESHOLD + GENERATOR_OODUP:

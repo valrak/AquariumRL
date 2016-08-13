@@ -23,6 +23,8 @@ class Monster(thing.Thing):
     lastattacker = None
     killcount = 0
     score = 0
+    combo = 0
+    currentcombo = False
 
     def __init__(self, parameters, gameengine):
         self.parameters = dict(parameters)
@@ -69,7 +71,7 @@ class Monster(thing.Thing):
                 text = "+" + text
             else:
                 text = "-" + text
-            self.gameengine.graphicshandler.addpop(text, self.getposition(), "red")
+            self.gameengine.graphicshandler.addpop(text, self.getposition())
 
     def lowerhealth(self, amount):
         self.setparam("hp", int(self.getparam("hp")) - int(amount))
@@ -108,15 +110,31 @@ class Monster(thing.Thing):
                     return True
         return False
 
+    def gettotalweight(self):
+        totalw = 0
+        for witem in self.inventory:
+            if witem.getparam("weight") is not None:
+                if witem.isstackable:
+                    totalw += int(witem.getparam("weight")) * int(witem.stack)
+                else:
+                    totalw += int(witem.getparam("weight"))
+        return totalw
+
+    def updatecombo(self):
+        # combo management
+        if not self.currentcombo:
+            self.resetcombo()
+        else:
+            self.currentcombo = False
+
     def update(self):
+        self.updatecombo()
         # weight management
         if self.getparam("weightLimit") is not None:
-            totalw = 0
-            for witem in self.inventory:
-                if witem.getparam("weight") is not None:
-                    totalw += int(witem.getparam("weight"))
+            totalw = self.gettotalweight()
             if totalw > int(self.getparam("weightLimit")):
-
+                if self.player:
+                    self.gameengine.gameevent.report("you can't carry so much weight!", None, None, None)
                 coord = (self.x, self.y+1)
                 if self.gameengine.mapfield.ispassable(coord):
                     self.setposition(coord)
@@ -265,9 +283,9 @@ class Monster(thing.Thing):
         # increase score for the attacker
         if self.lastattacker is not None and self.getparam("score") is not None and not self.gameengine.noscore:
             self.lastattacker.score += int(self.getparam("score"))
-            # fixme: include score when killed with item (dynamite). Item should have lastused.
             self.gameengine.gameevent.report(self.getname()+" killed by "+self.lastattacker.getname()+"!", None, None, None)
-
+            self.raisecombo()
+            self.lastattacker.raisecombo()
             self.lastattacker.killcount += 1
         else:
             self.gameengine.gameevent.report(self.getname()+" has been killed! ", None, None, None)
@@ -305,6 +323,7 @@ class Monster(thing.Thing):
             return None
         weapon.setposition(self.getposition())
         weapon = self.throwaway(weapon)
+        weapon.setlastuser(self)
         # set fuse for fused weapons
         if weapon.getparam("defaultFuse") is not None and weapon.getparam("fuse") is not None:
             weapon.setparam("fuse", int(weapon.getparam("defaultFuse")))
@@ -430,5 +449,15 @@ class Monster(thing.Thing):
     def goldscore(self):
         for ite in self.inventory:
             if ite.getflag("remove"):
-                self.score += int(ite.getparam("score"))
+                amount = ite.stack
+                for i in range(amount):
+                    self.score += int(ite.getparam("score"))
                 self.inventory.remove(ite)
+
+    def raisecombo(self):
+        self.combo += 1
+        self.currentcombo = True
+
+    def resetcombo(self):
+        self.combo = 0
+        self.currentcombo = False

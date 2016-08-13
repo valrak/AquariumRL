@@ -80,6 +80,15 @@
   "description": "",
   "tile": "0,0",
   "effect": "change",
+  "changeattributesname": ["weightLimit"],
+  "changeattributesvalue": ["20"],
+  "ttl": 2
+},
+"attack": {
+  "id": "attack",
+  "description": "",
+  "tile": "0,0",
+  "effect": "change",
   "changeattributesname": ["attack"],
   "changeattributesvalue": ["1"],
   "ttl": 2

@@ -6,7 +6,7 @@ from pygame.locals import *
 MAPPOSX = 10
 MAPPOSY = 10
 TILESIZE = 32
-MAXLOGLINES = 5
+MAXLOGLINES = 6
 
 
 class GraphicsHandler(object):
@@ -34,6 +34,11 @@ class GraphicsHandler(object):
         self.finalscreen = pygame.display.set_mode(self.size, HWSURFACE | DOUBLEBUF | RESIZABLE)
         self.screen = self.finalscreen.copy()
         pygame.font.init()
+        self.popfont = pygame.font.Font("./resources/fonts/pixelmix.ttf", 12)
+        self.logfont = pygame.font.Font("./resources/fonts/pixelmix.ttf", 20)
+        self.statusfont = pygame.font.Font("./resources/fonts/pixelmix.ttf", 14)
+        self.helpfont = pygame.font.Font("./resources/fonts/pixelmix.ttf", 14)
+        self.infofont = pygame.font.Font("./resources/fonts/pixelmix.ttf", 14)
 
     def event(self, thing, name=None, newvalue=None, oldvalue=None):
         if thing == "error":
@@ -65,20 +70,30 @@ class GraphicsHandler(object):
             effectimage = self.efftileeng.gettile(effect.parameters["id"])
             self.screen.blit(effectimage, c(effect.getvisualpos(TILESIZE)))
 
+        # Events
+        for key in self.eventstack:
+            self.screen.blit(self.eventstack[key], key)
+
         # Log
-        self.font = pygame.font.Font("./resources/fonts/pixelmix.ttf", 20)
         logposadd = 0
         logbackgr = pygame.Surface((700, 150))
         logbackgr = logbackgr.convert()
         logbackgr.fill(pygame.Color("black"))
         for line in self.loglines:
-            text = self.font.render(line, 1, (120+logposadd, 120+logposadd, 120+logposadd))
+            text = self.logfont.render(line, 1, (120+logposadd, 120+logposadd, 120+logposadd))
             logbackgr.blit(text, (10, 0+logposadd))
             logposadd += 20
-        self.screen.blit(logbackgr, (10, 530))
+        self.screen.blit(logbackgr, (10, 500))
 
         if self.gameengine.mapfield.getplayer is None:
             self.gameengine.state = "reset"
+
+        if self.gameengine.state == "help":
+            self.displayhelpscreen()
+            self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
+            pygame.display.flip()
+            return
+
         if self.gameengine.state == "reset":
             self.displaydeath(str(self.gameengine.lastscore))
             self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
@@ -86,7 +101,7 @@ class GraphicsHandler(object):
             return
 
         # Status
-        self.font = pygame.font.Font("./resources/fonts/pixelmix.ttf", 14)
+        self.displayhelp()
         watchimage = self.uiparttileeng.getcustomtile(0, 0, 168, 315)
 
         player = self.gameengine.mapfield.getplayer()
@@ -94,32 +109,54 @@ class GraphicsHandler(object):
         curhp = str(player.getparam("hp"))
         score = str(player.score)
         level = str(player.getparam("level"))
+        combo = str(player.combo)
+        # workaround as this value is not synced in display phase
+        if not player.currentcombo:
+            combo = str(0)
+        maxweight = str(player.getparam("weightLimit"))
+        weight = str(player.gettotalweight())
 
-        text = self.font.render("H "+curhp+" / "+maxhp, 1, (pygame.Color("green")))
-        watchimage.blit(text, (34, 126))
-        text = self.font.render("S "+score, 1, (pygame.Color("green")))
-        watchimage.blit(text, (34, 146))
-        text = self.font.render("L " + level + " / " +
+        tcolor = "green"
+        if (int(curhp) - int(maxhp) / 5) <= 0:
+            tcolor = "red"
+        text = self.statusfont.render("H "+curhp+" / "+maxhp, 1, (pygame.Color(tcolor)))
+        watchimage.blit(text, (40, 113))
+        text = self.statusfont.render("S "+score, 1, (pygame.Color("green")))
+        watchimage.blit(text, (40, 133))
+
+        tcolor = "green"
+        if (self.gameengine.getrequiredkillcount() - player.killcount) <= 0:
+            tcolor = "red"
+        text = self.statusfont.render("L " + level + " / " +
                                 str(self.gameengine.getrequiredkillcount() - player.killcount),
-                                1, (pygame.Color("green")))
-        watchimage.blit(text, (34, 166))
-        self.screen.blit(watchimage, (830, 100))
+                                1, (pygame.Color(tcolor)))
+        watchimage.blit(text, (40, 153))
 
-        # Events
-        for key in self.eventstack:
-            self.screen.blit(self.eventstack[key], key)
+        tcolor = "green"
+        if int(weight) > int(maxweight):
+            tcolor = "red"
+        text = self.statusfont.render("W " + weight + " / " + maxweight, 1, (pygame.Color(tcolor)))
+        watchimage.blit(text, (40, 173))
+
+        tcolor = "green"
+        if int(combo) >= self.gameengine.COMBO_ITEM:
+            tcolor = "red"
+        text = self.statusfont.render("C " + combo, 1, (pygame.Color(tcolor)))
+        watchimage.blit(text, (64, 193))
+
+        self.screen.blit(watchimage, (830, 100))
 
         # Special modes
         if self.gameengine.state == "fire":
             statusbackgr = pygame.Surface((100, 20))
             statusbackgr = statusbackgr.convert()
-            text = self.font.render("Firing", 1, (pygame.Color("grey70")))
+            text = self.statusfont.render("Firing", 1, (pygame.Color("grey70")))
             statusbackgr.blit(text, (1, 1))
             self.screen.blit(statusbackgr, (830, 20))
         if self.gameengine.state == "look":
             statusbackgr = pygame.Surface((100, 20))
             statusbackgr = statusbackgr.convert()
-            text = self.font.render("Looking", 1, (pygame.Color("grey70")))
+            text = self.statusfont.render("Looking", 1, (pygame.Color("grey70")))
             statusbackgr.blit(text, (1, 1))
             self.screen.blit(statusbackgr, (830, 20))
             cursorimage = self.uitileeng.getcustomtile(0, 0, 32, 32)
@@ -130,7 +167,6 @@ class GraphicsHandler(object):
                 self.drawwindow(infotext, self.gameengine.cursorcoord)
 
         self.displaypops()
-        self.displayhelp()
         self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
         pygame.display.flip()
 
@@ -172,7 +208,7 @@ class GraphicsHandler(object):
         invadd = 0
         inv = self.gameengine.mapfield.getplayer().inventory
         for line in stringlist:
-            text = self.font.render(line, 1, (pygame.Color("grey70")))
+            text = self.infofont.render(line, 1, (pygame.Color("grey70")))
             invbackgr.blit(text, (5, 5+invadd))
             invadd += 20
 
@@ -212,27 +248,27 @@ class GraphicsHandler(object):
 
         if stack is not None:
             textname = textname + stack
-        name = self.font.render(textname, 1, (pygame.Color("lightblue")))
+        name = self.infofont.render(textname, 1, (pygame.Color("lightblue")))
         belowname = pygame.Surface((1, 1), pygame.SRCALPHA)
 
         if item.getparam("damage") is not None:
-            damageface = self.font.render(str(item.getparam("damage")), 1, (pygame.Color("grey70")))
+            damageface = self.infofont.render(str(item.getparam("damage")), 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(damagetile, damageface, 2)
             belowname = self.glueleft(belowname, tempsurface)
         if item.getparam("weight") is not None:
-            weightface = self.font.render(str(item.getparam("weight")), 1, (pygame.Color("grey70")))
+            weightface = self.infofont.render(str(item.getparam("weight")), 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(weighttile, weightface, 2)
             belowname = self.glueleft(belowname, tempsurface)
         if item.getparam("range") is not None:
-            rangeface = self.font.render(str(item.getparam("range")), 1, (pygame.Color("grey70")))
+            rangeface = self.infofont.render(str(item.getparam("range")), 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(arrowtile, rangeface, 2)
             belowname = self.glueleft(belowname, tempsurface)
         tempsurface = self.gluebelow(name, belowname, 2)
         if textdesc is not None:
-            desc = self.font.render(textdesc, 1, (pygame.Color("grey40")))
+            desc = self.infofont.render(textdesc, 1, (pygame.Color("grey40")))
             tempsurface = self.gluebelow(tempsurface, desc)
         if letter is not None:
-            letterface = self.font.render(letter+") ", 1, (pygame.Color("grey70")))
+            letterface = self.infofont.render(letter+") ", 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(letterface, tempsurface)
         return tempsurface
 
@@ -250,19 +286,19 @@ class GraphicsHandler(object):
         step = 0
         if monster is not None:
             step = 8
-            name = self.font.render(monster.getname(), 1, (pygame.Color("red")))
-            attackface = self.font.render(str(monster.getparam("attack")), 1, (pygame.Color("grey70")))
+            name = self.infofont.render(monster.getname(), 1, (pygame.Color("red")))
+            attackface = self.infofont.render(str(monster.getparam("attack")), 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(damagetile, attackface, 2)
-            healthface = self.font.render(str(monster.getparam("hp")), 1, (pygame.Color("grey70")))
+            healthface = self.infofont.render(str(monster.getparam("hp")), 1, (pygame.Color("grey70")))
             healthface = self.glueleft(healthtile, healthface, 2)
             tempsurface = self.glueleft(healthface, tempsurface, 10)
             if monster.getbestranged() is not None:
-                rangedsurface = self.font.render(str(monster.getbestranged().getparam("damage")), 1, (pygame.Color("grey70")))
+                rangedsurface = self.infofont.render(str(monster.getbestranged().getparam("damage")), 1, (pygame.Color("grey70")))
                 rangedsurface = self.glueleft(arrowtile, rangedsurface, 2)
                 tempsurface = self.glueleft(tempsurface, rangedsurface, 10)
             textdesc = monster.getparam("description")
             if textdesc is not None:
-                descsurface = self.font.render(textdesc, 1, (pygame.Color("grey40")))
+                descsurface = self.infofont.render(textdesc, 1, (pygame.Color("grey40")))
                 tempsurface = self.gluebelow(tempsurface, descsurface)
             surface = self.gluebelow(name, tempsurface, 4)
         for item in items:
@@ -270,21 +306,21 @@ class GraphicsHandler(object):
             surface = self.gluebelow(surface, tempsurface, step)
             step = 8
         for effect in effects:
-            name = self.font.render(effect.getname(), 1, (pygame.Color("green")))
+            name = self.infofont.render(effect.getname(), 1, (pygame.Color("green")))
             belowname = pygame.Surface((1, 1), pygame.SRCALPHA)
             if effect.getparam("damage") is not None:
-                damageface = self.font.render(str(effect.getparam("damage")), 1, (pygame.Color("grey70")))
+                damageface = self.infofont.render(str(effect.getparam("damage")), 1, (pygame.Color("grey70")))
                 tempsurface = self.glueleft(damagetile, damageface, 2)
                 belowname = self.glueleft(belowname, tempsurface)
             if effect.ttl is not None:
                 ttl = effect.ttl
-                timeface = self.font.render(str(ttl), 1, (pygame.Color("grey70")))
+                timeface = self.infofont.render(str(ttl), 1, (pygame.Color("grey70")))
                 tempsurface = self.glueleft(timetile, timeface, 2)
                 belowname = self.glueleft(belowname, tempsurface)
             textdesc = effect.getparam("description")
             tempsurface = self.gluebelow(name, belowname, 2)
             if textdesc is not None:
-                descsurface = self.font.render(textdesc, 1, (pygame.Color("grey40")))
+                descsurface = self.infofont.render(textdesc, 1, (pygame.Color("grey40")))
                 tempsurface = self.gluebelow(tempsurface, descsurface)
             surface = self.gluebelow(surface, tempsurface, step)
         return surface
@@ -338,22 +374,27 @@ class GraphicsHandler(object):
         backgr.blit(drawing, (3, 3))
         self.screen.blit(backgr, coord)
 
-    def addpop(self, text, coord, tcolor):
+    def addpop(self, number, coord):
         for pop in self.pops:
             if coord == pop[1]:
-                pop[0] = pop[0] + text
+                oldnumber = int(pop[0])
+                newnumber = int(number)
+                newnumber = oldnumber + newnumber
+                if newnumber == 0:
+                    self.pops.remove(pop)
+                pop[0] = newnumber
                 return True
-        self.pops.append([text, coord, tcolor])
+        if int(number) != 0:
+            self.pops.append([number, coord])
 
     def displaypops(self):
         for pop in self.pops:
             coord = pop[1]
-            x = coord[0] * TILESIZE + TILESIZE
-            y = coord[1] * TILESIZE
+            x = (coord[0] * TILESIZE + TILESIZE) - TILESIZE/6
+            y = (coord[1] * TILESIZE) + TILESIZE/6
             text = pop[0]
-            tcolor = pop[2]
 
-            poptext = self.font.render(text, 1, (pygame.Color(tcolor)))
+            poptext = self.popfont.render(str(text), 1, (pygame.Color("yellow2")))
             self.screen.blit(poptext, (x, y))
 
     def erasepops(self):
@@ -372,13 +413,15 @@ class GraphicsHandler(object):
         logbackgr = logbackgr.convert()
         logbackgr.fill(pygame.Color("black"))
         for line in deathlines:
-            text = self.font.render(line, 1, (120, 120, 120))
+            text = self.logfont.render(line, 1, (120, 120, 120))
             logbackgr.blit(text, (10, 0 + logposadd))
             logposadd += 20
         self.screen.blit(logbackgr, (200, 100))
 
     def displayhelp(self):
         helplines = []
+        helplines.append("_h_elp")
+        helplines.append("")
         helplines.append("_f_ire")
         helplines.append("_i_nventory")
         helplines.append("_u_se")
@@ -392,10 +435,46 @@ class GraphicsHandler(object):
         logbackgr = logbackgr.convert()
         logbackgr.fill(pygame.Color("black"))
         for line in helplines:
-            text = self.font.render(line, 1, (200, 200, 200))
+            text = self.helpfont.render(line, 1, (200, 200, 200))
             logbackgr.blit(text, (10, 0 + logposadd))
             logposadd += 20
-        self.screen.blit(logbackgr, (830, 500))
+        self.screen.blit(logbackgr, (830, 430))
+
+    def displayhelpscreen(self):
+        helplines = []
+        helplines.append("Aquarium arena roguelike game")
+        helplines.append("")
+        helplines.append("by valrak")
+        helplines.append("")
+        helplines.append("---")
+        helplines.append("")
+        helplines.append("You've been catched by merman civilization and thrown into their ")
+        helplines.append("aquarium arena to entertain crowds. More you kill, more items")
+        helplines.append("you can expect to fall into the arena. Especially when you keep that")
+        helplines.append("combo meter active! Corals in the arena can be used to hide in them.")
+        helplines.append("")
+        helplines.append("After certain amount of kills gate appears. When this happens, no items")
+        helplines.append("are thrown to arena, only monsters are generated. Move through the gate")
+        helplines.append("as soon as possible, as your score don't go up until you go to next level.")
+        helplines.append("Bring gold to gate to raise your score.")
+        helplines.append("")
+        helplines.append("You have also your trusty watch:")
+        helplines.append("H is your current / maximum health.")
+        helplines.append("S is your current score.")
+        helplines.append("L is current level / amount of kills before gate appears.")
+        helplines.append("C is combo meter.")
+        helplines.append("W is current / maximum weight.")
+        helplines.append("")
+        helplines.append("Good luck!")
+        logposadd = 0
+        logbackgr = pygame.Surface((900, 490))
+        logbackgr = logbackgr.convert()
+        logbackgr.fill(pygame.Color("black"))
+        for line in helplines:
+            text = self.helpfont.render(line, 1, (200, 200, 200))
+            logbackgr.blit(text, (10, 0 + logposadd))
+            logposadd += 20
+        self.screen.blit(logbackgr, (5, 5))
 
     def eraseloglines(self):
         self.loglines = []

@@ -104,9 +104,10 @@
   "score": 0,
   "stackable": "true",
   "range": 10,
-  "level": 1,
+  "level": 2,
+  "weight": 2,
   "effect": "weak ray",
-  "rarity": 1
+  "rarity": 2
   },
 "repairkit": {
   "id": "repairkit",
@@ -131,8 +132,8 @@
   "damage": 0,
   "effect": "smoke"
   },
-"strength": {
-  "id": "strength",
+"attack orb": {
+  "id": "attack orb",
   "description": "+1 melee damage",
   "tile": "5,0",
   "flags": ["upgrade", "gravity", "usable"],
@@ -140,10 +141,10 @@
   "score": 0,
   "stackable": "false",
   "damage": 0,
-  "effect": "strength"
+  "effect": "attack"
   },
-"health": {
-  "id": "health",
+"health orb": {
+  "id": "health orb",
   "description": "+5 max HP",
   "tile": "6,0",
   "flags": ["upgrade", "gravity", "usable"],
@@ -152,6 +153,17 @@
   "stackable": "false",
   "damage": 0,
   "effect": "health"
+  },
+"strength orb": {
+  "id": "strength orb",
+  "description": "+20 max weight",
+  "tile": "6,0",
+  "flags": ["upgrade", "gravity", "usable"],
+  "upgradelevel": 1,
+  "score": 0,
+  "stackable": "false",
+  "damage": 0,
+  "effect": "strength"
   },
 "harpoon voucher": {
   "id": "harpoon voucher",
@@ -170,6 +182,7 @@
   "tile": "8,0",
   "flags": ["upgrade", "gravity", "usable"],
   "upgradelevel": 1,
+  "weight": 5,
   "score": 0,
   "stackable": "false",
   "damage": 0,
