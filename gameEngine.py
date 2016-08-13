@@ -101,7 +101,7 @@ class GameEngine(object):
         player.player = True
         player.setposition(self.mapfield.getrandompassable())
         for x in range(0, 5):
-            player.pick(Item(self.iteinfo['bar'], self))
+            player.pick(Item(self.iteinfo['harpoon'], self))
         player.pick(Item(self.iteinfo['dynamite'], self))
         self.mapfield.addmonster(player)
         return player

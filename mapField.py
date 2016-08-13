@@ -15,6 +15,7 @@ GENERATOR_CHANCERISEMONSTER = 20
 GENERATOR_TRESHOLD = 50
 GENERATOR_OODUP = 10  # out of depth chance to spawn higher level thing
 GENERATOR_OODDOWN = 30  # chance to spawn lower level thing
+COMBO_MULTIPLIER = 3 # how big combo bonus is during generating OOP items
 
 class MapField(object):
     gameengine = None
@@ -488,7 +489,7 @@ class MapField(object):
         if self.gameengine.state == "reset":
             return
         if now:
-            chance = 1000
+            chance = 50 + self.getplayer().combo * COMBO_MULTIPLIER
         else:
             self.genlast += 1
             chance = random.randint(0, GENERATOR_CHANCERISEITEM * self.genlast)

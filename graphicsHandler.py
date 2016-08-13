@@ -90,13 +90,13 @@ class GraphicsHandler(object):
 
         if self.gameengine.state == "help":
             self.displayhelpscreen()
-            self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
+            self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
             pygame.display.flip()
             return
 
         if self.gameengine.state == "reset":
             self.displaydeath(str(self.gameengine.lastscore))
-            self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
+            self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
             pygame.display.flip()
             return
 
@@ -167,7 +167,7 @@ class GraphicsHandler(object):
                 self.drawwindow(infotext, self.gameengine.cursorcoord)
 
         self.displaypops()
-        self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
+        self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
         pygame.display.flip()
 
     def eraseeventstack(self):
@@ -191,7 +191,7 @@ class GraphicsHandler(object):
             i += 1
             allitemsface = self.gluebelow(allitemsface, itemface)
         self.drawwindow(allitemsface, (1, 1))
-        self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
+        self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
         pygame.display.flip()
 
     def displaystringlist(self, stringlist):
@@ -213,7 +213,7 @@ class GraphicsHandler(object):
             invadd += 20
 
         self.screen.blit(invbackgr, (100, 100))
-        self.finalscreen.blit(pygame.transform.scale(self.screen, self.size), (0, 0))
+        self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
         pygame.display.flip()
 
     def pickupview(self, coord):
@@ -478,6 +478,16 @@ class GraphicsHandler(object):
 
     def eraseloglines(self):
         self.loglines = []
+
+    def correctratio(self, size):
+        originalx = self.gameengine.RESOLUTIONX
+        originaly = self.gameengine.RESOLUTIONY
+        originalratio = float(originalx) / float(originaly)
+        x = size[0]
+        y = size[1]
+        y = x / originalratio
+        return int(x), int(y)
+
 
 # FIXME: return coordinates to match map position to align to the grid """
 c = lambda coords: (coords[0] + MAPPOSX, coords[1] + MAPPOSX)
