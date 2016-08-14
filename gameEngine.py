@@ -103,6 +103,8 @@ class GameEngine(object):
         for x in range(0, 5):
             player.pick(Item(self.iteinfo['harpoon'], self))
         player.pick(Item(self.iteinfo['dynamite'], self))
+        player.pick(Item(self.iteinfo['dynamite'], self))
+        player.pick(Item(self.iteinfo['crystal shard'], self))
         self.mapfield.addmonster(player)
         return player
 
@@ -134,6 +136,8 @@ class GameEngine(object):
                         if coord is not None:
                             self.cursorcoord = (self.cursorcoord[0]+coord[0], self.cursorcoord[1]+coord[1])
                             self.draw()
+                        if event.type == pg.QUIT:
+                            self.endgame()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
                             self.draw()
@@ -145,12 +149,16 @@ class GameEngine(object):
                         else:
                             self.state = "game"
                             self.draw()
+                        if event.type == pg.QUIT:
+                            self.endgame()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
                             self.draw()
                             break
                     elif self.state == "use":
                         # cancel
+                        if event.type == pg.QUIT:
+                            self.endgame()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
                             self.gameevent.report("item use cancelled.", None, None, None)
@@ -170,6 +178,8 @@ class GameEngine(object):
 
                     # Firing state
                     elif self.state == "fire":
+                        if event.type == pg.QUIT:
+                            self.endgame()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
                             self.gameevent.report("firing cancelled.", None, None, None)
@@ -296,12 +306,12 @@ class GameEngine(object):
         self.turns += 1
         self.graphicshandler.eraseeventstack()
         self.processeffects()
-        for monster in self.mapfield.monsters:
-            monster.update()
         for uitem in self.mapfield.items:
             uitem.update()
         for ueffect in self.mapfield.effects:
             ueffect.update()
+        for monster in self.mapfield.monsters:
+            monster.update()
         self.mapfield.cleanup()
         self.mapfield.generatemonster()
         if self.mapfield.getplayer() is not None:
@@ -352,7 +362,12 @@ class GameEngine(object):
         loop = True
         while loop:
             for event in pygame.event.get():
-                keypressed = pygame.key.name(event.key)
+                try:
+                    keypressed = pygame.key.name(event.key)
+                except AttributeError as e:
+                    break
+                if event.type == pg.QUIT:
+                    self.endgame()
                 if event.type == pg.KEYDOWN and keypressed in self.ALPHABET:
                     if len(items) > self.ALPHABET.index(keypressed):
                         return items[self.ALPHABET.index(keypressed)]  # returns corresponding key alphabet index
@@ -366,6 +381,8 @@ class GameEngine(object):
         loop = True
         while loop:
             for event in pygame.event.get():
+                if event.type == pg.QUIT:
+                    self.endgame()
                 # cancel
                 if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                     return None

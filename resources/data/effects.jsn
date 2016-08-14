@@ -2,7 +2,7 @@
 "spawn": {
   "id": "spawn",
   "description": "something is coming!",
-  "tile": "0,0",
+  "tile": "10,0",
   "effect": "spawn",
   "spawn": "random",
   "ttl": 0

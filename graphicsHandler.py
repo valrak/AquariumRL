@@ -243,6 +243,7 @@ class GraphicsHandler(object):
         damagetile = self.uitileeng.getcustomtile(0, 32, 16, 16)
         weighttile = self.uitileeng.getcustomtile(0, 64, 16, 16)
         arrowtile = self.uitileeng.getcustomtile(0, 32+16, 16, 16)
+        rangetile = self.uitileeng.getcustomtile(16, 32 + 32, 16, 16)
         textname = item.getname()
         textdesc = item.getparam("description")
 
@@ -253,7 +254,7 @@ class GraphicsHandler(object):
 
         if item.getparam("damage") is not None:
             damageface = self.infofont.render(str(item.getparam("damage")), 1, (pygame.Color("grey70")))
-            tempsurface = self.glueleft(damagetile, damageface, 2)
+            tempsurface = self.glueleft(arrowtile, damageface, 2)
             belowname = self.glueleft(belowname, tempsurface)
         if item.getparam("weight") is not None:
             weightface = self.infofont.render(str(item.getparam("weight")), 1, (pygame.Color("grey70")))
@@ -261,8 +262,9 @@ class GraphicsHandler(object):
             belowname = self.glueleft(belowname, tempsurface)
         if item.getparam("range") is not None:
             rangeface = self.infofont.render(str(item.getparam("range")), 1, (pygame.Color("grey70")))
-            tempsurface = self.glueleft(arrowtile, rangeface, 2)
+            tempsurface = self.glueleft(rangetile, rangeface, 2)
             belowname = self.glueleft(belowname, tempsurface)
+
         tempsurface = self.gluebelow(name, belowname, 2)
         if textdesc is not None:
             desc = self.infofont.render(textdesc, 1, (pygame.Color("grey40")))
@@ -280,6 +282,7 @@ class GraphicsHandler(object):
         timetile = self.uitileeng.getcustomtile(16, 32+16, 16, 16)
         healthtile = self.uitileeng.getcustomtile(16, 32, 16, 16)
         arrowtile = self.uitileeng.getcustomtile(0, 32+16, 16, 16)
+        rangetile = self.uitileeng.getcustomtile(16, 32+32, 16, 16)
         if monster is None and len(items) == 0 and len(effects) == 0:
             return None
         surface = pygame.Surface((1, 1), pygame.SRCALPHA)
@@ -295,6 +298,9 @@ class GraphicsHandler(object):
             if monster.getbestranged() is not None:
                 rangedsurface = self.infofont.render(str(monster.getbestranged().getparam("damage")), 1, (pygame.Color("grey70")))
                 rangedsurface = self.glueleft(arrowtile, rangedsurface, 2)
+                tempsurface = self.glueleft(tempsurface, rangedsurface, 10)
+                rangedsurface = self.infofont.render(str(monster.getbestranged().getparam("range")), 1, (pygame.Color("grey70")))
+                rangedsurface = self.glueleft(rangetile, rangedsurface, 2)
                 tempsurface = self.glueleft(tempsurface, rangedsurface, 10)
             textdesc = monster.getparam("description")
             if textdesc is not None:

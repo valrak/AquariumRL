@@ -67,7 +67,7 @@
   "damage": 0,
   "effect": "None",
   "fuse": -1,
-  "defaultFuse": 5,
+  "defaultFuse": 4,
   "fuseeffect": "explosion",
   "level": 1,
   "weight": 5,

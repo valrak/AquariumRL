@@ -63,7 +63,30 @@ class Effect(thing.Thing):
                     return True
         return False
 
+    def large(self):
+        neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+        for n in neighbors:
+            ncoord = pathfinder.alterposition(self.getposition(), n)
+            protoeffect = copy.copy(self.gameengine.effinfo[self.getname()])
+            # remove large to prevent flood
+            # copy because we don't want to change the flags in global effects library
+            flags = copy.copy(protoeffect["flags"])
+            for f in flags:
+                if f == "large":
+                    flags.remove(f)
+                    break
+            protoeffect["flags"] = flags
+            neweffect = Effect(protoeffect, self.gameengine)
+            neweffect.setposition(ncoord)
+            neweffect.setowner(self.owner)
+            neweffect.ttl = self.ttl
+
+            neweffect.setparam("flags", flags)
+            self.gameengine.mapfield.effects.append(neweffect)
+
     def update(self):
+        if self.getflag("large"):
+            self.large()
         if self.donotupdate is True:
             self.donotupdate = False
             if self.ttl is not None:
@@ -82,23 +105,6 @@ class Effect(thing.Thing):
                     neweffect.ttl = self.ttl - 1
                     neweffect.donotupdate = True
                     neweffect.setowner(self.owner)
-                    self.gameengine.mapfield.effects.append(neweffect)
-            if self.getflag("large"):
-                neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
-                for n in neighbors:
-                    ncoord = pathfinder.alterposition(self.getposition(), n)
-                    neweffect = Effect(self.gameengine.effinfo[self.getname()], self.gameengine)
-                    neweffect.setposition(ncoord)
-                    neweffect.setowner(self.owner)
-                    neweffect.ttl = self.ttl
-                    # remove large to prevent flood
-                    # copy because we don't want to change the flags in global effects library
-                    flags = copy.copy(neweffect.getparam("flags"))
-                    for f in flags:
-                        if f == "large":
-                            flags.remove(f)
-                            break
-                    neweffect.setparam("flags", flags)
                     self.gameengine.mapfield.effects.append(neweffect)
             if self.getparam("damage"):
                 occupant = self.gameengine.mapfield.getoccupants(self.getposition())
