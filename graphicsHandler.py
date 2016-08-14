@@ -36,7 +36,7 @@ class GraphicsHandler(object):
         pygame.font.init()
         self.popfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 16)
         self.logfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 20)
-        self.statusfont = pygame.font.Font("./resources/fonts/unifont.ttf", 16)
+        self.statusfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 14)
         self.helpfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 16)
         self.infofont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 16)
 
