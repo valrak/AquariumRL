@@ -125,6 +125,7 @@ class GameEngine(object):
                     if self.state == "reset":
                         self.deathscreen()
                         self.state = "game"
+                        self.gameevent.report("Your score was: "+str(self.lastscore)+".", None, None, None)
                         savehiscore(self.lastscore, self.hiscore)
                         self.resetgame()
                         break
@@ -267,11 +268,11 @@ class GameEngine(object):
         self.noscore = False
 
         del self.mapfield
-        del self.graphicshandler
+        #del self.graphicshandler
         arenamap = None
         self.mapfield = MapField(arenamap, self.mapinfo, self.moninfo, self.effinfo, self.iteinfo, self)
         self.mapfield.generatelevel(25, 15)
-        self.graphicshandler = GraphicsHandler(self)
+        #self.graphicshandler = GraphicsHandler(self)
 
         self.loop()
 

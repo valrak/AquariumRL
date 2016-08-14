@@ -29,6 +29,14 @@
   "amount": "1",
   "ttl": 2
   },
+"repair+3": {
+  "id": "repair+3",
+  "description": "",
+  "tile": "4,0",
+  "effect": "repair",
+  "amount": "3",
+  "ttl": 2
+  },
 "bigrepair": {
   "id": "repair",
   "description": "",
@@ -53,11 +61,33 @@
   "flags": ["large"],
   "ttl": 2
   },
+"small explosion": {
+  "id": "small explosion",
+  "tile": "2,0",
+  "effect": "explode",
+  "damage": "5",
+  "flags": ["large"],
+  "ttl": 2
+  },
 "weak ray": {
   "id": "weak ray",
   "tile": "7,0",
   "effect": "explode",
-  "damage": "2",
+  "damage": "3",
+  "ttl": 2
+  },
+"strong ray": {
+  "id": "strong ray",
+  "tile": "8,0",
+  "effect": "explode",
+  "damage": "6",
+  "ttl": 2
+  },
+"ultra ray": {
+  "id": "ultra ray",
+  "tile": "9,0",
+  "effect": "explode",
+  "damage": "9",
   "ttl": 2
   },
 "volt": {
@@ -108,6 +138,15 @@
   "tile": "0,0",
   "effect": "give",
   "itemname": "harpoon",
+  "amount": 5,
+  "ttl": 2
+},
+"giveMermpoons": {
+  "id": "giveMermpoons",
+  "description": "",
+  "tile": "0,0",
+  "effect": "give",
+  "itemname": "mermpoon",
   "amount": 5,
   "ttl": 2
 }

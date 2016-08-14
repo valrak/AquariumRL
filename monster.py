@@ -176,7 +176,8 @@ class Monster(thing.Thing):
                     bestranged = self.getbestranged()
                     if bestranged is not None and self.firetime == 0:
                         # if the player is near me and I have better attack than ranged weapon, then bash him
-                        if pathfinder.isnear(playerpos, position) and int(bestranged.getparam("damage")) < int(self.getparam("attack")):
+                        if pathfinder.isnear(playerpos, position) and \
+                                        bestranged.getparam("damage") is not None and int(bestranged.getparam("damage")) < int(self.getparam("attack")):
                             False
                         # if is in range an line, shoot!
                         else:
@@ -185,7 +186,7 @@ class Monster(thing.Thing):
                                 wrange = int(bestranged.getparam("range"))
                                 linetotarget = pathfinder.lineto(position, playerpos)
                                 linetotarget = linetotarget[1:-1]
-                                if len(linetotarget) <= wrange:
+                                if len(linetotarget) < wrange:
                                     # check if there is anything in the path
                                     canshoot = True
                                     for p in linetotarget:
@@ -219,7 +220,6 @@ class Monster(thing.Thing):
                         else: # wander randomly
                             self.action(self.gameengine.mapfield.getrandomnearby(position))
                     actions += 1
-
                 # can move only on ground
                 if self.getflag("ground") and not self.getflag("nomove") and self.canact(actions):
                     position = self.getposition()
@@ -273,6 +273,12 @@ class Monster(thing.Thing):
         self.gameengine.mapfield.effects.append(neweffect)
         # drop all items
         self.dropall()
+        # perform death effects
+        if self.getparam("deatheffect") is not None:
+            neweffect = effect.Effect(self.gameengine.effinfo[self.getparam("deatheffect")], self.gameengine)
+            neweffect.setposition(self.getposition())
+            neweffect.setowner(self.lastattacker)
+            self.gameengine.mapfield.effects.append(neweffect)
         # inform home that I'm not going home any more
         if self.home is not None:
             self.home.removechild(self)

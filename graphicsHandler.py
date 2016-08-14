@@ -34,11 +34,11 @@ class GraphicsHandler(object):
         self.finalscreen = pygame.display.set_mode(self.size, HWSURFACE | DOUBLEBUF | RESIZABLE)
         self.screen = self.finalscreen.copy()
         pygame.font.init()
-        self.popfont = pygame.font.Font("./resources/fonts/pixelmix.ttf", 12)
-        self.logfont = pygame.font.Font("./resources/fonts/pixelmix.ttf", 20)
-        self.statusfont = pygame.font.Font("./resources/fonts/pixelmix.ttf", 14)
-        self.helpfont = pygame.font.Font("./resources/fonts/pixelmix.ttf", 14)
-        self.infofont = pygame.font.Font("./resources/fonts/pixelmix.ttf", 14)
+        self.popfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 16)
+        self.logfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 20)
+        self.statusfont = pygame.font.Font("./resources/fonts/unifont.ttf", 16)
+        self.helpfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 16)
+        self.infofont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 16)
 
     def event(self, thing, name=None, newvalue=None, oldvalue=None):
         if thing == "error":

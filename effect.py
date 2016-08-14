@@ -81,6 +81,7 @@ class Effect(thing.Thing):
                     neweffect.setposition(dispcoord)
                     neweffect.ttl = self.ttl - 1
                     neweffect.donotupdate = True
+                    neweffect.setowner(self.owner)
                     self.gameengine.mapfield.effects.append(neweffect)
             if self.getflag("large"):
                 neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
@@ -88,6 +89,7 @@ class Effect(thing.Thing):
                     ncoord = pathfinder.alterposition(self.getposition(), n)
                     neweffect = Effect(self.gameengine.effinfo[self.getname()], self.gameengine)
                     neweffect.setposition(ncoord)
+                    neweffect.setowner(self.owner)
                     neweffect.ttl = self.ttl
                     # remove large to prevent flood
                     # copy because we don't want to change the flags in global effects library
