@@ -552,8 +552,9 @@ class MapField(object):
             if monster.getparam("hp") <= 0:
                 found.append(monster)
         for fdel in found:
-            fdel.destroy()
             self.monsters.remove(fdel)
+            fdel.destroy()
+
 
         # remove effects with overdo ttl
         found = []

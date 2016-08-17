@@ -28,13 +28,14 @@ mapinfo = None
 effinfo = None
 iteminfo = None
 
-# todo: melee weapons ?
+# todo: make explosions animated for better graphical representation of the process (as the monster can enter the
+#       explosion tile and do not get hurt (because the explosion was in the last turn and monster entered just the
+#       graphical representation, this can confuse the player
 # todo: pickup interface
 # todo: drop interface
 # todo: config file
 # todo: dynamite fuse setting
 # todo: dynamite destroys blocks
-# todo: remove loop in loop in loop
 # todo: map generator - remove isolated caves
 # todo: AI - when fired upon, go to the point where fire comes
 # todo: AI - recon in corals
@@ -104,7 +105,6 @@ class GameEngine(object):
             player.pick(Item(self.iteinfo['harpoon'], self))
         player.pick(Item(self.iteinfo['dynamite'], self))
         player.pick(Item(self.iteinfo['dynamite'], self))
-        player.pick(Item(self.iteinfo['crystal shard'], self))
         self.mapfield.addmonster(player)
         return player
 
@@ -303,15 +303,22 @@ class GameEngine(object):
         sys.exit()
 
     def passturn(self):
+        for ueffect in self.mapfield.effects:
+            ueffect.resetupdate()
         self.turns += 1
         self.graphicshandler.eraseeventstack()
         self.processeffects()
+        self.mapfield.cleanup()
         for uitem in self.mapfield.items:
             uitem.update()
         for ueffect in self.mapfield.effects:
-            ueffect.update()
+            if not ueffect.isupdated():
+                ueffect.update()
         for monster in self.mapfield.monsters:
             monster.update()
+            for ueffect in self.mapfield.effects:
+                if not ueffect.isupdated():
+                    ueffect.update()
         self.mapfield.cleanup()
         self.mapfield.generatemonster()
         if self.mapfield.getplayer() is not None:

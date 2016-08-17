@@ -279,6 +279,8 @@ class Monster(thing.Thing):
             neweffect.setposition(self.getposition())
             neweffect.setowner(self.lastattacker)
             self.gameengine.mapfield.effects.append(neweffect)
+            neweffect.update()
+            self.gameengine.mapfield.cleanup()
         # inform home that I'm not going home any more
         if self.home is not None:
             self.home.removechild(self)

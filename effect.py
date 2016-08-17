@@ -12,6 +12,7 @@ class Effect(thing.Thing):
     ttl = 1
     donotupdate = False
     owner = None
+    updated = False
     flags = []
 
     def __init__(self, parameters, gameengine):
@@ -20,6 +21,12 @@ class Effect(thing.Thing):
         self.ttl = parameters['ttl']
         if self.ttl == -1:
             self.ttl = None
+
+    def resetupdate(self):
+        self.updated = False
+
+    def isupdated(self):
+        return self.updated
 
     def setposition(self, coord):
         self.x = coord[0]
@@ -83,8 +90,10 @@ class Effect(thing.Thing):
 
             neweffect.setparam("flags", flags)
             self.gameengine.mapfield.effects.append(neweffect)
+            neweffect.update()
 
     def update(self):
+        self.updated = True
         if self.getflag("large"):
             self.large()
         if self.donotupdate is True:
