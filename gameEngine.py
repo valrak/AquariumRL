@@ -20,7 +20,6 @@ mapmaxy = 0
 PLAYERCREATURE = "diver"
 ARENAMAPFILE = "resources/maps/arena1.csv"
 
-
 mapfield = None
 gameevent = None
 moninfo = None
@@ -31,6 +30,10 @@ iteminfo = None
 # todo: make explosions animated for better graphical representation of the process (as the monster can enter the
 #       explosion tile and do not get hurt (because the explosion was in the last turn and monster entered just the
 #       graphical representation, this can confuse the player
+# todo: items: gauss gun - sniping one target across the map with huge damage
+# todo: redraw crystal shard
+
+# todo: monsters: redraw mine, make large mine, huge mine, redraw spitter
 # todo: pickup interface
 # todo: drop interface
 # todo: config file
@@ -40,7 +43,7 @@ iteminfo = None
 # todo: AI - when fired upon, go to the point where fire comes
 # todo: AI - recon in corals
 # todo: optimize: redraw only when something changed
-
+# todo: list of kills
 
 class GameEngine(object):
     ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
@@ -48,6 +51,7 @@ class GameEngine(object):
 
     RESOLUTIONX = 1024
     RESOLUTIONY = 660
+    LASTLEVEL = 10
     SIZE = (RESOLUTIONX, RESOLUTIONY)
     SCORETABLE = [100, 300]
     COMBO_ITEM = 3
@@ -93,7 +97,7 @@ class GameEngine(object):
         self.gameevent.report("Welcome to Aquarium Arena!", None, None, None)
         self.gameevent.report("Top gladiator score is "+str(loadhiscore())+" points!", None, None, None)
         # main game loop
-        #player.setparam("level", "3")
+        player.setparam("level", "5")
         return player
 
     def generateplayer(self):

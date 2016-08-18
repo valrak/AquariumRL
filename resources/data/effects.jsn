@@ -56,16 +56,27 @@
 "explosion": {
   "id": "explosion",
   "tile": "2,0",
+  "description": "blast leaves whirly water",
   "effect": "explode",
   "damage": "20",
   "flags": ["large"],
   "ttl": 2
   },
-"small explosion": {
-  "id": "small explosion",
+"weak explosion": {
+  "id": "weak explosion",
   "tile": "2,0",
+  "description": "blast leaves whirly water",
   "effect": "explode",
-  "damage": "5",
+  "damage": "3",
+  "flags": ["large"],
+  "ttl": 2
+  },
+"strong explosion": {
+  "id": "strong explosion",
+  "tile": "2,0",
+  "description": "blast leaves whirly water",
+  "effect": "explode",
+  "damage": "6",
   "flags": ["large"],
   "ttl": 2
   },
@@ -88,6 +99,13 @@
   "tile": "9,0",
   "effect": "explode",
   "damage": "9",
+  "ttl": 2
+  },
+"gauss bolt": {
+  "id": "gauss bolt",
+  "tile": "9,0",
+  "effect": "explode",
+  "damage": "30",
   "ttl": 2
   },
 "volt": {

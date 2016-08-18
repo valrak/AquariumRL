@@ -133,10 +133,13 @@ class Effect(thing.Thing):
                     self.gameengine.noscore = False
                     self.gameengine.graphicshandler.erasepops()
                     occupant.goldscore()
-                    self.gameengine.newmap()
-                    self.gameengine.itemsgenerated = 0
-                    self.gameengine.mapfield.getplayer().killcount = 0
-                    self.gameengine.state = "upgrade"
+                    if int(occupant.getparam("level")) >= self.gameengine.LASTLEVEL:
+                        self.gameengine.state = "reset"
+                    else:
+                        self.gameengine.newmap()
+                        self.gameengine.itemsgenerated = 0
+                        self.gameengine.mapfield.getplayer().killcount = 0
+                        self.gameengine.state = "upgrade"
             if self.getparam("effect") == "give":
                 amount = 1
                 if self.getparam("amount") is not None:

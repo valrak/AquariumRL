@@ -95,7 +95,11 @@ class GraphicsHandler(object):
             return
 
         if self.gameengine.state == "reset":
-            self.displaydeath(str(self.gameengine.lastscore))
+            player = self.gameengine.mapfield.getplayer()
+            if player is not None and int(player.getparam("level")) >= self.gameengine.LASTLEVEL:
+                self.displaywin(self.gameengine.mapfield.getplayer().score)
+            else:
+                self.displaydeath(str(self.gameengine.lastscore))
             self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
             pygame.display.flip()
             return
@@ -110,9 +114,7 @@ class GraphicsHandler(object):
         score = str(player.score)
         level = str(player.getparam("level"))
         combo = str(player.combo)
-        # workaround as this value is not synced in display phase
-        if not player.currentcombo:
-            combo = str(0)
+
         maxweight = str(player.getparam("weightLimit"))
         weight = str(player.gettotalweight())
 
@@ -411,11 +413,29 @@ class GraphicsHandler(object):
         deathlines.append("")
         deathlines.append(" You are dead.")
         deathlines.append("")
-        deathlines.append(" Score: " + score)
+        deathlines.append(" Score: " + str(score))
         deathlines.append("")
         deathlines.append(" Press any key to continue.")
         logposadd = 0
         logbackgr = pygame.Surface((400, 150))
+        logbackgr = logbackgr.convert()
+        logbackgr.fill(pygame.Color("black"))
+        for line in deathlines:
+            text = self.logfont.render(line, 1, (120, 120, 120))
+            logbackgr.blit(text, (10, 0 + logposadd))
+            logposadd += 20
+        self.screen.blit(logbackgr, (200, 100))
+
+    def displaywin(self, score):
+        deathlines = []
+        deathlines.append("")
+        deathlines.append(" Congratulations! After many battles, tritons set you free, you've won the game!")
+        deathlines.append("")
+        deathlines.append(" Score: " + str(score))
+        deathlines.append("")
+        deathlines.append(" Press any key to continue.")
+        logposadd = 0
+        logbackgr = pygame.Surface((760, 150))
         logbackgr = logbackgr.convert()
         logbackgr.fill(pygame.Color("black"))
         for line in deathlines:
@@ -454,8 +474,8 @@ class GraphicsHandler(object):
         helplines.append("")
         helplines.append("---")
         helplines.append("")
-        helplines.append("You've been catched by merman civilization and thrown into their ")
-        helplines.append("aquarium arena to entertain crowds. More you kill, more items")
+        helplines.append("You've been caught by merman civilization and thrown into their ")
+        helplines.append("Aquarium Arena to entertain crowds. More you kill, more items")
         helplines.append("you can expect to fall into the arena. Especially when you keep that")
         helplines.append("combo meter active! Corals in the arena can be used to hide in them.")
         helplines.append("")
@@ -493,7 +513,6 @@ class GraphicsHandler(object):
         y = size[1]
         y = x / originalratio
         return int(x), int(y)
-
 
 # FIXME: return coordinates to match map position to align to the grid """
 c = lambda coords: (coords[0] + MAPPOSX, coords[1] + MAPPOSX)

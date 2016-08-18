@@ -140,18 +140,21 @@ def lineto(start, end):
         points.reverse()
     return points
 
+
 # checks if the coordinates are besides
 def isnear(coord, newcoord):
     if (abs(coord[0] - newcoord[0]) == 1 or abs(coord[0] - newcoord[0]) == 0) and \
-        (abs(coord[1] - newcoord[1]) == 1 or abs(coord[1] - newcoord[1])):
+            (abs(coord[1] - newcoord[1]) == 1 or abs(coord[1] - newcoord[1]) == 0):
         return True
     return False
+
 
 # alters position to given coordinates, for example to (0, -1) alters one step north
 def alterposition(coord, alteration):
     newx = coord[0] + alteration[0]
     newy = coord[1] + alteration[1]
     return (newx, newy)
+
 
 # returns direction to the target, in one of 9 ways, if any
 def finddirection(coord, target):

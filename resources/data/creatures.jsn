@@ -150,23 +150,36 @@
   "tile": "10,0",
   "attack": "2",
   "speed": "3",
-  "level": 4,
-  "score": 200,
+  "level": 5,
+  "score": 80,
   "rarity": 2
   },
  "small mine": {
   "id": "small mine",
   "type": "mechanical",
-  "description": "explodes when killed",
-  "flags": ["ranged", "nomove", "relectric"],
-  "deatheffect": "small explosion",
-  "hp": "1",
+  "description": "exploding! don't come near!",
+  "flags": ["nomove", "relectric", "selfdestruct"],
+  "deatheffect": "weak explosion",
+  "hp": "2",
   "attack": "0",
   "tile": "12,0",
-  "fire": "sting",
   "speed": "1",
   "level": 1,
   "score": 20,
+  "rarity": 2
+  },
+ "big mine": {
+  "id": "big mine",
+  "type": "mechanical",
+  "description": "exploding! don't come near!",
+  "flags": ["nomove", "relectric", "selfdestruct"],
+  "deatheffect": "strong explosion",
+  "hp": "5",
+  "attack": "0",
+  "tile": "13,0",
+  "speed": "1",
+  "level": 4,
+  "score": 60,
   "rarity": 2
   }
 }

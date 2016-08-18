@@ -94,7 +94,8 @@ class Monster(thing.Thing):
         for eff in effects:
             if eff.getflag("novisibility"):
                 return False
-        self.setparam("hp", int(self.getparam("hp")) - int(weapon.getparam("damage")))
+        if weapon.getparam("damage") is not None:
+            self.setparam("hp", int(self.getparam("hp")) - int(weapon.getparam("damage")))
 
     def getparam(self, name):
         try:
@@ -170,7 +171,9 @@ class Monster(thing.Thing):
                         actions += 1
                         if self.getparam("firelimit") is not None:
                             self.firetime = int(self.getparam("firelimit"))
-
+                if self.getflag("selfdestruct") and self.canact(actions) and self.gameengine.mapfield.cansee(position, playerpos):
+                    if pathfinder.isnear(playerpos, position):
+                        self.setparam("hp", 0)
                 # I have ranged capability and see the target
                 if self.getflag("ranged") and self.gameengine.mapfield.cansee(position, playerpos) and self.canact(actions):
                     bestranged = self.getbestranged()
@@ -455,12 +458,15 @@ class Monster(thing.Thing):
 
     # change coins and score items for score at the end of level
     def goldscore(self):
+        found = []
         for ite in self.inventory:
             if ite.getflag("remove"):
                 amount = ite.stack
                 for i in range(amount):
                     self.score += int(ite.getparam("score"))
-                self.inventory.remove(ite)
+                found.append(ite)
+        for fdel in found:
+            self.inventory.remove(fdel)
 
     def raisecombo(self):
         self.combo += 1
