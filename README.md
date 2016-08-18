@@ -13,14 +13,8 @@ Experience:
 ![Aquarium Arena in action](http://i.imgur.com/8cDcTjD.png "screenshot")
 ![Look interface](http://i.imgur.com/khhtRmN.png "screenshot")
 
-## Download
-* [Version X.Y](https://github.com/username/sw-name/archive/master.zip)
-* Other Versions
-
-## Contributors
-
 ## License
-* see [LICENSE](https://github.com/username/sw-name/blob/master/LICENSE.md) file
+* see [LICENSE](https://github.com/valrak/AquariumRL/blob/master/LICENSE.md) file
 
 ## Version
 * Version 0.1

@@ -30,10 +30,6 @@ iteminfo = None
 # todo: make explosions animated for better graphical representation of the process (as the monster can enter the
 #       explosion tile and do not get hurt (because the explosion was in the last turn and monster entered just the
 #       graphical representation, this can confuse the player
-# todo: items: gauss gun - sniping one target across the map with huge damage
-# todo: redraw crystal shard
-
-# todo: monsters: redraw mine, make large mine, huge mine, redraw spitter
 # todo: pickup interface
 # todo: drop interface
 # todo: config file
