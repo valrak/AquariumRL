@@ -1,6 +1,6 @@
 Aquarium Arena
 ======
-**Aquarium Arena** is a coffe-break roguelike game which pit you underwater against various sea dwellers.
+**Aquarium Arena** is a coffeebreak roguelike game which pit you underwater against various sea dwellers.
   Conquer 10 arenas with rising challenge and win your freedom.
 
 Experience:

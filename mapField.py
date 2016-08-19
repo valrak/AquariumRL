@@ -576,3 +576,14 @@ class MapField(object):
 
     def removeisolatedplaces(self):
         return True
+
+    # input passable map is enough
+    # def markisolated(self, map):
+    #     linked = []
+    #
+    #     for row in map:
+    #         for column in row:
+    #             if map[row][column] is not map.passable:
+    #                 neighbors =
+    #
+    #

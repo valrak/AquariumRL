@@ -4,7 +4,6 @@ class Node(object):
     h = 0
     parent = None
     passable = 0
-    reachable = 1
 
     def f(self):
         return self.g + self.h

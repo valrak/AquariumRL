@@ -93,7 +93,7 @@ class GameEngine(object):
         self.gameevent.report("Welcome to Aquarium Arena!", None, None, None)
         self.gameevent.report("Top gladiator score is "+str(loadhiscore())+" points!", None, None, None)
         # main game loop
-        player.setparam("level", "5")
+        #player.setparam("level", "5")
         return player
 
     def generateplayer(self):
@@ -103,8 +103,6 @@ class GameEngine(object):
         player.setposition(self.mapfield.getrandompassable())
         for x in range(0, 5):
             player.pick(Item(self.iteinfo['harpoon'], self))
-        player.pick(Item(self.iteinfo['dynamite'], self))
-        player.pick(Item(self.iteinfo['dynamite'], self))
         self.mapfield.addmonster(player)
         return player
 
