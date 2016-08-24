@@ -16,6 +16,8 @@ GENERATOR_TRESHOLD = 50
 GENERATOR_OODUP = 10  # out of depth chance to spawn higher level thing
 GENERATOR_OODDOWN = 30  # chance to spawn lower level thing
 COMBO_MULTIPLIER = 3 # how big combo bonus is during generating OOP items
+NEIGHBORS = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+
 
 class MapField(object):
     gameengine = None
@@ -145,7 +147,8 @@ class MapField(object):
                         self.terrain[coord[1]][coord[0]] = "|"
                 coord = (coord[0], coord[1]-1)
         self.passablemap = self.generatepassablemap()
-        # todo: remove isolated places
+
+        self.removeisolatedplaces()
 
     def getplayer(self):
         for monster in self.monsters:
@@ -233,13 +236,16 @@ class MapField(object):
                 return False
         return False
 
-    def getrandompassable(self):
+    def getrandompassable(self, notnearplayer=False):
         for i in range(100):
             coord = (random.randint(0, self.maxx), random.randint(0, self.maxy))
             if self.ispassable(coord):
-                return coord
+                if notnearplayer and self.getplayer() is not None:
+                    if not pathfinder.isnear(coord, self.getplayer().getposition()):
+                        return coord
+                else:
+                    return coord
         # failed to obtain passable
-        # TODO: obtain passable from nearest free cell at random location
         for y in range(self.maxy):
             for x in range(self.maxx):
                 if self.ispassable((x, y)):
@@ -384,7 +390,7 @@ class MapField(object):
             self.monsters.append(monster)
 
     def addrandomspawn(self):
-        coord = self.getrandompassable()
+        coord = self.getrandompassable(True)
         if coord is not None:
             neweffect = Effect(self.effinfo['spawn'], gameEngine)
             neweffect.setposition(coord)
@@ -412,7 +418,7 @@ class MapField(object):
         if isgroundmon:
             coord = self.getrandomground()
         else:
-            coord = self.getrandompassable()
+            coord = self.getrandompassable(True)
         if coord is not None:
             neweffect = Effect(self.effinfo['spawn'], gameEngine)
             neweffect.setposition(coord)
@@ -425,7 +431,7 @@ class MapField(object):
         if monster.getflag("ground"):
             coord = self.getrandomground()
         else:
-            coord = self.getrandompassable()
+            coord = self.getrandompassable(True)
         if coord is not None:
             monster.setposition(coord)
             self.monsters.append(monster)
@@ -576,16 +582,27 @@ class MapField(object):
         player.setposition(self.getrandomfree())
         self.monsters.append(player)
 
+    def getneighbors(self, x, y):
+        neigh = []
+        for n in NEIGHBORS:
+            if not (x + n[0] > self.maxx or x + n[0] < 0 or y + n[1] > self.maxy or y + n[1] < 0):
+                neigh.append(self.terrain[x+n[0]][y+n[1]])
+            else:
+                neigh.append("#")
+        return neigh
+
     def removeisolatedplaces(self):
         return True
-
     # input passable map is enough
-    # def markisolated(self, map):
-    #     linked = []
-    #
-    #     for row in map:
-    #         for column in row:
-    #             if map[row][column] is not map.passable:
-    #                 neighbors =
-    #
+
+    def markisolated(self, map):
+        linked = []
+
+        for row in map:
+            for column in row:
+                if map[row][column] is not map.passable:
+                    neighbors = self.getneighbors(0, 0)
+                    if len(neighbors) == 0:
+                        linked.append()
+
 

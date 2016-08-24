@@ -33,13 +33,11 @@ iteminfo = None
 # todo: pickup interface
 # todo: drop interface
 # todo: config file
-# todo: dynamite fuse setting
-# todo: dynamite destroys blocks
 # todo: map generator - remove isolated caves
 # todo: AI - when fired upon, go to the point where fire comes
 # todo: AI - recon in corals
 # todo: optimize: redraw only when something changed
-# todo: list of kills
+
 
 class GameEngine(object):
     ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',

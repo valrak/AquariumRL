@@ -6,6 +6,7 @@ import item
 import effect
 import copy
 
+
 class Monster(thing.Thing):
     x = 0
     y = 0
@@ -307,6 +308,7 @@ class Monster(thing.Thing):
             self.gameengine.gameevent.report(self.getname()+" has been killed! ", None, None, None)
         # game reset
         if self.player:
+            self.gameengine.gameevent.report("Merfolk are ecstatic!")
             self.gameengine.lastscore = self.score
             self.gameengine.lastplayer = copy.copy(self)
             self.gameengine.state = "reset"
