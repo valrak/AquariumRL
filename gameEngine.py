@@ -56,6 +56,7 @@ class GameEngine(object):
     hiscore = loadhiscore()
     noscore = False
     lastscore = 0
+    lastplayer = None
     itemsgenerated = 0
     clock = pygame.time.Clock()
 
@@ -90,8 +91,8 @@ class GameEngine(object):
 
         # introduction messages
         # self.graphicshandler.eraseloglines()
-        self.gameevent.report("Welcome to Aquarium Arena!", None, None, None)
-        self.gameevent.report("Top gladiator score is "+str(loadhiscore())+" points!", None, None, None)
+        self.gameevent.report("Welcome to Aquarium Arena!")
+        self.gameevent.report("Top gladiator score is "+str(loadhiscore())+" points!")
         # main game loop
         #player.setparam("level", "5")
         return player
@@ -125,7 +126,7 @@ class GameEngine(object):
                     if self.state == "reset":
                         self.deathscreen()
                         self.state = "game"
-                        self.gameevent.report("Your score was: "+str(self.lastscore)+".", None, None, None)
+                        self.gameevent.report("Your score was: "+str(self.lastscore)+".")
                         savehiscore(self.lastscore, self.hiscore)
                         self.resetgame()
                         break
@@ -159,18 +160,18 @@ class GameEngine(object):
                             self.endgame()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
-                            self.gameevent.report("item use cancelled.", None, None, None)
+                            self.gameevent.report("item use cancelled.")
                             self.draw()
                             break
                         index = self.displayinventory("usable")
                         if index is None:
-                            self.gameevent.report("you have nothing usable.", None, None, None)
+                            self.gameevent.report("you have nothing usable.")
                             self.draw()
                         self.state = "game"
                         if index is not None:
                             if len(player.getinventory("usable"))-1 >= index:
                                 self.gameevent.report("using ... " +
-                                                      player.getinventory("usable")[index].getname(), None, None, None)
+                                                      player.getinventory("usable")[index].getname())
                                 player.useitem(player.getinventory("usable")[index])
                                 self.passturn()
 
@@ -180,7 +181,7 @@ class GameEngine(object):
                             self.endgame()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
-                            self.gameevent.report("firing cancelled.", None, None, None)
+                            self.gameevent.report("firing cancelled.")
                             self.draw()
                             break
                         coord = utils.getcoordsbyevent(event)
@@ -197,7 +198,7 @@ class GameEngine(object):
                                 if len(player.inventory)-1 >= index:
                                     player.rangedpreference = player.inventory[index]
                                     self.gameevent.report("firing " + player.rangedpreference.getname() +
-                                                          " press i or space to change.", None, None, None)
+                                                          " press i or space to change.")
                                     self.draw()
 
                     # Upgrade mode toggles
@@ -239,19 +240,19 @@ class GameEngine(object):
                         # fire
                         if event.type == pg.KEYDOWN and event.key == pg.K_f:
                             if len(player.inventory) == 0:
-                                self.gameevent.report("You have nothing to fire", None, None, None)
+                                self.gameevent.report("You have nothing to fire")
                                 self.state = "game"
                             elif player.rangedpreference is None:
                                 if player.getbestranged() is None:
                                     player.rangedpreference = player.inventory[0]
                                     self.gameevent.report("firing " + player.rangedpreference.getname() +
-                                                          ". Press i or space to change.", None, None, None)
+                                                          ". Press i or space to change.")
                                 else:
                                     self.gameevent.report("firing " + player.getbestranged().getname() +
-                                                          ". Press i or space to change.", None, None, None)
+                                                          ". Press i or space to change.")
                             else:
                                 self.gameevent.report("firing " + player.rangedpreference.getname() +
-                                                      ". Press i or space to change.", None, None, None)
+                                                      ". Press i or space to change.")
                             self.draw()
                             self.state = "fire"
                             break
@@ -263,7 +264,7 @@ class GameEngine(object):
                             citems = self.mapfield.getitems(player.getposition())
                             for item in citems:
                                 player.pick(item)
-                                self.gameevent.report("picked up a " + item.getname(), None, None, None)
+                                self.gameevent.report("picked up a " + item.getname())
                             self.passturn()
             time_passed = self.clock.tick(30)
 
@@ -324,6 +325,7 @@ class GameEngine(object):
                 self.mapfield.generateitem()
                 self.itemsgenerated += 1
             if self.mapfield.getplayer().combo >= self.COMBO_ITEM:
+                self.gameevent.report("Crowds of mermen are cheering and throwing items to arena!")
                 self.mapfield.generateitem(True)
             # endlevel - no score for kills but more monsters
             if self.noscore is True:
@@ -332,7 +334,7 @@ class GameEngine(object):
             if self.mapfield.getplayer().killcount >= self.getrequiredkillcount() and self.noscore is not True:
                 self.noscore = True
                 self.mapfield.generategate()
-                self.gameevent.report("GATE IS OPEN! Move through the gate!", None, None, None)
+                self.gameevent.report("GATE IS OPEN! Move through the gate!")
         self.draw()
         self.graphicshandler.pops = []
 

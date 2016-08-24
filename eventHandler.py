@@ -8,7 +8,7 @@ class EventHandler(object):
     def register(self, object):
         self.listeners.append(object)
 
-    def report(self, thing, name, newvalue, oldvalue):
+    def report(self, thing, name=None, newvalue=None, oldvalue=None):
         for listener in self.listeners:
             listener.event(thing, name, newvalue, oldvalue)
 

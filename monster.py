@@ -4,6 +4,7 @@ import pathfinder
 import random
 import item
 import effect
+import copy
 
 class Monster(thing.Thing):
     x = 0
@@ -25,6 +26,8 @@ class Monster(thing.Thing):
     score = 0
     combo = 0
     currentcombo = False
+
+    killslist = {}
 
     def __init__(self, parameters, gameengine):
         self.parameters = dict(parameters)
@@ -298,11 +301,14 @@ class Monster(thing.Thing):
             self.raisecombo()
             self.lastattacker.raisecombo()
             self.lastattacker.killcount += 1
+            # update kill list
+            self.lastattacker.killslist[self.getname()] = self.lastattacker.killslist.get(self.getname(), 0) + 1
         else:
             self.gameengine.gameevent.report(self.getname()+" has been killed! ", None, None, None)
         # game reset
         if self.player:
             self.gameengine.lastscore = self.score
+            self.gameengine.lastplayer = copy.copy(self)
             self.gameengine.state = "reset"
 
     def removechild(self, child):
@@ -459,14 +465,17 @@ class Monster(thing.Thing):
     # change coins and score items for score at the end of level
     def goldscore(self):
         found = []
+        score_addition = 0
         for ite in self.inventory:
             if ite.getflag("remove"):
                 amount = ite.stack
                 for i in range(amount):
-                    self.score += int(ite.getparam("score"))
+                    score_addition += int(ite.getparam("score"))
                 found.append(ite)
         for fdel in found:
             self.inventory.remove(fdel)
+        self.score += score_addition
+        return score_addition
 
     def raisecombo(self):
         self.combo += 1

@@ -132,7 +132,11 @@ class Effect(thing.Thing):
                     occupant.setparam("level", int(occupant.getparam("level")) + 1)
                     self.gameengine.noscore = False
                     self.gameengine.graphicshandler.erasepops()
-                    occupant.goldscore()
+                    goldscore_add = occupant.goldscore()
+                    self.gameengine.gameevent.report("Merfolk are ecstatic!", None, None, None)
+                    if goldscore_add > 0:
+                        self.gameengine.gameevent.report("You got "+str(goldscore_add)+" points for the gold items brought to gate.", None, None, None)
+                    self.gameengine.gameevent.report("Choose your reward!", None, None, None)
                     if int(occupant.getparam("level")) >= self.gameengine.LASTLEVEL:
                         self.gameengine.state = "reset"
                     else:

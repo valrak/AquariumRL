@@ -97,9 +97,10 @@ class GraphicsHandler(object):
         if self.gameengine.state == "reset":
             player = self.gameengine.mapfield.getplayer()
             if player is not None and int(player.getparam("level")) >= self.gameengine.LASTLEVEL:
-                self.displaywin(self.gameengine.mapfield.getplayer().score)
+                player.score += int(player.score) + 1000 * int(self.gameengine.LASTLEVEL)
+                self.displaywin(self.gameengine.mapfield.getplayer().score, self.gameengine.lastplayer.killslist)
             else:
-                self.displaydeath(str(self.gameengine.lastscore))
+                self.displaydeath(str(self.gameengine.lastscore), self.gameengine.lastplayer.killslist)
             self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
             pygame.display.flip()
             return
@@ -408,16 +409,24 @@ class GraphicsHandler(object):
     def erasepops(self):
         self.pops = []
 
-    def displaydeath(self, score):
+    def displaydeath(self, score, killlist):
+        kills = self.killliststrings(killlist)
+        ysize = 150
         deathlines = []
         deathlines.append("")
         deathlines.append(" You are dead.")
         deathlines.append("")
         deathlines.append(" Score: " + str(score))
+        if kills is not None:
+            deathlines.append("")
+            deathlines.append(" Kill list: ")
+            for kill in kills:
+                deathlines.append(" " + kill)
+                ysize += 25
         deathlines.append("")
         deathlines.append(" Press any key to continue.")
         logposadd = 0
-        logbackgr = pygame.Surface((400, 150))
+        logbackgr = pygame.Surface((400, ysize))
         logbackgr = logbackgr.convert()
         logbackgr.fill(pygame.Color("black"))
         for line in deathlines:
@@ -426,16 +435,24 @@ class GraphicsHandler(object):
             logposadd += 20
         self.screen.blit(logbackgr, (200, 100))
 
-    def displaywin(self, score):
+    def displaywin(self, score, killlist):
+        kills = self.killliststrings(killlist)
+        ysize = 150
         deathlines = []
         deathlines.append("")
         deathlines.append(" Congratulations! After many battles, tritons set you free, you've won the game!")
         deathlines.append("")
         deathlines.append(" Score: " + str(score))
+        if kills is not None:
+            deathlines.append("")
+            deathlines.append(" Kill list: ")
+            for kill in kills:
+                deathlines.append(" " + kill)
+                ysize += 25
         deathlines.append("")
         deathlines.append(" Press any key to continue.")
         logposadd = 0
-        logbackgr = pygame.Surface((760, 150))
+        logbackgr = pygame.Surface((400, ysize))
         logbackgr = logbackgr.convert()
         logbackgr.fill(pygame.Color("black"))
         for line in deathlines:
@@ -443,6 +460,15 @@ class GraphicsHandler(object):
             logbackgr.blit(text, (10, 0 + logposadd))
             logposadd += 20
         self.screen.blit(logbackgr, (200, 100))
+
+    def killliststrings(self, killlist):
+        if len(killlist) == 0:
+            return None
+        result = []
+        for monster in killlist:
+            amount = str(killlist[monster])
+            result.append(amount + " of " + monster)
+        return result
 
     def displayhelp(self):
         helplines = []

@@ -552,7 +552,8 @@ class MapField(object):
             if monster.getparam("hp") <= 0:
                 found.append(monster)
         for fdel in found:
-            self.monsters.remove(fdel)
+            if fdel in self.monsters:
+                self.monsters.remove(fdel)
             fdel.destroy()
 
 
@@ -562,7 +563,8 @@ class MapField(object):
             if effect.ttl is not None and effect.ttl <= 0:
                 found.append(effect)
         for fdel in found:
-            self.effects.remove(fdel)
+            if fdel in self.effects:
+                self.effects.remove(fdel)
 
     def replacemap(self):
         player = self.getplayer()
@@ -586,4 +588,4 @@ class MapField(object):
     #             if map[row][column] is not map.passable:
     #                 neighbors =
     #
-    #
+
