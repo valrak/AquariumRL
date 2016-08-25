@@ -52,7 +52,8 @@ class MapField(object):
         self.moninfo = moninfo
         self.effinfo = effinfo
         self.iteinfo = iteinfo
-        if mapfile != None:
+
+        if mapfile is not None:
             self.terrain = list(mapfile)
             for row in self.terrain:
                 self.maxy += 1
@@ -242,32 +243,74 @@ class MapField(object):
         return False
 
     def getrandompassable(self, notnearplayer=False):
-        for i in range(100):
-            coord = (random.randint(0, self.maxx), random.randint(0, self.maxy))
-            if self.ispassable(coord):
-                if notnearplayer and self.getplayer() is not None:
-                    if not pathfinder.isnear(coord, self.getplayer().getposition()):
-                        return coord
-                else:
-                    return coord
-        # failed to obtain passable
+        listfree = []
         for y in range(self.maxy):
             for x in range(self.maxx):
                 if self.ispassable((x, y)):
-                    return coord
+                    if notnearplayer and self.getplayer() is not None:
+                        if not pathfinder.isnear((x, y), self.getplayer().getposition()):
+                            listfree.append((x, y))
+                    else:
+                        listfree.append((x, y))
+
+        if len(listfree) != 0:
+            return listfree[random.randint(0, len(listfree) - 1)]
+        else:
+            for y in range(self.maxy):
+                for x in range(self.maxx):
+                    if self.ispassable((x, y)):
+                        return x, y
         return None
 
+        #
+        # for i in range(100):
+        #     coord = (random.randint(0, self.maxx), random.randint(0, self.maxy))
+        #     if self.ispassable(coord):
+        #         if notnearplayer and self.getplayer() is not None:
+        #             if not pathfinder.isnear(coord, self.getplayer().getposition()):
+        #                 return coord
+        #         else:
+        #             return coord
+        # # failed to obtain passable
+        # for y in range(self.maxy):
+        #     for x in range(self.maxx):
+        #         if self.ispassable((x, y)):
+        #             return coord
+        # return None
+
     def getrandomfree(self):
-        for i in range(100):
-            coord = (random.randint(0, self.maxx), random.randint(0, self.maxy))
-            if self.isfree(coord):
-                return coord
-        # failed to obtain passable
-        # TODO: obtain passable from nearest free cell at random location
+        listfree = []
         for y in range(self.maxy):
             for x in range(self.maxx):
                 if self.isfree((x, y)):
-                    return coord
+                    listfree.append((x, y))
+        if len(listfree) != 0:
+            return listfree[random.randint(0, len(listfree)-1)]
+        return None
+
+    def issafe(self, coord):
+        if coord is not None and coord[0] < self.maxx and coord[1] < self.maxy and coord[0] >= 0 and coord[1] >= 0:
+            cell = self.getterrain(coord)
+            if (cell["passable"]) == "true" and self.getoccupants(coord) is None and len(self.geteffects(coord)) == 0:
+                neighbors = self.getneighbors(coord[0], coord[1])
+                for n in neighbors:
+                    if self.getoccupants(n) is not None:
+                        return False
+                return True
+            else:
+                return False
+        return False
+
+    def getrandomsafe(self):
+        listsafe = []
+        for y in range(self.maxy):
+            for x in range(self.maxx):
+                if self.issafe((x, y)):
+                    listsafe.append((x, y))
+        if len(listsafe) != 0:
+            return listsafe[random.randint(0, len(listsafe)-1)]
+        else:
+            return self.getrandomfree()
         return None
 
     # returns random field in neigbors of given location
@@ -599,7 +642,6 @@ class MapField(object):
 
     def removeisolatedplaces(self):
         def replaceregion(fromvalue, tovalue):
-            lastamount = 0
             x = 0
             y = 0
             for row in regionvaluemap:
@@ -670,7 +712,6 @@ class MapField(object):
         regions = sorted(regionnumbers.items(), key=operator.itemgetter(1), reverse=True)
         y = 0
         x = 0
-        print regions
         for row in self.terrain:
             for column in row:
                 if regionvaluemap[y][x] != 0 and regionvaluemap[y][x] != regions[0][0]:

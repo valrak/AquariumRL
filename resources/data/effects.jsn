@@ -167,5 +167,12 @@
   "itemname": "mermpoon",
   "amount": 5,
   "ttl": 2
+},
+"telebeam": {
+  "id": "telebeam",
+  "description": "teleportation whirl",
+  "tile": "11,0",
+  "effect": "tele",
+  "ttl": 2
 }
 }

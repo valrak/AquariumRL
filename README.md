@@ -20,10 +20,4 @@ Experience:
 * Version 0.2
 
 ## Changelog
-v 0.2
-+ kill list
-+ verbose log message after various in game events
-+ score increase after successful win
-+ configurable keystrokes
-% fixed map generator: end of isolated caves
-% monster spawn is not generated near player any more
+* see [changelog.txt](https://github.com/valrak/AquariumRL/blob/master/changelog.txt) file

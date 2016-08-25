@@ -126,6 +126,13 @@ class Effect(thing.Thing):
                 occupant = self.gameengine.mapfield.getoccupants(self.getposition())
                 if occupant is not None:
                     occupant.raisehealth(int(self.getparam("amount")))
+            if self.getparam("effect") == "tele":
+                occupant = self.gameengine.mapfield.getoccupants(self.getposition())
+                if occupant is not None:
+                    newlocation = self.gameengine.mapfield.getrandomsafe()
+                    if newlocation is not None:
+                        occupant.setposition(newlocation)
+                        self.gameengine.gameevent.report(occupant.getname()+" teleported to another location!")
             if self.getparam("effect") == "gate":
                 occupant = self.gameengine.mapfield.getoccupants(self.getposition())
                 if occupant is not None and occupant.player:
