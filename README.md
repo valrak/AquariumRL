@@ -5,9 +5,9 @@ Aquarium Arena
 
 Experience:
 * Sidescroller 2d perspective.
-* Underwater environment, where items are falling slowly to the ground turn by turn and you can catch them mid-way.
+* Underwater environment, where items are falling slowly to the ground, turn by turn, and you can catch them mid-way.
+* Be part of merfolk cultural heritage
 * Tritons, sharks, crabs-stealing-stuff and whatnot.
-* It's Python, but not libtcod.
 
 #### Screenshot
 ![Aquarium Arena in action](http://i.imgur.com/8cDcTjD.png "screenshot")
@@ -17,4 +17,13 @@ Experience:
 * see [LICENSE](https://github.com/valrak/AquariumRL/blob/master/LICENSE.md) file
 
 ## Version
-* Version 0.1
+* Version 0.2
+
+## Changelog
+v 0.2
++ kill list
++ verbose log message after various in game events
++ score increase after successful win
++ configurable keystrokes
+% fixed map generator: end of isolated caves
+% monster spawn is not generated near player any more

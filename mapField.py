@@ -4,6 +4,7 @@ from effect import *
 from item import *
 import csv
 import utils
+import operator
 
 WALL = '0'
 FREE = '1'
@@ -17,7 +18,10 @@ GENERATOR_OODUP = 10  # out of depth chance to spawn higher level thing
 GENERATOR_OODDOWN = 30  # chance to spawn lower level thing
 COMBO_MULTIPLIER = 3 # how big combo bonus is during generating OOP items
 NEIGHBORS = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+SEQLOOKNEIGHBORS = [(-1, 0), (0, -1), (1, -1), (-1, -1)]
 
+MAXROCKAMOUNT = 30
+MINROCKAMOUNT = 80
 
 class MapField(object):
     gameengine = None
@@ -75,7 +79,8 @@ class MapField(object):
         self.maxx = maxx
         self.maxy = maxy
         self.terrain = []
-        rockamount = maxx*maxy/80
+        rockamountr = random.randint(MAXROCKAMOUNT, MINROCKAMOUNT)
+        rockamount = maxx * maxy / rockamountr
         rockamountrand = maxx*maxy/95
         rocksize = 7
         rocksizerand = 5
@@ -147,8 +152,8 @@ class MapField(object):
                         self.terrain[coord[1]][coord[0]] = "|"
                 coord = (coord[0], coord[1]-1)
         self.passablemap = self.generatepassablemap()
-
         self.removeisolatedplaces()
+        self.passablemap = self.generatepassablemap()
 
     def getplayer(self):
         for monster in self.monsters:
@@ -582,27 +587,94 @@ class MapField(object):
         player.setposition(self.getrandomfree())
         self.monsters.append(player)
 
-    def getneighbors(self, x, y):
+    def getneighbors(self, x, y, neighlist=NEIGHBORS):
         neigh = []
-        for n in NEIGHBORS:
-            if not (x + n[0] > self.maxx or x + n[0] < 0 or y + n[1] > self.maxy or y + n[1] < 0):
-                neigh.append(self.terrain[x+n[0]][y+n[1]])
+        for n in neighlist:
+            if (((x + n[0]) > self.maxx) or ((x + n[0]) < 0) or
+                    ((y + n[1]) > self.maxy) or ((y + n[1]) < 0)):
+                neigh.append(None)
             else:
-                neigh.append("#")
+                neigh.append((x + n[0], y + n[1]))
         return neigh
 
     def removeisolatedplaces(self):
-        return True
-    # input passable map is enough
+        def replaceregion(fromvalue, tovalue):
+            lastamount = 0
+            x = 0
+            y = 0
+            for row in regionvaluemap:
+                for column in row:
+                    if regionvaluemap[y][x] == fromvalue:
+                        regionvaluemap[y][x] = tovalue
+                    x += 1
+                x = 0
+                y += 1
+            # remove also from region number list
+            if fromvalue in regionnumbers:
+                lastamount = regionnumbers.get(fromvalue)
+                regionnumbers.pop(fromvalue)
+            else:
+                lastamount = 1
+            updateamount = regionnumbers.get(tovalue)
+            regionnumbers.update({tovalue: updateamount + lastamount})
 
-    def markisolated(self, map):
-        linked = []
+        # Create a region counter
+        regionvaluemap = []
+        for y in range(self.maxy + 1):
+            row = []
+            for x in range(self.maxx + 1):
+                row.append(0)
+            regionvaluemap.append(row)
 
-        for row in map:
+        maxregion = 1
+        regionnumbers = {}
+        y = 0
+        x = 0
+        for row in self.terrain:
             for column in row:
-                if map[row][column] is not map.passable:
-                    neighbors = self.getneighbors(0, 0)
-                    if len(neighbors) == 0:
-                        linked.append()
+                if self.ispassable((x, y)):
+                    region = maxregion
+                    newregion = True
+                    # check the northeast, north, northwest, and west pixel are connected
+                    neighbors = self.getneighbors(x, y, SEQLOOKNEIGHBORS)
+                    for n in neighbors:
+                        if n is not None:
+                            neighbourvalue = regionvaluemap[n[1]][n[0]]
+                            # check if it is traversable
+                            if neighbourvalue > 0:
+                                if region < neighbourvalue:
+                                    # found region which is actually connected to this
+                                    replaceregion(neighbourvalue, region)
+                                    newregion = False
+                                # need to correct current region as we've found another one
+                                elif neighbourvalue < region:
+                                    replaceregion(region, neighbourvalue)
+                                    newregion = False
+                                    region = neighbourvalue
+                                else:
+                                    # found connected to current already
+                                    if not region == neighbourvalue:
+                                        region = neighbourvalue
+                                        regionnumbers.update({region: int(regionnumbers.get(region) + 1)})
+                                    newregion = False
+                    regionvaluemap[y][x] = region
+                    # new region, assign new number
+                    if newregion:
+                        maxregion += 1
+                        regionnumbers.update({region: 1})
+                x += 1
+            y += 1
+            x = 0
 
-
+        # fill the isolated tiles
+        regions = sorted(regionnumbers.items(), key=operator.itemgetter(1), reverse=True)
+        y = 0
+        x = 0
+        print regions
+        for row in self.terrain:
+            for column in row:
+                if regionvaluemap[y][x] != 0 and regionvaluemap[y][x] != regions[0][0]:
+                    self.terrain[y][x] = "#"
+                x += 1
+            y += 1
+            x = 0
