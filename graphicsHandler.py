@@ -452,7 +452,7 @@ class GraphicsHandler(object):
         deathlines.append("")
         deathlines.append(" Press any key to continue.")
         logposadd = 0
-        logbackgr = pygame.Surface((400, ysize))
+        logbackgr = pygame.Surface((760, ysize))
         logbackgr = logbackgr.convert()
         logbackgr.fill(pygame.Color("black"))
         for line in deathlines:
@@ -476,12 +476,12 @@ class GraphicsHandler(object):
         helplines.append("")
         helplines.append("_f_ire")
         helplines.append("_i_nventory")
-        helplines.append("_u_se")
-        helplines.append("_l_ook")
-        helplines.append("_,_pick")
+        helplines.append("_a_pply")
+        helplines.append("e_x_amine")
+        helplines.append("_p_ick (or comma)")
         helplines.append("")
-        helplines.append("move by numpad")
-        helplines.append("fire by numpad")
+        helplines.append("move/fire: numpad")
+        helplines.append("         \\vi keys")
         logposadd = 0
         logbackgr = pygame.Surface((200, 200))
         logbackgr = logbackgr.convert()

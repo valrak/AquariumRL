@@ -26,6 +26,7 @@ moninfo = None
 mapinfo = None
 effinfo = None
 iteminfo = None
+keystrokes = None
 
 # todo: make explosions animated for better graphical representation of the process (as the monster can enter the
 #       explosion tile and do not get hurt (because the explosion was in the last turn and monster entered just the
@@ -70,6 +71,23 @@ class GameEngine(object):
         self.mapinfo = jsonInit.loadjson("resources/data/map.jsn")
         self.effinfo = jsonInit.loadjson("resources/data/effects.jsn")
         self.iteinfo = jsonInit.loadjson("resources/data/items.jsn")
+        self.keystrokes = jsonInit.loadjson("config/keystrokes.jsn")
+
+        self.inventorykey = utils.populatekeys(self.keystrokes.get("inventory"))
+        self.standkey = utils.populatekeys(self.keystrokes.get("stand"))
+        self.applykey = utils.populatekeys(self.keystrokes.get("apply"))
+        self.firekey = utils.populatekeys(self.keystrokes.get("fire"))
+        self.examinekey = utils.populatekeys(self.keystrokes.get("examine"))
+        self.pickkey = utils.populatekeys(self.keystrokes.get("pick"))
+        self.helpkey = utils.populatekeys(self.keystrokes.get("help"))
+        self.upkey = utils.populatekeys(self.keystrokes.get("up"))
+        self.downkey = utils.populatekeys(self.keystrokes.get("down"))
+        self.leftkey = utils.populatekeys(self.keystrokes.get("left"))
+        self.rightkey = utils.populatekeys(self.keystrokes.get("right"))
+        self.upleftkey = utils.populatekeys(self.keystrokes.get("upleft"))
+        self.downleftkey = utils.populatekeys(self.keystrokes.get("downleft"))
+        self.uprightkey = utils.populatekeys(self.keystrokes.get("upright"))
+        self.downrightkey = utils.populatekeys(self.keystrokes.get("downright"))
 
         self.mapfield = MapField(arenamap, self.mapinfo, self.moninfo, self.effinfo, self.iteinfo, self)
         self.mapfield.generatelevel(25, 15)
@@ -129,7 +147,7 @@ class GameEngine(object):
                         self.resetgame()
                         break
                     elif self.state == "look":
-                        coord = utils.getcoordsbyevent(event)
+                        coord = self.getcoordsbyevent(event)
                         if coord is not None:
                             self.cursorcoord = (self.cursorcoord[0]+coord[0], self.cursorcoord[1]+coord[1])
                             self.draw()
@@ -182,7 +200,7 @@ class GameEngine(object):
                             self.gameevent.report("firing cancelled.")
                             self.draw()
                             break
-                        coord = utils.getcoordsbyevent(event)
+                        coord = self.getcoordsbyevent(event)
                         if coord is not None:
                             player.fire(coord, player.rangedpreference)
 
@@ -190,7 +208,7 @@ class GameEngine(object):
                                 self.state = "game"
                                 self.draw()
                             self.passturn()
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_i or event.key == pg.K_SPACE):
+                        if event.type == pg.KEYDOWN and (event.key in self.inventorykey or event.key == pg.K_SPACE):
                             index = self.displayinventory()
                             if index is not None:
                                 if len(player.inventory)-1 >= index:
@@ -214,29 +232,30 @@ class GameEngine(object):
                         if event.type == pg.KEYDOWN:
                             self.draw()
                         # Lines
-                        coord = utils.getcoordsbyevent(event)
+                        coord = self.getcoordsbyevent(event)
                         if coord is not None:
                             coord = (player.x+coord[0], player.y+coord[1])
                             player.action(coord)
                             self.passturn()
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_SPACE or event.key == pg.K_KP5):
+                        if event.type == pg.KEYDOWN and (event.key in self.standkey):
                             self.passturn()
 
                         # Commands
                         # help
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_h):
+                        if event.type == pg.KEYDOWN and (event.key in self.helpkey):
                             self.state = "help"
                             self.draw()
                         # look
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_l):
+                        if event.type == pg.KEYDOWN and (event.key in self.examinekey):
                             self.cursorcoord = self.mapfield.getplayer().getposition()
                             self.state = "look"
                             self.draw()
                         # inventory
-                        if event.type == pg.KEYDOWN and (event.key == pg.K_i):
+
+                        if event.type == pg.KEYDOWN and (event.key in self.inventorykey):
                             self.state = "inventory"
                         # fire
-                        if event.type == pg.KEYDOWN and event.key == pg.K_f:
+                        if event.type == pg.KEYDOWN and event.key in self.firekey:
                             if len(player.inventory) == 0:
                                 self.gameevent.report("You have nothing to fire")
                                 self.state = "game"
@@ -255,9 +274,9 @@ class GameEngine(object):
                             self.state = "fire"
                             break
                         # use
-                        if event.type == pg.KEYDOWN and event.key == pg.K_u:
+                        if event.type == pg.KEYDOWN and event.key in self.applykey:
                             self.state = "use"
-                        if event.type == pg.KEYDOWN and event.key == pg.K_COMMA:
+                        if event.type == pg.KEYDOWN and event.key in self.pickkey:
                             # pick up item
                             citems = self.mapfield.getitems(player.getposition())
                             for item in citems:
@@ -401,3 +420,24 @@ class GameEngine(object):
             if self.mapfield.getplayer().getparam("level") is not None:
                 base += int(self.mapfield.getplayer().getparam("level")) * 10
         return base
+
+    def getcoordsbyevent(self, event):
+        coord = None
+        if event.type == pg.KEYDOWN and (event.key in self.upkey):
+            coord = (0, -1)
+        if event.type == pg.KEYDOWN and (event.key in self.downkey):
+            coord = (0, +1)
+        if event.type == pg.KEYDOWN and (event.key in self.leftkey):
+            coord = (-1, 0)
+        if event.type == pg.KEYDOWN and (event.key in self.rightkey):
+            coord = (+1, 0)
+        # Diagonals
+        if event.type == pg.KEYDOWN and (event.key in self.uprightkey):
+            coord = (+1, -1)
+        if event.type == pg.KEYDOWN and (event.key in self.upleftkey):
+            coord = (-1, -1)
+        if event.type == pg.KEYDOWN and (event.key in self.downleftkey):
+            coord = (-1, +1)
+        if event.type == pg.KEYDOWN and (event.key in self.downrightkey):
+            coord = (+1, +1)
+        return coord

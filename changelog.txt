@@ -3,3 +3,4 @@ v 0.2
 + kill list
 + verbose log message after various in game events
 + score increase after successful win
+% monster spawn is not generated near player any more
