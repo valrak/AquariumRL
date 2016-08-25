@@ -97,8 +97,10 @@ class GraphicsHandler(object):
         if self.gameengine.state == "reset":
             player = self.gameengine.mapfield.getplayer()
             if player is not None and int(player.getparam("level")) >= self.gameengine.LASTLEVEL:
-                player.score += int(player.score) + 1000 * int(self.gameengine.LASTLEVEL)
-                self.displaywin(self.gameengine.mapfield.getplayer().score, self.gameengine.lastplayer.killslist)
+                winscoreadd = 1000 * int(self.gameengine.LASTLEVEL)
+                player.score += int(player.score) + winscoreadd
+                self.gameengine.gameevent.report("Your score was raised by " + str(winscoreadd) + " points!")
+                self.displaywin(player.score, player.killslist)
             else:
                 self.displaydeath(str(self.gameengine.lastscore), self.gameengine.lastplayer.killslist)
             self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
@@ -437,10 +439,12 @@ class GraphicsHandler(object):
 
     def displaywin(self, score, killlist):
         kills = self.killliststrings(killlist)
-        ysize = 150
+        ysize = 200
         deathlines = []
         deathlines.append("")
-        deathlines.append(" Congratulations! After many battles, tritons set you free, you've won the game!")
+        deathlines.append(" Congratulations! ")
+        deathlines.append(" Tritons set you free.")
+        deathlines.append(" You've won the game!")
         deathlines.append("")
         deathlines.append(" Score: " + str(score))
         if kills is not None:
@@ -452,7 +456,7 @@ class GraphicsHandler(object):
         deathlines.append("")
         deathlines.append(" Press any key to continue.")
         logposadd = 0
-        logbackgr = pygame.Surface((760, ysize))
+        logbackgr = pygame.Surface((400, ysize))
         logbackgr = logbackgr.convert()
         logbackgr.fill(pygame.Color("black"))
         for line in deathlines:

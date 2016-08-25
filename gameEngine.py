@@ -46,7 +46,7 @@ class GameEngine(object):
 
     RESOLUTIONX = 1024
     RESOLUTIONY = 660
-    LASTLEVEL = 10
+    LASTLEVEL = 11
     SIZE = (RESOLUTIONX, RESOLUTIONY)
     SCORETABLE = [100, 300]
     COMBO_ITEM = 3
@@ -110,7 +110,7 @@ class GameEngine(object):
         self.gameevent.report("Welcome to Aquarium Arena!")
         self.gameevent.report("Top gladiator score is "+str(loadhiscore())+" points!")
         # main game loop
-        #player.setparam("level", "5")
+        player.setparam("level", "10")
         return player
 
     def generateplayer(self):
@@ -120,6 +120,7 @@ class GameEngine(object):
         player.setposition(self.mapfield.getrandompassable())
         for x in range(0, 5):
             player.pick(Item(self.iteinfo['harpoon'], self))
+        player.pick(Item(self.iteinfo['mermpoon voucher'], self))
         self.mapfield.addmonster(player)
         return player
 
@@ -143,7 +144,8 @@ class GameEngine(object):
                         self.deathscreen()
                         self.state = "game"
                         self.gameevent.report("Your score was: "+str(self.lastscore)+".")
-                        savehiscore(self.lastscore, self.hiscore)
+                        if savehiscore(self.lastscore, self.hiscore):
+                            self.gameevent.report("New hiscore! Congratulations!")
                         self.resetgame()
                         break
                     elif self.state == "look":
@@ -310,6 +312,8 @@ class GameEngine(object):
         while loop:
             for event in pygame.event.get():
                 # cancel
+                if event.type == pg.QUIT:
+                    self.endgame()
                 if event.type == pg.KEYDOWN:
                     return None
             self.clock.tick(30)

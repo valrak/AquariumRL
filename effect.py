@@ -120,6 +120,7 @@ class Effect(thing.Thing):
                 if occupant is not None:
                     if not (occupant.getflag("relectric") and self.getflag("electric")):
                         occupant.lowerhealth(self.getparam("damage"))
+                        self.gameengine.gameevent.report(occupant.getname()+" has been hit by "+self.getname()+"!")
                         if self.owner is not None:
                             occupant.lastattacker = self.owner
             if self.getparam("effect") == "repair":
@@ -154,11 +155,14 @@ class Effect(thing.Thing):
             if self.getparam("effect") == "give":
                 amount = 1
                 if self.getparam("amount") is not None:
+
                     amount = int(self.getparam("amount"))
                 if self.getparam("itemname") is not None:
                     for i in range(amount):
                         self.gameengine.mapfield.addatrandomsurfaceitem(
                             item.Item(self.gameengine.iteinfo[self.getparam("itemname")], self.gameengine))
+                    self.gameengine.gameevent.report(
+                        str(self.getparam("amount")) + " of " + self.getparam("itemname") + " was thrown into the arena.")
             if self.getparam("effect") == "change":
                 occupant = self.gameengine.mapfield.getoccupants(self.getposition())
                 if occupant is not None:

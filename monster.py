@@ -201,6 +201,8 @@ class Monster(thing.Thing):
                                             canshoot = False
                                     if canshoot:
                                         self.fire(direct, bestranged)
+                                        self.gameengine.gameevent.report(
+                                            self.getname() + " fired " + bestranged.getname() + "!")
                                         actions += 1
                                         if self.getparam("firelimit") is not None:
                                             self.firetime = int(self.getparam("firelimit"))

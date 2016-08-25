@@ -17,5 +17,5 @@ def savehiscore(score, hiscore):
         with open('hiscore', 'w') as f:
             f.write(str(score))
             f.close()
-
-    return True
+            return True
+    return False
