@@ -183,10 +183,17 @@ class GraphicsHandler(object):
             self.loglines.pop(0)
         self.loglines.append(logline)
 
-    def displayitemlist(self, itemlist):
+    def displayitemlist(self, itemlist, fromitem=0):
         allitemsface = pygame.Surface((1, 1), pygame.SRCALPHA)
         i = 0
+        lastitem = 0
+        if fromitem >= len(itemlist):
+            fromitem = 0
         for item in itemlist:
+            if fromitem > lastitem:
+                lastitem += 1
+                i += 1
+                continue
             if i >= len(self.gameengine.ALPHABET):
                 break
             if item.isstackable():
@@ -194,10 +201,16 @@ class GraphicsHandler(object):
             else:
                 itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i])
             i += 1
+            lastitem += 1
             allitemsface = self.gluebelow(allitemsface, itemface)
+            if (allitemsface.get_height() > int(self.gameengine.RESOLUTIONX / 2)) and len(itemlist) > lastitem:
+                pageinfo = self.infofont.render("press space for next page", 1, (pygame.Color("lightgreen")))
+                allitemsface = self.gluebelow(allitemsface, pageinfo)
+                break
         self.drawwindow(allitemsface, (1, 1))
         self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
         pygame.display.flip()
+        return lastitem
 
     def displaystringlist(self, stringlist):
         maxy = len(stringlist) * 30

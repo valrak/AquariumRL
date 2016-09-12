@@ -13,5 +13,6 @@
   "fire": ["f", "F"],
   "examine": ["x", "X"],
   "pick": ["p", "COMMA", "P"],
-  "help": ["h", "H"]
+  "help": ["h", "H"],
+  "next": ["SPACE", "ENTER"]
 }

@@ -1,8 +1,11 @@
-v 0.2
+v 0.3
+% inventory pages
 
+v 0.2
 + kill list
 + verbose log message after various in game events
 + score increase after successful win
 + configurable keystrokes
 + telestones
 % monster spawn is not generated near player any more
+% fixed isolated caves

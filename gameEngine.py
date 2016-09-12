@@ -79,6 +79,7 @@ class GameEngine(object):
         self.firekey = utils.populatekeys(self.keystrokes.get("fire"))
         self.examinekey = utils.populatekeys(self.keystrokes.get("examine"))
         self.pickkey = utils.populatekeys(self.keystrokes.get("pick"))
+        self.nextkey = utils.populatekeys(self.keystrokes.get("next"))
         self.helpkey = utils.populatekeys(self.keystrokes.get("help"))
         self.upkey = utils.populatekeys(self.keystrokes.get("up"))
         self.downkey = utils.populatekeys(self.keystrokes.get("down"))
@@ -110,7 +111,7 @@ class GameEngine(object):
         self.gameevent.report("Welcome to Aquarium Arena!")
         self.gameevent.report("Top gladiator score is "+str(loadhiscore())+" points!")
         # main game loop
-        player.setparam("level", "10")
+        #player.setparam("level", "10")
         return player
 
     def generateplayer(self):
@@ -120,7 +121,17 @@ class GameEngine(object):
         player.setposition(self.mapfield.getrandompassable())
         for x in range(0, 5):
             player.pick(Item(self.iteinfo['harpoon'], self))
+        player.pick(Item(self.iteinfo['coin'], self))
+        player.pick(Item(self.iteinfo['bar'], self))
+        player.pick(Item(self.iteinfo['mermpoon'], self))
         player.pick(Item(self.iteinfo['mermpoon voucher'], self))
+        player.pick(Item(self.iteinfo['harpoon voucher'], self))
+        player.pick(Item(self.iteinfo['sealing crystal'], self))
+        player.pick(Item(self.iteinfo['crystal shard'], self))
+        player.pick(Item(self.iteinfo['telestone'], self))
+        player.pick(Item(self.iteinfo['attack orb'], self))
+        player.pick(Item(self.iteinfo['gauss gun'], self))
+        player.pick(Item(self.iteinfo['ultra raygun'], self))
         self.mapfield.addmonster(player)
         return player
 
@@ -296,12 +307,9 @@ class GameEngine(object):
         self.noscore = False
 
         del self.mapfield
-        #del self.graphicshandler
         arenamap = None
         self.mapfield = MapField(arenamap, self.mapinfo, self.moninfo, self.effinfo, self.iteinfo, self)
         self.mapfield.generatelevel(25, 15)
-        #self.graphicshandler = GraphicsHandler(self)
-
         self.loop()
 
     def draw(self):
@@ -386,7 +394,7 @@ class GameEngine(object):
                             items.append(Item(self.iteinfo[ite], self))
         if len(items) == 0:
             return None
-        self.graphicshandler.displayitemlist(items)
+        lastitem = self.graphicshandler.displayitemlist(items)
         loop = True
         while loop:
             for event in pygame.event.get():
@@ -396,6 +404,9 @@ class GameEngine(object):
                     break
                 if event.type == pg.QUIT:
                     self.endgame()
+                if event.type == pg.KEYDOWN and event.key in self.nextkey:
+                    self.draw()
+                    self.graphicshandler.displayitemlist(items, lastitem)
                 if event.type == pg.KEYDOWN and keypressed in self.ALPHABET:
                     if len(items) > self.ALPHABET.index(keypressed):
                         return items[self.ALPHABET.index(keypressed)]  # returns corresponding key alphabet index
@@ -405,7 +416,7 @@ class GameEngine(object):
         items = self.mapfield.getplayer().getinventory(requiredflag)
         if len(items) == 0:
             return None
-        self.graphicshandler.displayitemlist(items)
+        lastitem = self.graphicshandler.displayitemlist(items)
         loop = True
         while loop:
             for event in pygame.event.get():
@@ -414,6 +425,9 @@ class GameEngine(object):
                 # cancel
                 if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                     return None
+                if event.type == pg.KEYDOWN and event.key in self.nextkey:
+                    self.draw()
+                    self.graphicshandler.displayitemlist(items, lastitem)
                 if event.type == pg.KEYDOWN and pygame.key.name(event.key) in self.ALPHABET:
                     return self.ALPHABET.index(pygame.key.name(event.key))  # returns corresponding key alphabet index
             self.clock.tick(30)
