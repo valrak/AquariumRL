@@ -88,6 +88,11 @@ class Monster(thing.Thing):
         self.setparam("hp", newhp)
 
     def combat(self, attacker):
+        effects = self.gameengine.mapfield.geteffects(self.getposition())
+        # protected by shield
+        for eff in effects:
+            if eff.getparam("effect") == "shield":
+                return False
         self.lastattacker = attacker
         self.setparam("hp", int(self.getparam("hp")) - int(attacker.getparam("attack")))
 
@@ -96,7 +101,8 @@ class Monster(thing.Thing):
             self.lastattacker = attacker
         effects = self.gameengine.mapfield.geteffects(self.getposition())
         for eff in effects:
-            if eff.getflag("novisibility"):
+            # protected by shield or poor visibility
+            if eff.getflag("novisibility") or eff.getparam("effect") == "shield":
                 return False
         if weapon.getparam("damage") is not None:
             self.setparam("hp", int(self.getparam("hp")) - int(weapon.getparam("damage")))

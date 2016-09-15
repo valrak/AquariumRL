@@ -296,5 +296,18 @@
   "stackable": "true",
   "damage": 0,
   "effect": "telebeam"
+  },
+"shield cube": {
+  "id": "shield cube",
+  "description": "creates shield wall",
+  "tile": "18,0",
+  "flags": ["gravity", "usable"],
+  "weight": 8,
+  "level": 4,
+  "rarity": 4,
+  "score": 0,
+  "stackable": "true",
+  "damage": 0,
+  "effect": "shield wall"
   }
 }

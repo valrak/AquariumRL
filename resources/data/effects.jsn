@@ -174,5 +174,12 @@
   "tile": "11,0",
   "effect": "tele",
   "ttl": 2
+},
+"shield wall": {
+  "id": "shield wall",
+  "description": "impenetrable shield wall",
+  "tile": "12,0",
+  "effect": "shield",
+  "ttl": 4
 }
 }
