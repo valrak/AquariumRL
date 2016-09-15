@@ -126,6 +126,8 @@ class GameEngine(object):
         player.setposition(self.mapfield.getrandompassable())
         for x in range(0, 5):
             player.pick(Item(self.iteinfo['harpoon'], self))
+        player.pick(Item(self.iteinfo['raygun'], self))
+        player.pick(Item(self.iteinfo['gauss gun'], self))
         self.mapfield.addmonster(player)
         return player
 
@@ -283,12 +285,12 @@ class GameEngine(object):
                                 self.gameevent.report("You have nothing to fire")
                                 self.state = "game"
                             elif player.rangedpreference is None:
-                                if player.getbestranged() is None:
+                                if player.getbestrangedforplayer() is None:
                                     player.rangedpreference = player.inventory[0]
                                     self.gameevent.report("firing " + player.rangedpreference.getname() +
                                                           ". Press i or space to change.")
                                 else:
-                                    self.gameevent.report("firing " + player.getbestranged().getname() +
+                                    self.gameevent.report("firing " + player.getbestrangedforplayer().getname() +
                                                           ". Press i or space to change.")
                             else:
                                 self.gameevent.report("firing " + player.rangedpreference.getname() +

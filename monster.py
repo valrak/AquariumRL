@@ -343,7 +343,10 @@ class Monster(thing.Thing):
         weapon = what
         if what is None:
             if self.rangedpreference is None:
-                weapon = self.getbestranged()
+                if self.player:
+                    weapon = self.getbestrangedforplayer()
+                else:
+                    weapon = self.getbestranged()
             else:
                 weapon = self.rangedpreference
         if weapon is None:
@@ -449,7 +452,7 @@ class Monster(thing.Thing):
     def canact(self, currentmoves):
         if self.getparam("hp") <= 0:
             return False
-        if currentmoves < int(self.getparam("speed")):
+        if currentmoves <= int(self.getparam("speed")):
             return True
         return False
 
@@ -470,6 +473,23 @@ class Monster(thing.Thing):
             if ite.getparam("damage") is not None and ite.getparam("damage") > bestdamage:
                 bestitem = ite
                 bestdamage = bestitem.getparam("damage")
+        return bestitem
+
+    def getbestrangedforplayer(self):
+        bestitem = None
+        bestdamage = 0
+        for ite in self.inventory:
+            # search for preffered weapons (harpoons)f
+            if ite.getflag("preffered") and \
+                            ite.getparam("damage") is not None and ite.getparam("damage") > bestdamage:
+                bestitem = ite
+                bestdamage = bestitem.getparam("damage")
+        # no preffered weapons
+        if bestitem is None:
+            for ite in self.inventory:
+                if ite.getparam("damage") is not None and ite.getparam("damage") > bestdamage:
+                    bestitem = ite
+                    bestdamage = bestitem.getparam("damage")
         return bestitem
 
     # change coins and score items for score at the end of level
