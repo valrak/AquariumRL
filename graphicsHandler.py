@@ -500,17 +500,7 @@ class GraphicsHandler(object):
         return result
 
     def displayhelp(self):
-        helplines = []
-        helplines.append("h_e_lp")
-        helplines.append("")
-        helplines.append("_f_ire")
-        helplines.append("_i_nventory")
-        helplines.append("_a_pply")
-        helplines.append("e_x_amine")
-        helplines.append("_p_ick (or _,_)")
-        helplines.append("_d_rop")
-        helplines.append("move/fire: numpad")
-        helplines.append("         \\vi keys")
+        helplines = self.gameengine.helpboxtext
         logposadd = 0
         logbackgr = pygame.Surface((200, 200))
         logbackgr = logbackgr.convert()
@@ -522,31 +512,7 @@ class GraphicsHandler(object):
         self.screen.blit(logbackgr, (830, 430))
 
     def displayhelpscreen(self):
-        helplines = []
-        helplines.append("Aquarium arena roguelike game")
-        helplines.append("")
-        helplines.append("by valrak")
-        helplines.append("")
-        helplines.append("---")
-        helplines.append("")
-        helplines.append("You've been caught by merman civilization and thrown into their ")
-        helplines.append("Aquarium Arena to entertain crowds. More you kill, more items")
-        helplines.append("you can expect to fall into the arena. Especially when you keep that")
-        helplines.append("combo meter active! Corals in the arena can be used to hide in them.")
-        helplines.append("")
-        helplines.append("After certain amount of kills gate appears. When this happens, no items")
-        helplines.append("are thrown to arena, only monsters are generated. Move through the gate")
-        helplines.append("as soon as possible, as your score don't go up until you go to next level.")
-        helplines.append("Bring gold to gate to raise your score.")
-        helplines.append("")
-        helplines.append("You have also your trusty watch:")
-        helplines.append("H is your current / maximum health.")
-        helplines.append("S is your current score.")
-        helplines.append("L is current level / amount of kills before gate appears.")
-        helplines.append("C is combo meter.")
-        helplines.append("W is current / maximum weight.")
-        helplines.append("")
-        helplines.append("Good luck!")
+        helplines = self.gameengine.helpscreentext
         logposadd = 0
         logbackgr = pygame.Surface((900, 490))
         logbackgr = logbackgr.convert()

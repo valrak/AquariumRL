@@ -1,0 +1,10 @@
+h_e_lp
+
+_f_ire
+_i_nventory
+_a_pply
+e_x_amine
+_p_ick (or _,_)
+_d_rop
+move/fire: numpad
+         \\vi keys

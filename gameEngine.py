@@ -92,6 +92,9 @@ class GameEngine(object):
         self.uprightkey = utils.populatekeys(self.keystrokes.get("upright"))
         self.downrightkey = utils.populatekeys(self.keystrokes.get("downright"))
 
+        self.helpscreentext = utils.loadtextfile("resources/texts/helpScreen.txt")
+        self.helpboxtext = utils.loadtextfile("resources/texts/helpBox.txt")
+
         self.mapfield = MapField(arenamap, self.mapinfo, self.moninfo, self.effinfo, self.iteinfo, self)
         self.mapfield.generatelevel(25, 15)
 

@@ -22,3 +22,16 @@ def populatekeys(keylist):
         if getkey(key) is not None:
             truekeys.append(getkey(key))
     return truekeys
+
+
+def loadtextfile(filename):
+    lines = []
+    try:
+        f = open(filename, "r")
+        for line in f:
+            line = line.rstrip()
+            lines.append(line)
+        f.close()
+        return lines
+    except IOError:
+        return lines
