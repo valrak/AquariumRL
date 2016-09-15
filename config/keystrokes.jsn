@@ -7,12 +7,14 @@
   "downleft": ["b", "1", "KP1", "B", "END"],
   "upright": ["u", "9", "KP9", "U", "PAGEUP"],
   "downright": ["n", "3", "KP3", "N", "PAGEDOWN"],
-  "stand": ["KP_PERIOD", "PERIOD", "KP5", "5", "ENTER"],
+  "stand": ["KP_PERIOD", "PERIOD", "KP5", "5"],
   "inventory": ["i", "I"],
   "apply": ["a", "A"],
   "fire": ["f", "F"],
   "examine": ["x", "X"],
   "pick": ["p", "COMMA", "P"],
-  "help": ["h", "H"],
-  "next": ["SPACE", "ENTER"]
+  "drop": ["d", "D"],
+  "confirm": ["RETURN", "KP_ENTER"],
+  "help": ["e", "E"],
+  "next": ["SPACE"]
 }

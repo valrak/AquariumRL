@@ -396,7 +396,7 @@ class Monster(thing.Thing):
             else:
                 self.inventory.remove(ite)
 
-    def getinventory(self, flag):
+    def getinventory(self, flag=None):
         if flag is None:
             return self.inventory
         else:

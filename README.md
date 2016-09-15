@@ -6,7 +6,7 @@ Aquarium Arena
 Experience:
 * Sidescroller 2d perspective.
 * Underwater environment, where items are falling slowly to the ground, turn by turn, and you can catch them mid-way.
-* Be part of merfolk cultural heritage
+* Merfolk cultural heritage
 * Tritons, sharks, crabs-stealing-stuff and whatnot.
 
 #### Screenshot
@@ -17,7 +17,7 @@ Experience:
 * see [LICENSE](https://github.com/valrak/AquariumRL/blob/master/LICENSE.md) file
 
 ## Version
-* Version 0.2
+* [Version 0.2](https://github.com/valrak/AquariumRL/releases/tag/0.2)
 
 ## Changelog
 * see [changelog.txt](https://github.com/valrak/AquariumRL/blob/master/changelog.txt) file

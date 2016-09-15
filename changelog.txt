@@ -1,5 +1,6 @@
 v 0.3
-% inventory pages
++ inventory pages
+% vi keys and help screen collision fix
 
 v 0.2
 + kill list

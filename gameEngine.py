@@ -81,6 +81,8 @@ class GameEngine(object):
         self.pickkey = utils.populatekeys(self.keystrokes.get("pick"))
         self.nextkey = utils.populatekeys(self.keystrokes.get("next"))
         self.helpkey = utils.populatekeys(self.keystrokes.get("help"))
+        self.confirmkey = utils.populatekeys(self.keystrokes.get("confirm"))
+        self.dropkey = utils.populatekeys(self.keystrokes.get("drop"))
         self.upkey = utils.populatekeys(self.keystrokes.get("up"))
         self.downkey = utils.populatekeys(self.keystrokes.get("down"))
         self.leftkey = utils.populatekeys(self.keystrokes.get("left"))
@@ -121,17 +123,6 @@ class GameEngine(object):
         player.setposition(self.mapfield.getrandompassable())
         for x in range(0, 5):
             player.pick(Item(self.iteinfo['harpoon'], self))
-        player.pick(Item(self.iteinfo['coin'], self))
-        player.pick(Item(self.iteinfo['bar'], self))
-        player.pick(Item(self.iteinfo['mermpoon'], self))
-        player.pick(Item(self.iteinfo['mermpoon voucher'], self))
-        player.pick(Item(self.iteinfo['harpoon voucher'], self))
-        player.pick(Item(self.iteinfo['sealing crystal'], self))
-        player.pick(Item(self.iteinfo['crystal shard'], self))
-        player.pick(Item(self.iteinfo['telestone'], self))
-        player.pick(Item(self.iteinfo['attack orb'], self))
-        player.pick(Item(self.iteinfo['gauss gun'], self))
-        player.pick(Item(self.iteinfo['ultra raygun'], self))
         self.mapfield.addmonster(player)
         return player
 
@@ -183,6 +174,22 @@ class GameEngine(object):
                             self.state = "game"
                             self.draw()
                             break
+                    elif self.state == "drop":
+                        # cancel
+                        if event.type == pg.QUIT:
+                            self.endgame()
+                        if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
+                            self.state = "game"
+                            self.draw()
+                            break
+                        selecteditems = self.displayselectableinventory()
+                        self.draw()
+                        self.state = "game"
+                        if selecteditems is not None and len(selecteditems) > 0:
+                            for droppeditem in selecteditems:
+                                self.gameevent.report("dropped " + droppeditem.getname())
+                                player.drop(droppeditem)
+                            self.passturn()
                     elif self.state == "use":
                         # cancel
                         if event.type == pg.QUIT:
@@ -289,6 +296,8 @@ class GameEngine(object):
                         # use
                         if event.type == pg.KEYDOWN and event.key in self.applykey:
                             self.state = "use"
+                        if event.type == pg.KEYDOWN and event.key in self.dropkey:
+                            self.state = "drop"
                         if event.type == pg.KEYDOWN and event.key in self.pickkey:
                             # pick up item
                             citems = self.mapfield.getitems(player.getposition())
@@ -427,9 +436,42 @@ class GameEngine(object):
                     return None
                 if event.type == pg.KEYDOWN and event.key in self.nextkey:
                     self.draw()
-                    self.graphicshandler.displayitemlist(items, lastitem)
+                    lastitem = self.graphicshandler.displayitemlist(items, lastitem)
                 if event.type == pg.KEYDOWN and pygame.key.name(event.key) in self.ALPHABET:
                     return self.ALPHABET.index(pygame.key.name(event.key))  # returns corresponding key alphabet index
+            self.clock.tick(30)
+
+    def displayselectableinventory(self, requiredflag=None):
+        items = self.mapfield.getplayer().getinventory(requiredflag)
+        if len(items) == 0:
+            return None
+        originallastitem = 0
+        lastitem = self.graphicshandler.displayitemlist(items)
+        loop = True
+        selected = []
+        while loop:
+            for event in pygame.event.get():
+                if event.type == pg.QUIT:
+                    self.endgame()
+                # cancel
+                if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
+                    return None
+                if event.type == pg.KEYDOWN and event.key in self.nextkey:
+                    self.draw()
+                    originallastitem = lastitem
+                    lastitem = self.graphicshandler.displayitemlist(items, lastitem, selected)
+                if event.type == pg.KEYDOWN and pygame.key.name(event.key) in self.ALPHABET:
+                    keyindex = self.ALPHABET.index(pygame.key.name(event.key))
+                    if keyindex <= len(self.mapfield.getplayer().getinventory()) - 1:
+                        sitem = self.mapfield.getplayer().getinventory()[keyindex]
+                        if sitem in selected:
+                            selected.remove(sitem)
+                        else:
+                            selected.append(sitem)
+                    self.graphicshandler.displayitemlist(items, originallastitem, selected)
+                if event.type == pg.KEYDOWN and event.key in self.confirmkey:
+                    return selected
+
             self.clock.tick(30)
 
     def getrequiredkillcount(self):

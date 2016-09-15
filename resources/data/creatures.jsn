@@ -145,7 +145,7 @@
  "serpent": {
   "id": "serpent",
   "type": "fish",
-  "description": "fast",
+  "description": "moves twice a turn",
   "hp": "2",
   "tile": "10,0",
   "attack": "2",
@@ -180,6 +180,6 @@
   "speed": "1",
   "level": 4,
   "score": 60,
-  "rarity": 2
+  "rarity": 1
   }
 }

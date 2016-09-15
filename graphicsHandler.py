@@ -39,6 +39,8 @@ class GraphicsHandler(object):
         self.statusfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 14)
         self.helpfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 16)
         self.infofont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 16)
+        self.underlineinfofont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 16)
+        self.underlineinfofont.set_underline(True)
 
     def event(self, thing, name=None, newvalue=None, oldvalue=None):
         if thing == "error":
@@ -183,28 +185,35 @@ class GraphicsHandler(object):
             self.loglines.pop(0)
         self.loglines.append(logline)
 
-    def displayitemlist(self, itemlist, fromitem=0):
+    def displayitemlist(self, itemlist, fromitem=0, selected=None):
         allitemsface = pygame.Surface((1, 1), pygame.SRCALPHA)
         i = 0
         lastitem = 0
         if fromitem >= len(itemlist):
             fromitem = 0
         for item in itemlist:
+            underscore = None
             if fromitem > lastitem:
                 lastitem += 1
                 i += 1
                 continue
             if i >= len(self.gameengine.ALPHABET):
                 break
+            if selected is not None and item in selected:
+                underscore = True
             if item.isstackable():
-                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i], " (x"+str(item.stack)+")")
+                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i], " (x"+str(item.stack)+")", underscore)
             else:
-                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i])
+                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i], None, underscore)
             i += 1
             lastitem += 1
             allitemsface = self.gluebelow(allitemsface, itemface)
             if (allitemsface.get_height() > int(self.gameengine.RESOLUTIONX / 2)) and len(itemlist) > lastitem:
-                pageinfo = self.infofont.render("press space for next page", 1, (pygame.Color("lightgreen")))
+                if selected is None:
+                    pageinfo = self.infofont.render("space - next page", 1,
+                                                    (pygame.Color("lightgreen")))
+                else:
+                    pageinfo = self.infofont.render("space - next page, enter - confirm", 1, (pygame.Color("lightgreen")))
                 allitemsface = self.gluebelow(allitemsface, pageinfo)
                 break
         self.drawwindow(allitemsface, (1, 1))
@@ -257,7 +266,7 @@ class GraphicsHandler(object):
             # surface = self.gluebelow(surface, itemsurface, 2)
         return stringlist
 
-    def itemdisplay(self, item, letter=None, stack=None):
+    def itemdisplay(self, item, letter=None, stack=None, fontflag=None):
         damagetile = self.uitileeng.getcustomtile(0, 32, 16, 16)
         weighttile = self.uitileeng.getcustomtile(0, 64, 16, 16)
         arrowtile = self.uitileeng.getcustomtile(0, 32+16, 16, 16)
@@ -267,7 +276,10 @@ class GraphicsHandler(object):
 
         if stack is not None:
             textname = textname + stack
-        name = self.infofont.render(textname, 1, (pygame.Color("lightblue")))
+        if fontflag is None:
+            name = self.infofont.render(textname, 1, (pygame.Color("lightblue")))
+        else:
+            name = self.underlineinfofont.render(textname, 1, (pygame.Color("lightblue")))
         belowname = pygame.Surface((1, 1), pygame.SRCALPHA)
 
         if item.getparam("damage") is not None:
@@ -489,14 +501,14 @@ class GraphicsHandler(object):
 
     def displayhelp(self):
         helplines = []
-        helplines.append("_h_elp")
+        helplines.append("h_e_lp")
         helplines.append("")
         helplines.append("_f_ire")
         helplines.append("_i_nventory")
         helplines.append("_a_pply")
         helplines.append("e_x_amine")
-        helplines.append("_p_ick (or comma)")
-        helplines.append("")
+        helplines.append("_p_ick (or _,_)")
+        helplines.append("_d_rop")
         helplines.append("move/fire: numpad")
         helplines.append("         \\vi keys")
         logposadd = 0
