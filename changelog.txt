@@ -2,8 +2,10 @@ v 0.3
 + inventory pages
 + drop interface
 + item: shieldcube
+% preffered weapons for player only are harpoons
 % vi keys and help screen collision fix
 % small tile changes
+% various minor bugfixes and changes to balance
 
 v 0.2
 + kill list

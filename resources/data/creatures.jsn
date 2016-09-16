@@ -137,10 +137,10 @@
   "tile": "9,0",
   "attack": "1",
   "speed": "1",
-  "level": 1,
+  "level": 6,
   "fire": "tritonraygun",
   "score": 125,
-  "rarity": 4
+  "rarity": 3
   },
  "serpent": {
   "id": "serpent",

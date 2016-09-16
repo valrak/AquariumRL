@@ -212,7 +212,7 @@ class Monster(thing.Thing):
                                         actions += 1
                                         if self.getparam("firelimit") is not None:
                                             self.firetime = int(self.getparam("firelimit"))
-
+                                        break  # to prevent jumping in the own line of fire
                 # if can move then move to player
                 if not self.getflag("nomove") and not self.getflag("ground") and self.canact(actions):
                     if not self.player:
@@ -242,18 +242,20 @@ class Monster(thing.Thing):
                         # if the player is nearby, I will cut him
                         if len(pathfinder.lineto(position, playerpos)) == 2:
                             self.action(playerpos)
+                            actions += 1
                         # I don't have anything to hold to, I will fall
                         if not self.gameengine.mapfield.isgrounded(self.getposition()):
                             self.action((self.x, self.y + 1))
                         # or i will wander by one direction
                         else:
-                            if self.direction is None:
-                                directions = [-1, 1]
-                                self.direction = directions[random.randint(0, 1)]
-                            goto = self.gameengine.mapfield.getpassableground(self.getposition(), self.direction)
-                            if goto is None:
-                                self.direction *= -1
-                            self.action(goto)
+                            if self.canact(actions):
+                                if self.direction is None:
+                                    directions = [-1, 1]
+                                    self.direction = directions[random.randint(0, 1)]
+                                goto = self.gameengine.mapfield.getpassableground(self.getposition(), self.direction)
+                                if goto is None:
+                                    self.direction *= -1
+                                self.action(goto)
                 # check isgrounded, if not fall down
                 if self.getflag("ground") and not self.gameengine.mapfield.isgrounded(self.getposition()):
                     coord = (self.x, self.y+1)
@@ -452,7 +454,7 @@ class Monster(thing.Thing):
     def canact(self, currentmoves):
         if self.getparam("hp") <= 0:
             return False
-        if currentmoves <= int(self.getparam("speed")):
+        if currentmoves < int(self.getparam("speed")):
             return True
         return False
 
