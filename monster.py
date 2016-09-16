@@ -356,6 +356,7 @@ class Monster(thing.Thing):
         weapon.setposition(self.getposition())
         weapon = self.throwaway(weapon)
         weapon.setlastuser(self)
+        weapon.fired = True
         # set fuse for fused weapons
         if weapon.getparam("defaultFuse") is not None and weapon.getparam("fuse") is not None:
             weapon.setparam("fuse", int(weapon.getparam("defaultFuse")))

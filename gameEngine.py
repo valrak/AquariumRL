@@ -232,7 +232,7 @@ class GameEngine(object):
                                 if len(player.inventory)-1 >= index:
                                     player.rangedpreference = player.inventory[index]
                                     self.gameevent.report("firing " + player.rangedpreference.getname() +
-                                                          " press i or space to change.")
+                                                          ". inventory to change, direction to fire")
                                     self.draw()
 
                     # Upgrade mode toggles
@@ -288,15 +288,15 @@ class GameEngine(object):
                                 if player.getbestrangedforplayer() is None:
                                     player.rangedpreference = player.inventory[0]
                                     self.gameevent.report("firing " + player.rangedpreference.getname() +
-                                                          ". Press i or space to change.")
+                                                          ". inventory to change, direction to fire")
                                 else:
                                     bestrangedweapon = player.getbestrangedforplayer()
                                     player.rangedpreference = bestrangedweapon
                                     self.gameevent.report("firing " + bestrangedweapon.getname() +
-                                                          ". Press i or space to change.")
+                                                          ". inventory to change, direction to fire")
                             else:
                                 self.gameevent.report("firing " + player.rangedpreference.getname() +
-                                                      ". Press i or space to change.")
+                                                      ". inventory to change, direction to fire")
                             self.state = "fire"
                             self.draw()
 

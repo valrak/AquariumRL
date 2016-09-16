@@ -12,9 +12,9 @@ class Item(thing.Thing):
     gameengine = None
     lastuser = None
     stack = 1
+    fired = False
 
     def __init__(self, parameters, gameengine):
-        self.delay = 0
         self.parameters = dict(parameters)
         self.gameengine = gameengine
 
@@ -57,21 +57,22 @@ class Item(thing.Thing):
         return False
 
     def update(self):
-        if (self.getflag("gravity") and self.delay == 1) or (self.getflag("gravity") and not self.getflag("delay")):
-            if not self.gameengine.mapfield.isgrounded(self.getposition()):
-                self.setposition((self.x, self.y + 1))
-        # delay set for projectiles, not fall immidiately after firing
-        if self.getflag("delay") and self.delay == 0:
-            self.delay = 1
-        if self.getparam("fuse") is not None:
-            if int(self.getparam("fuse")) == 1:
-                neweffect = effect.Effect(self.gameengine.effinfo[self.getparam("fuseeffect")], self.gameengine)
-                neweffect.setposition(self.getposition())
-                neweffect.setowner(self.lastuser)
-                self.gameengine.mapfield.effects.append(neweffect)
-                self.gameengine.mapfield.items.remove(self)
-            elif int(self.getparam("fuse")) != -1:
-                self.setparam("fuse", int(self.getparam("fuse")) - 1)
+        # do not update immidiately after firing
+        if self.fired:
+            self.fired = False
+        else:
+            if self.getflag("gravity"):
+                if not self.gameengine.mapfield.isgrounded(self.getposition()):
+                    self.setposition((self.x, self.y + 1))
+            if self.getparam("fuse") is not None:
+                if int(self.getparam("fuse")) == 1:
+                    neweffect = effect.Effect(self.gameengine.effinfo[self.getparam("fuseeffect")], self.gameengine)
+                    neweffect.setposition(self.getposition())
+                    neweffect.setowner(self.lastuser)
+                    self.gameengine.mapfield.effects.append(neweffect)
+                    self.gameengine.mapfield.items.remove(self)
+                elif int(self.getparam("fuse")) != -1:
+                    self.setparam("fuse", int(self.getparam("fuse")) - 1)
 
     def geteffect(self):
         if self.parameters['effect'] != "None":
