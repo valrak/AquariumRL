@@ -75,9 +75,12 @@ class Item(thing.Thing):
                     self.setparam("fuse", int(self.getparam("fuse")) - 1)
 
     def geteffect(self):
-        if self.parameters['effect'] != "None":
-            return self.parameters['effect']
-        else:
+        try :
+            if self.parameters['effect'] != "None":
+                return self.parameters['effect']
+            else:
+                return None
+        except KeyError:
             return None
 
     def getvalue(self):
@@ -95,12 +98,13 @@ class Item(thing.Thing):
             return False
 
     def getfinalitemdamage(self):
-        if self.getparam("damage") is not None:
-            damage = self.getparam("damage")
-        else:
-            itemeffectinfo = self.gameengine.effinfo[self.geteffect()]
-            try:
-                damage = itemeffectinfo["damage"]
-            except KeyError:
-                damage = None
+        try:
+            if self.getparam("damage") is not None:
+                damage = self.getparam("damage")
+            else:
+                if self.geteffect is not None:
+                    itemeffectinfo = self.gameengine.effinfo[self.geteffect()]
+                    damage = itemeffectinfo["damage"]
+        except KeyError:
+            damage = None
         return damage

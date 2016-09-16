@@ -4,6 +4,7 @@ v 0.3
 + item: shieldcube
 + mouselook info view
 + fire range information in firing mode
++ help screen image
 % preffered weapons for player only are harpoons
 % vi keys and help screen collision fix
 % small tile changes

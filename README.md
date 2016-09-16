@@ -10,7 +10,7 @@ Experience:
 * Tritons, sharks, crabs-stealing-stuff and whatnot.
 
 #### Screenshot
-![Aquarium Arena in action](http://i.imgur.com/8cDcTjD.png "screenshot")
+![Aquarium Arena in action](http://i.imgur.com/x7et68f.png "screenshot")
 ![Look interface](http://i.imgur.com/khhtRmN.png "screenshot")
 
 ## License

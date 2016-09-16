@@ -33,6 +33,8 @@ class GameEngine(object):
     ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
                 'v', 'w', 'x', 'y', 'z']
 
+    GATE_MONSTER_RAND_CHANCE = 50
+
     RESOLUTIONX = 1024
     RESOLUTIONY = 660
     MAPMAXY = 15
@@ -365,7 +367,8 @@ class GameEngine(object):
                 self.mapfield.generateitem(True)
             # endlevel - no score for kills but more monsters
             if self.noscore is True:
-                self.mapfield.generatemonster()
+                if random.randint(0, 100) >= self.GATE_MONSTER_RAND_CHANCE:
+                    self.mapfield.generatemonster()
             # next level trigger
             if self.mapfield.getplayer().killcount >= self.getrequiredkillcount() and self.noscore is not True:
                 self.noscore = True
