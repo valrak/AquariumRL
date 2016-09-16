@@ -110,7 +110,7 @@
   },
 "volt": {
   "id": "volt",
-  "description": "electric discharge",
+  "description": "randomly moving electric discharge",
   "tile": "5,0",
   "effect": "volt",
   "damage": "1",

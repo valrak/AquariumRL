@@ -13,12 +13,3 @@ After certain amount of kills gate appears. When this happens, no items
 are thrown to arena, only monsters are generated. Move through the gate
 as soon as possible, as your score don't go up until you go to next level.
 Bring gold to gate to raise your score.
-
-You have also your trusty watch:
-H is your current / maximum health.
-S is your current score.
-L is current level / amount of kills before gate appears.
-C is combo meter.
-W is current / maximum weight.
-
-Good luck!

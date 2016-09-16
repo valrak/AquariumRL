@@ -105,7 +105,7 @@
  "medusa": {
   "id": "medusa",
   "type": "medusa",
-  "description": "throws electric bolts",
+  "description": "randomly discharges electricity",
   "hp": "1",
   "tile": "7,0",
   "attack": "0",

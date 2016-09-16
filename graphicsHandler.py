@@ -557,7 +557,10 @@ class GraphicsHandler(object):
             text = self.helpfont.render(line, 1, (200, 200, 200))
             logbackgr.blit(text, (10, 0 + logposadd))
             logposadd += 20
+        helpimage = pygame.image.load('resources/img/helpscreen.png')
+        logbackgr = self.gluebelow(logbackgr, helpimage)
         self.screen.blit(logbackgr, (5, 5))
+        pygame.display.flip()
 
     def eraseloglines(self):
         self.loglines = []

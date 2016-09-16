@@ -108,7 +108,7 @@ class GameEngine(object):
         self.gameevent.report("Welcome to Aquarium Arena!")
         self.gameevent.report("Top gladiator score is "+str(loadhiscore())+" points!")
         # main game loop
-        player.setparam("level", "10")
+        #player.setparam("level", "10")
         return player
 
     def generateplayer(self):
@@ -118,9 +118,9 @@ class GameEngine(object):
         player.setposition(self.mapfield.getrandompassable())
         for x in range(0, 5):
             player.pick(Item(self.iteinfo['harpoon'], self))
-        player.pick(Item(self.iteinfo['raygun'], self))
-        player.pick(Item(self.iteinfo['gauss gun'], self))
-        player.pick(Item(self.iteinfo['dynamite'], self))
+        # player.pick(Item(self.iteinfo['raygun'], self))
+        # player.pick(Item(self.iteinfo['gauss gun'], self))
+        # player.pick(Item(self.iteinfo['dynamite'], self))
         self.mapfield.addmonster(player)
         return player
 
@@ -129,12 +129,7 @@ class GameEngine(object):
         self.draw()
         while True:
             for event in pygame.event.get():
-                if event.type == pg.QUIT:
-                    self.endgame()
-                elif event.type == VIDEORESIZE:
-                    self.graphicshandler.resize(event.dict['size'])
-                    self.draw()
-                else:
+                if not self.universalevents(event):
                     if self.state == "help":
                         self.deathscreen()
                         self.state = "game"
@@ -149,33 +144,31 @@ class GameEngine(object):
                         self.resetgame()
                         break
                     elif self.state == "look":
+                        self.universalevents(event)
                         coord = self.getcoordsbyevent(event)
                         if coord is not None:
                             self.cursorcoord = (self.cursorcoord[0]+coord[0], self.cursorcoord[1]+coord[1])
                             self.draw()
-                        if event.type == pg.QUIT:
-                            self.endgame()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
                             self.draw()
                             break
                     elif self.state == "inventory":
+                        self.universalevents(event)
                         citem = self.displayinventory()
                         if citem is not None:
                             None
                         else:
                             self.state = "game"
                             self.draw()
-                        if event.type == pg.QUIT:
-                            self.endgame()
+                        self.universalevents(event)
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
                             self.draw()
                             break
                     elif self.state == "drop":
+                        self.universalevents(event)
                         # cancel
-                        if event.type == pg.QUIT:
-                            self.endgame()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
                             self.draw()
@@ -189,9 +182,8 @@ class GameEngine(object):
                                 player.drop(droppeditem)
                             self.passturn()
                     elif self.state == "use":
+                        self.universalevents(event)
                         # cancel
-                        if event.type == pg.QUIT:
-                            self.endgame()
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
                             self.gameevent.report("item use cancelled.")
@@ -211,8 +203,7 @@ class GameEngine(object):
 
                     # Firing state
                     elif self.state == "fire":
-                        if event.type == pg.QUIT:
-                            self.endgame()
+                        self.universalevents(event)
                         if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                             self.state = "game"
                             self.gameevent.report("firing cancelled.")
@@ -237,6 +228,7 @@ class GameEngine(object):
 
                     # Upgrade mode toggles
                     elif self.state == "upgrade":
+                        self.universalevents(event)
                         citem = self.displayupgrades()
                         self.state = "game"
                         self.draw()
@@ -336,9 +328,7 @@ class GameEngine(object):
         loop = True
         while loop:
             for event in pygame.event.get():
-                # cancel
-                if event.type == pg.QUIT:
-                    self.endgame()
+                self.universalevents(event)
                 if event.type == pg.KEYDOWN:
                     return None
             self.clock.tick(30)
@@ -419,8 +409,6 @@ class GameEngine(object):
                     keypressed = pygame.key.name(event.key)
                 except AttributeError as e:
                     break
-                if event.type == pg.QUIT:
-                    self.endgame()
                 if event.type == pg.KEYDOWN and event.key in self.nextkey:
                     self.draw()
                     self.graphicshandler.displayitemlist(items, lastitem)
@@ -437,8 +425,7 @@ class GameEngine(object):
         loop = True
         while loop:
             for event in pygame.event.get():
-                if event.type == pg.QUIT:
-                    self.endgame()
+                self.universalevents(event)
                 # cancel
                 if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                     return None
@@ -459,8 +446,7 @@ class GameEngine(object):
         selected = []
         while loop:
             for event in pygame.event.get():
-                if event.type == pg.QUIT:
-                    self.endgame()
+                self.universalevents(event)
                 # cancel
                 if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                     return None
@@ -509,3 +495,11 @@ class GameEngine(object):
         if event.type == pg.KEYDOWN and (event.key in self.downrightkey):
             coord = (+1, +1)
         return coord
+
+    def universalevents(self, event):
+        if event.type == pg.QUIT:
+            self.endgame()
+        elif event.type == VIDEORESIZE:
+            self.graphicshandler.resize(event.dict['size'])
+            self.draw()
+        return False
