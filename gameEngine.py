@@ -9,6 +9,7 @@ from eventHandler import *
 from pygame.locals import *
 
 import pygame
+import math
 import sys
 import pygame.locals as pg
 from utils import *
@@ -94,6 +95,8 @@ class GameEngine(object):
 
         self.messagehandler = MessageHandler()
         self.graphicshandler = GraphicsHandler(self)
+
+        ratio = self.graphicshandler.correctratio(self.SIZE)
 
         self.gameevent = EventHandler()
         self.gameevent.register(self.messagehandler)
@@ -245,8 +248,11 @@ class GameEngine(object):
                             self.draw()
                         # mouselook
                         if event.type == pygame.MOUSEMOTION:
-                            mousetile = self.graphicshandler.gettileposition(event.pos)
-
+                            currentresx = pygame.display.Info().current_w
+                            originalpixelsize = float(currentresx) / float(self.RESOLUTIONX)
+                            ex = int(math.ceil(event.pos[0] / originalpixelsize))
+                            ey = int(math.ceil(event.pos[1] / originalpixelsize))
+                            mousetile = self.graphicshandler.gettileposition((ex, ey))
                             if mousetile is not None and self.graphicshandler.mousetile != mousetile:
                                 self.graphicshandler.mousetile = mousetile
                                 self.draw()
