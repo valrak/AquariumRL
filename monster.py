@@ -516,3 +516,10 @@ class Monster(thing.Thing):
     def resetcombo(self):
         self.combo = 0
         self.currentcombo = False
+
+    def win(self):
+        if self.player:
+            winscoreadd = 1000 * int(self.gameengine.LASTLEVEL)
+            self.score += int(self.score) + winscoreadd
+            self.gameengine.gameevent.report("Your score was raised by " + str(winscoreadd) + " points!")
+

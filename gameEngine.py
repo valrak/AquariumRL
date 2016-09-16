@@ -14,6 +14,7 @@ import pygame.locals as pg
 from utils import *
 from hiscore import *
 
+
 mapmaxx = 0
 mapmaxy = 0
 
@@ -28,24 +29,15 @@ effinfo = None
 iteminfo = None
 keystrokes = None
 
-# todo: make explosions animated for better graphical representation of the process (as the monster can enter the
-#       explosion tile and do not get hurt (because the explosion was in the last turn and monster entered just the
-#       graphical representation, this can confuse the player
-# todo: pickup interface
-# todo: drop interface
-# todo: config file
-# todo: map generator - remove isolated caves
-# todo: AI - when fired upon, go to the point where fire comes
-# todo: AI - recon in corals
-# todo: optimize: redraw only when something changed
-
-
 class GameEngine(object):
     ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
                 'v', 'w', 'x', 'y', 'z']
 
     RESOLUTIONX = 1024
     RESOLUTIONY = 660
+    MAPMAXY = 15
+    MAPMAXX = 25
+
     LASTLEVEL = 11
     SIZE = (RESOLUTIONX, RESOLUTIONY)
     SCORETABLE = [100, 300]
@@ -96,7 +88,7 @@ class GameEngine(object):
         self.helpboxtext = utils.loadtextfile("resources/texts/helpBox.txt")
 
         self.mapfield = MapField(arenamap, self.mapinfo, self.moninfo, self.effinfo, self.iteinfo, self)
-        self.mapfield.generatelevel(25, 15)
+        self.mapfield.generatelevel(self.MAPMAXX, self.MAPMAXY)
 
         self.messagehandler = MessageHandler()
         self.graphicshandler = GraphicsHandler(self)
@@ -256,6 +248,13 @@ class GameEngine(object):
                     elif self.state == "game":
                         if event.type == pg.KEYDOWN:
                             self.draw()
+                        # mouselook
+                        if event.type == pygame.MOUSEMOTION:
+                            mousetile = self.graphicshandler.gettileposition(event.pos)
+
+                            if mousetile is not None and self.graphicshandler.mousetile != mousetile:
+                                self.graphicshandler.mousetile = mousetile
+                                self.draw()
                         # Lines
                         coord = self.getcoordsbyevent(event)
                         if coord is not None:

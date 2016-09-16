@@ -3,6 +3,10 @@ import gameEngine
 from tileEngine import *
 from pygame.locals import *
 
+WATCHPOS = (830, 100)
+LOGWINDOWPOS = (10, 500)
+LOGWINDOWSIZE = (700, 150)
+
 MAPPOSX = 10
 MAPPOSY = 10
 TILESIZE = 32
@@ -15,6 +19,7 @@ class GraphicsHandler(object):
     pops = []
     gameengine = None
     size = None
+    mousetile = None
 
     def __init__(self, gameengine):
         self.gameengine = gameengine
@@ -78,14 +83,14 @@ class GraphicsHandler(object):
 
         # Log
         logposadd = 0
-        logbackgr = pygame.Surface((700, 150))
+        logbackgr = pygame.Surface(LOGWINDOWSIZE)
         logbackgr = logbackgr.convert()
         logbackgr.fill(pygame.Color("black"))
         for line in self.loglines:
             text = self.logfont.render(line, 1, (120+logposadd, 120+logposadd, 120+logposadd))
             logbackgr.blit(text, (10, 0+logposadd))
             logposadd += 20
-        self.screen.blit(logbackgr, (10, 500))
+        self.screen.blit(logbackgr, LOGWINDOWPOS)
 
         if self.gameengine.mapfield.getplayer is None:
             self.gameengine.state = "reset"
@@ -99,9 +104,7 @@ class GraphicsHandler(object):
         if self.gameengine.state == "reset":
             player = self.gameengine.mapfield.getplayer()
             if player is not None and int(player.getparam("level")) >= self.gameengine.LASTLEVEL:
-                winscoreadd = 1000 * int(self.gameengine.LASTLEVEL)
-                player.score += int(player.score) + winscoreadd
-                self.gameengine.gameevent.report("Your score was raised by " + str(winscoreadd) + " points!")
+                player.win()
                 self.displaywin(player.score, player.killslist)
             else:
                 self.displaydeath(str(self.gameengine.lastscore), self.gameengine.lastplayer.killslist)
@@ -151,7 +154,7 @@ class GraphicsHandler(object):
         text = self.statusfont.render("C " + combo, 1, (pygame.Color(tcolor)))
         watchimage.blit(text, (64, 193))
 
-        self.screen.blit(watchimage, (830, 100))
+        self.screen.blit(watchimage, WATCHPOS)
 
         # Special modes
         if self.gameengine.state == "fire":
@@ -172,7 +175,11 @@ class GraphicsHandler(object):
             infotext = self.infoview(self.gameengine.cursorcoord)
             if infotext is not None:
                 self.drawwindow(infotext, self.gameengine.cursorcoord)
-
+        else:
+            if self.mousetile is not None:
+                infotext = self.infoview(self.mousetile)
+                if infotext is not None:
+                    self.drawwindow(infotext, self.mousetile)
         self.displaypops()
         self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
         pygame.display.flip()
@@ -308,13 +315,15 @@ class GraphicsHandler(object):
         monster = self.gameengine.mapfield.getoccupants(coord)
         items = self.gameengine.mapfield.getitems(coord)
         effects = self.gameengine.mapfield.geteffects(coord)
+        # nothing to display
+        if monster is None and len(items) == 0 and len(effects) == 0:
+            return None
+
         damagetile = self.uitileeng.getcustomtile(0, 32, 16, 16)
         timetile = self.uitileeng.getcustomtile(16, 32+16, 16, 16)
         healthtile = self.uitileeng.getcustomtile(16, 32, 16, 16)
         arrowtile = self.uitileeng.getcustomtile(0, 32+16, 16, 16)
         rangetile = self.uitileeng.getcustomtile(16, 32+32, 16, 16)
-        if monster is None and len(items) == 0 and len(effects) == 0:
-            return None
         surface = pygame.Surface((1, 1), pygame.SRCALPHA)
         step = 0
         if monster is not None:
@@ -389,6 +398,16 @@ class GraphicsHandler(object):
     def resize(self, newsize):
         self.finalscreen = pygame.display.set_mode(newsize, HWSURFACE | DOUBLEBUF | RESIZABLE)
         self.size = newsize
+
+    def gettileposition(self, windowcoord):
+        x = windowcoord[0]
+        y = windowcoord[1]
+        x -= MAPPOSX
+        y -= MAPPOSY
+        x /= TILESIZE
+        y /= TILESIZE
+        if x >= 0 and x < self.gameengine.MAPMAXX and y >= 0 and y < self.gameengine.MAPMAXY:
+            return x, y
 
     def drawwindow(self, drawing, coord):
         step = 50

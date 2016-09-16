@@ -6,10 +6,6 @@ import csv
 import utils
 import operator
 
-WALL = '0'
-FREE = '1'
-STAIRS = '2'
-
 ''' random things generator constants '''
 GENERATOR_CHANCERISEITEM = 20  # percentile of random chance rising after not generating anything
 GENERATOR_CHANCERISEMONSTER = 16
