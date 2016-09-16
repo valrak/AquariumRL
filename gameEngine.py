@@ -120,6 +120,7 @@ class GameEngine(object):
             player.pick(Item(self.iteinfo['harpoon'], self))
         player.pick(Item(self.iteinfo['raygun'], self))
         player.pick(Item(self.iteinfo['gauss gun'], self))
+        player.pick(Item(self.iteinfo['dynamite'], self))
         self.mapfield.addmonster(player)
         return player
 
@@ -289,13 +290,16 @@ class GameEngine(object):
                                     self.gameevent.report("firing " + player.rangedpreference.getname() +
                                                           ". Press i or space to change.")
                                 else:
-                                    self.gameevent.report("firing " + player.getbestrangedforplayer().getname() +
+                                    bestrangedweapon = player.getbestrangedforplayer()
+                                    player.rangedpreference = bestrangedweapon
+                                    self.gameevent.report("firing " + bestrangedweapon.getname() +
                                                           ". Press i or space to change.")
                             else:
                                 self.gameevent.report("firing " + player.rangedpreference.getname() +
                                                       ". Press i or space to change.")
-                            self.draw()
                             self.state = "fire"
+                            self.draw()
+
                             break
                         # use
                         if event.type == pg.KEYDOWN and event.key in self.applykey:

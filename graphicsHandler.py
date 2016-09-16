@@ -1,5 +1,5 @@
 import gameEngine
-
+import pathfinder
 from tileEngine import *
 from pygame.locals import *
 
@@ -161,6 +161,45 @@ class GraphicsHandler(object):
             statusbackgr = pygame.Surface((100, 20))
             statusbackgr = statusbackgr.convert()
             text = self.statusfont.render("Firing", 1, (pygame.Color("grey70")))
+            # display fire range
+            pointerimage = self.uitileeng.getcustomtile(32, 0, 32, 32)
+            weapon = self.gameengine.mapfield.getplayer().rangedpreference
+            wrange = None
+            if weapon is not None:
+                wrange = self.gameengine.mapfield.getplayer().rangedpreference.getparam("range")
+            possible = []
+            if wrange is not None:
+                for direction in pathfinder.neighbors:
+                    temppos = self.gameengine.mapfield.getplayer().getposition()
+                    for i in range(0, wrange):
+                        if weapon.getflag("beam"):
+                            if weapon.geteffect() is not None:
+                                temppos = pathfinder.alterposition(temppos, direction)
+                                # if weapon hits obstacle
+                                if not self.gameengine.mapfield.isnonsolid(temppos):
+                                    break
+                                possible.append(temppos)
+                        else:
+                            oldpos = temppos
+                            temppos = pathfinder.alterposition(temppos, direction)
+                            monsterat = self.gameengine.mapfield.getoccupants(temppos)
+                            if not self.gameengine.mapfield.isnonsolid(temppos):
+                                possible.append(oldpos)
+                                break
+                            # if weapon hits any monster
+                            if monsterat is not None:
+                                possible.append(temppos)
+                                break
+                            # if weapon hits obstacle
+                            elif not self.gameengine.mapfield.ispassable(temppos):
+                                break
+                            # if not, it flies to its maximum range
+                            else:
+                                if i == wrange-1:
+                                    possible.append(temppos)
+            for location in possible:
+                self.screen.blit(pointerimage, (location[0]*TILESIZE+MAPPOSX,
+                                                location[1]*TILESIZE+MAPPOSY))
             statusbackgr.blit(text, (1, 1))
             self.screen.blit(statusbackgr, (830, 20))
         if self.gameengine.state == "look":
