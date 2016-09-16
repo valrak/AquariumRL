@@ -1,4 +1,5 @@
 import gameEngine
+import effect
 import pathfinder
 from tileEngine import *
 from pygame.locals import *
@@ -248,20 +249,20 @@ class GraphicsHandler(object):
             if selected is not None and item in selected:
                 underscore = True
             if item.isstackable():
-                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i], " (x"+str(item.stack)+")", underscore)
+                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i], underscore)
             else:
-                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i], None, underscore)
+                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i], underscore)
             i += 1
             lastitem += 1
             allitemsface = self.gluebelow(allitemsface, itemface)
             if (allitemsface.get_height() > int(self.gameengine.RESOLUTIONX / 2)) and len(itemlist) > lastitem:
-                if selected is None:
-                    pageinfo = self.infofont.render("space - next page", 1,
-                                                    (pygame.Color("lightgreen")))
-                else:
-                    pageinfo = self.infofont.render("space - next page, enter - confirm", 1, (pygame.Color("lightgreen")))
+                pageinfo = self.infofont.render("space - next page", 1, (pygame.Color("lightgreen")))
                 allitemsface = self.gluebelow(allitemsface, pageinfo)
                 break
+        if selected is not None:
+            pageinfo = self.infofont.render("enter - confirm", 1, (pygame.Color("lightgreen")))
+            allitemsface = self.gluebelow(allitemsface, pageinfo)
+
         self.drawwindow(allitemsface, (1, 1))
         self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
         pygame.display.flip()
@@ -289,49 +290,26 @@ class GraphicsHandler(object):
         self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
         pygame.display.flip()
 
-    def pickupview(self, coord):
-        #todo
-        items = self.gameengine.mapfield.getitems(coord)
-        stringlist = []
-        # weighttile = self.uitileeng.getcustomtile(0, 64, 16, 16)
-        # surface = pygame.Surface((1, 1), pygame.SRCALPHA)
-        i = 0
-        for item in items:
-            if i >= len(self.gameengine.ALPHABET):
-                break
-            if item.isstackable():
-                stringlist.append(self.gameengine.ALPHABET[i]+") "+item.getname()+" (x"+str(item.stack)+")")
-            else:
-                stringlist.append(self.gameengine.ALPHABET[i]+") "+item.getname())
-            i += 1
-
-            # itemsurface = self.font.render(item.getname(), 1, (pygame.Color("blue")))
-            # if item.getparam("weight") is not None:
-            #     weightface = self.font.render(str(item.getparam("weight")), 1, (pygame.Color("grey70")))
-            #     itemsurface = self.glueleft(surface, weightface, 4)
-            # surface = self.gluebelow(surface, itemsurface, 2)
-        return stringlist
-
-    def itemdisplay(self, item, letter=None, stack=None, fontflag=None):
-        damagetile = self.uitileeng.getcustomtile(0, 32, 16, 16)
+    def itemdisplay(self, item, letter=None, fontflag=None):
         weighttile = self.uitileeng.getcustomtile(0, 64, 16, 16)
         arrowtile = self.uitileeng.getcustomtile(0, 32+16, 16, 16)
         rangetile = self.uitileeng.getcustomtile(16, 32 + 32, 16, 16)
         textname = item.getname()
         textdesc = item.getparam("description")
-
-        if stack is not None:
-            textname = textname + stack
+        if item.isstackable():
+            if item.stack > 1:
+                textname = textname + "("+str(item.stack)+"x)"
         if fontflag is None:
             name = self.infofont.render(textname, 1, (pygame.Color("lightblue")))
         else:
             name = self.underlineinfofont.render(textname, 1, (pygame.Color("lightblue")))
         belowname = pygame.Surface((1, 1), pygame.SRCALPHA)
 
-        if item.getparam("damage") is not None:
-            damageface = self.infofont.render(str(item.getparam("damage")), 1, (pygame.Color("grey70")))
+        if item.getfinalitemdamage() is not None:
+            damageface = self.infofont.render(str(item.getfinalitemdamage()), 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(arrowtile, damageface, 2)
             belowname = self.glueleft(belowname, tempsurface)
+
         if item.getparam("weight") is not None:
             weightface = self.infofont.render(str(item.getparam("weight")), 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(weighttile, weightface, 2)
@@ -374,7 +352,7 @@ class GraphicsHandler(object):
             healthface = self.glueleft(healthtile, healthface, 2)
             tempsurface = self.glueleft(healthface, tempsurface, 10)
             if monster.getbestranged() is not None:
-                rangedsurface = self.infofont.render(str(monster.getbestranged().getparam("damage")), 1, (pygame.Color("grey70")))
+                rangedsurface = self.infofont.render(str(monster.getbestranged().getfinalitemdamage()), 1, (pygame.Color("grey70")))
                 rangedsurface = self.glueleft(arrowtile, rangedsurface, 2)
                 tempsurface = self.glueleft(tempsurface, rangedsurface, 10)
                 rangedsurface = self.infofont.render(str(monster.getbestranged().getparam("range")), 1, (pygame.Color("grey70")))

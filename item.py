@@ -93,3 +93,14 @@ class Item(thing.Thing):
             return True
         else:
             return False
+
+    def getfinalitemdamage(self):
+        if self.getparam("damage") is not None:
+            damage = self.getparam("damage")
+        else:
+            itemeffectinfo = self.gameengine.effinfo[self.geteffect()]
+            try:
+                damage = itemeffectinfo["damage"]
+            except KeyError:
+                damage = None
+        return damage

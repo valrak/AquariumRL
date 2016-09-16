@@ -420,15 +420,24 @@ class Monster(thing.Thing):
 
     def drop(self, ite):
         ite.setposition(self.getposition())
-        self.inventory.remove(ite)
-        self.gameengine.mapfield.items.append(ite)
+        if ite.isstackable:
+            self.throwaway(ite, True)
+            self.gameengine.mapfield.items.append(ite)
+        else:
+            ite.setposition(self.getposition())
+            self.inventory.remove(ite)
+            self.gameengine.mapfield.items.append(ite)
 
-    def throwaway(self, ite):
+    def throwaway(self, ite, everything=False):
         if self.inventory.__contains__(ite):
             if ite.isstackable:
-                if ite.stack > 1:
-                    ite.stack -= 1
-                else:
+                if not everything:
+                    if ite.stack > 1:
+                        ite.stack -= 1
+                    else:
+                        self.inventory.remove(ite)
+                        self.rangedpreference = None
+                if everything:
                     self.inventory.remove(ite)
                     self.rangedpreference = None
                 pos = ite.getposition()
@@ -523,4 +532,5 @@ class Monster(thing.Thing):
             winscoreadd = 1000 * int(self.gameengine.LASTLEVEL)
             self.score += int(self.score) + winscoreadd
             self.gameengine.gameevent.report("Your score was raised by " + str(winscoreadd) + " points!")
+            self.gameengine.lastscore = self.score
 

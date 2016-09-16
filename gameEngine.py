@@ -108,7 +108,7 @@ class GameEngine(object):
         self.gameevent.report("Welcome to Aquarium Arena!")
         self.gameevent.report("Top gladiator score is "+str(loadhiscore())+" points!")
         # main game loop
-        #player.setparam("level", "10")
+        player.setparam("level", "10")
         return player
 
     def generateplayer(self):
