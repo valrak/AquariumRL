@@ -141,9 +141,9 @@ class Monster(thing.Thing):
     def update(self):
         self.updatecombo()
         # weight management
-        if self.getparam("weightLimit") is not None:
+        if self.getparam("weight limit") is not None:
             totalw = self.gettotalweight()
-            if totalw > int(self.getparam("weightLimit")):
+            if totalw > int(self.getparam("weight limit")):
                 if self.player:
                     self.gameengine.gameevent.report("you can't carry so much weight!", None, None, None)
                 coord = (self.x, self.y+1)

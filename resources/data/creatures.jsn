@@ -8,7 +8,7 @@
   "attack": "1",
   "level": 1,
   "speed": "1",
-  "weightLimit": "60"
+  "weight limit": "60"
   },
 "catfish": {
   "id": "catfish",

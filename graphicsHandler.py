@@ -40,7 +40,7 @@ class GraphicsHandler(object):
         self.finalscreen = pygame.display.set_mode(self.size, HWSURFACE | DOUBLEBUF | RESIZABLE)
         self.screen = self.finalscreen.copy()
         pygame.font.init()
-        self.popfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 16)
+        self.popfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 18)
         self.logfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 20)
         self.statusfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 14)
         self.helpfont = pygame.font.Font("./resources/fonts/FreeMonoBold.ttf", 16)
@@ -54,7 +54,10 @@ class GraphicsHandler(object):
         # fixme: temporary, move to messageHandler!
         if name is not None and newvalue is not None:
             if not newvalue == oldvalue:
-                self.newlogline(str(thing.getname() + " changed its " + name + " to " + str(newvalue)))
+                # self.newlogline(str(thing.getname() + " changed its " + name + " to " + str(newvalue)))
+                if thing.getname() == "diver":
+                    if name != "hp":
+                        self.newlogline("Your "+name+" changed to "+str(newvalue)+"!")
         if name is None and newvalue is None and oldvalue is None:
             self.newlogline(thing)
 
@@ -124,7 +127,7 @@ class GraphicsHandler(object):
         level = str(player.getparam("level"))
         combo = str(player.combo)
 
-        maxweight = str(player.getparam("weightLimit"))
+        maxweight = str(player.getparam("weight limit"))
         weight = str(player.gettotalweight())
 
         tcolor = "green"
@@ -293,6 +296,7 @@ class GraphicsHandler(object):
     def itemdisplay(self, item, letter=None, fontflag=None):
         weighttile = self.uitileeng.getcustomtile(0, 64, 16, 16)
         arrowtile = self.uitileeng.getcustomtile(0, 32+16, 16, 16)
+        timetile = self.uitileeng.getcustomtile(16, 32 + 16, 16, 16)
         rangetile = self.uitileeng.getcustomtile(16, 32 + 32, 16, 16)
         textname = item.getname()
         textdesc = item.getparam("description")
@@ -317,6 +321,10 @@ class GraphicsHandler(object):
         if item.getparam("range") is not None:
             rangeface = self.infofont.render(str(item.getparam("range")), 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(rangetile, rangeface, 2)
+            belowname = self.glueleft(belowname, tempsurface)
+        if item.getparam("fuse") is not None:
+            fuseface = self.infofont.render(str(item.getparam("fuse")), 1, (pygame.Color("grey70")))
+            tempsurface = self.glueleft(timetile, fuseface, 2)
             belowname = self.glueleft(belowname, tempsurface)
 
         tempsurface = self.gluebelow(name, belowname, 2)
@@ -466,7 +474,11 @@ class GraphicsHandler(object):
             y = (coord[1] * TILESIZE) + TILESIZE/6
             text = pop[0]
 
-            poptext = self.popfont.render(str(text), 1, (pygame.Color("yellow2")))
+            playercoord = self.gameengine.mapfield.getplayer().getposition()
+            popcolor = "yellow2"
+            if coord == playercoord:
+                popcolor = "cyan"
+            poptext = self.popfont.render(str(text), 1, (pygame.Color(popcolor)))
             self.screen.blit(poptext, (x, y))
 
     def erasepops(self):

@@ -128,7 +128,7 @@
   "description": "",
   "tile": "0,0",
   "effect": "change",
-  "changeattributesname": ["weightLimit"],
+  "changeattributesname": ["weight limit"],
   "changeattributesvalue": ["20"],
   "ttl": 2
 },

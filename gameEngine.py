@@ -125,7 +125,7 @@ class GameEngine(object):
             player.pick(Item(self.iteinfo['harpoon'], self))
         # player.pick(Item(self.iteinfo['raygun'], self))
         # player.pick(Item(self.iteinfo['gauss gun'], self))
-        # player.pick(Item(self.iteinfo['dynamite'], self))
+        player.pick(Item(self.iteinfo['dynamite'], self))
         self.mapfield.addmonster(player)
         return player
 
