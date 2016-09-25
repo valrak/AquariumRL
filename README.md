@@ -17,7 +17,7 @@ Experience:
 * see [LICENSE](https://github.com/valrak/AquariumRL/blob/master/LICENSE.md) file
 
 ## Version
-* [Version 0.2](https://github.com/valrak/AquariumRL/releases/tag/0.2)
+* [Version 0.3](https://github.com/valrak/AquariumRL/releases/tag/0.3)
 
 ## Changelog
 * see [changelog.txt](https://github.com/valrak/AquariumRL/blob/master/changelog.txt) file
