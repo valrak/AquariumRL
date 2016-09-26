@@ -54,6 +54,9 @@ class GameEngine(object):
     itemsgenerated = 0
     clock = pygame.time.Clock()
 
+    # game settings
+    deepblue = 0
+
     def __init__(self):
         # with open(ARENAMAPFILE, 'rb') as csvfile:
         #     csvread = csv.reader(csvfile, delimiter=';', quotechar='"')
@@ -67,6 +70,7 @@ class GameEngine(object):
         self.effinfo = jsonInit.loadjson("resources/data/effects.jsn")
         self.iteinfo = jsonInit.loadjson("resources/data/items.jsn")
         self.keystrokes = jsonInit.loadjson("config/keystrokes.jsn")
+        self.settings = jsonInit.loadjson("config/settings.jsn")
 
         self.inventorykey = utils.populatekeys(self.keystrokes.get("inventory"))
         self.standkey = utils.populatekeys(self.keystrokes.get("stand"))
@@ -104,6 +108,9 @@ class GameEngine(object):
         self.loop()
 
     def initgame(self):
+        # set settings
+        self.deepblue = self.settings['deep-blue-effect']
+
         pygame.init()
         pygame.display.set_caption('Aquarium Arena')
         player = self.generateplayer()

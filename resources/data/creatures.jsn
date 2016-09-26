@@ -3,6 +3,7 @@
   "flags": ["nospawn"],
   "id": "diver",
   "type": "human",
+  "description": "very long message very long message",
   "hp": "10",
   "tile": "3,0",
   "attack": "1",

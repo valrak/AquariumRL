@@ -85,6 +85,16 @@ class GraphicsHandler(object):
         for key in self.eventstack:
             self.screen.blit(self.eventstack[key], key)
 
+        # Special effects
+        if self.gameengine.deepblue == 1:
+            alpha = 0
+            for y in range(self.maplayer.get_height()):
+                s = pygame.Surface((self.maplayer.get_width(), 1))
+                s.set_alpha(int(alpha))
+                s.fill((0, 36, 56))
+                self.screen.blit(s, (MAPPOSX, MAPPOSY + y))
+                alpha += 0.2
+
         # Log
         logposadd = 0
         logbackgr = pygame.Surface(LOGWINDOWSIZE)
@@ -448,6 +458,12 @@ class GraphicsHandler(object):
             y = y - size[1] - step
         else:
             y += step
+
+        if (x + size[0]) >= self.gameengine.RESOLUTIONX:
+            x -= x + size[0] - self.gameengine.RESOLUTIONX
+        if (y + size[1]) >= self.gameengine.RESOLUTIONY:
+            y -= y + size[1] - self.gameengine.RESOLUTIONY
+
         coord = (x, y)
         backgr = pygame.Surface((size[0], size[1]))
         backgr = backgr.convert()
