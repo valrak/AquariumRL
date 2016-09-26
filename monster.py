@@ -154,11 +154,11 @@ class Monster(thing.Thing):
             # not applicable for player
             actions = 0
             while self.canact(actions):
-                # I like to collect various things, if there are any under me, take them!
                 if self.gameengine.mapfield.getplayer() is None:
                     return
                 playerpos = self.gameengine.mapfield.getplayer().getposition()
                 position = self.getposition()
+                # I like to collect various things, if there are any under me, take them!
                 if self.getflag("collector"):
                     # if I am near home, I'll put there my items
                     if self.home is not None and len(self.inventory) > 0:
@@ -215,7 +215,45 @@ class Monster(thing.Thing):
                                         break  # to prevent jumping in the own line of fire
                 # if can move then move to player
                 if not self.getflag("nomove") and not self.getflag("ground") and self.canact(actions):
-                    if not self.player:
+                    # i am a thief and want to steal harpoons
+                    if self.getflag("harpoon thief"):
+                        # search for nearby item
+                        itemnear = False
+                        localitems = self.gameengine.mapfield.getitems(self.getposition())
+                        if len(localitems) > 0:
+                            for witem in localitems:
+                                if witem.getflag("harpoon"):
+                                    self.pick(witem)
+                            actions += 1
+                            continue
+                        for lookeditem in self.gameengine.mapfield.items:
+                            if lookeditem.getflag("harpoon"):
+                                if pathfinder.isnear(self.getposition(), lookeditem.getposition()):
+                                    itemnear = True
+                                    # item will not fall, go directly to it
+                                    if self.gameengine.mapfield.isgrounded(lookeditem.getposition()):
+                                        goto = self.gameengine.mapfield.findpath(self.getposition(), lookeditem.getposition())
+                                    # item will fail, go below
+                                    else:
+                                        downpos = lookeditem.x, lookeditem.y - 1
+                                        # will fall on me, wait
+                                        if downpos == self.getposition():
+                                            actions += 1
+                                            break
+                                        # will fall near, go for it
+                                        elif pathfinder.isnear(self.getposition(), downpos):
+                                            goto = self.gameengine.mapfield.findpath(self.getposition(), downpos)
+                                        # will fall too far, go for previous position first
+                                        else:
+                                            goto = self.gameengine.mapfield.findpath(self.getposition(), lookeditem.getposition())
+                                    self.action(goto)
+                                    actions += 1
+                                    break
+                        # there is item nearby, do not move to player
+                        if itemnear:
+                            continue
+                    # i am standard monster and want to kill the diver or wander randomly
+                    if self.canact(actions):
                         if self.lastseen == position:
                             self.lastseen = None
                         if self.gameengine.mapfield.cansee(position, playerpos):

@@ -36,6 +36,8 @@ def lowest(iset):
 
 
 def tracepath(node, startcoord):
+    if node.parent is None:
+        return None
     if node.parent.coord == startcoord:
         return node.coord
     else:

@@ -121,7 +121,7 @@
  "triton": {
   "id": "triton",
   "type": "triton",
-  "hp": "5",
+  "hp": "6",
   "tile": "6,0",
   "attack": "3",
   "speed": "1",
@@ -182,5 +182,18 @@
   "level": 4,
   "score": 60,
   "rarity": 3
+  },
+ "merman thief": {
+  "id": "merman thief",
+  "type": "triton",
+  "description": "steals your harpoons",
+  "flags": ["harpoon thief", "ranged"],
+  "hp": "5",
+  "attack": "0",
+  "tile": "14,0",
+  "speed": "2",
+  "level": 5,
+  "score": 100,
+  "rarity": 2
   }
 }

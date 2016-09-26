@@ -1,3 +1,11 @@
+v 0.4
++ monster: harpoon thief
++ settings file
++ depth visual effect (optional, selectable in settings file)
+% fixed positioning of info window
+% message log change
+% color coded health change popup of player
+
 v 0.3
 + inventory pages
 + drop interface
