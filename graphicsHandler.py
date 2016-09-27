@@ -332,7 +332,7 @@ class GraphicsHandler(object):
             rangeface = self.infofont.render(str(item.getparam("range")), 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(rangetile, rangeface, 2)
             belowname = self.glueleft(belowname, tempsurface)
-        if item.getparam("fuse") is not None:
+        if item.getparam("fuse") is not None and int(item.getparam("fuse")) > -1:
             fuseface = self.infofont.render(str(item.getparam("fuse")), 1, (pygame.Color("grey70")))
             tempsurface = self.glueleft(timetile, fuseface, 2)
             belowname = self.glueleft(belowname, tempsurface)
@@ -380,6 +380,12 @@ class GraphicsHandler(object):
             if textdesc is not None:
                 descsurface = self.infofont.render(textdesc, 1, (pygame.Color("grey40")))
                 tempsurface = self.gluebelow(tempsurface, descsurface)
+            if not monster.player and len(monster.getinventory()) > 0:
+                descsurface = self.infofont.render("items:", 1, (pygame.Color("grey60")))
+                tempsurface = self.gluebelow(tempsurface, descsurface)
+                for mitem in monster.getinventory():
+                    descsurface = self.infofont.render(" "+mitem.getname(), 1, (pygame.Color("grey60")))
+                    tempsurface = self.gluebelow(tempsurface, descsurface)
             surface = self.gluebelow(name, tempsurface, 4)
         for item in items:
             tempsurface = self.itemdisplay(item)

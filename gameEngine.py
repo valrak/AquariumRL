@@ -130,9 +130,6 @@ class GameEngine(object):
         player.setposition(self.mapfield.getrandompassable())
         for x in range(0, 5):
             player.pick(Item(self.iteinfo['harpoon'], self))
-        # player.pick(Item(self.iteinfo['raygun'], self))
-        # player.pick(Item(self.iteinfo['gauss gun'], self))
-        player.pick(Item(self.iteinfo['dynamite'], self))
         self.mapfield.addmonster(player)
         return player
 
@@ -318,7 +315,6 @@ class GameEngine(object):
                             citems = self.mapfield.getitems(player.getposition())
                             for item in citems:
                                 player.pick(item)
-                                self.gameevent.report("picked up a " + item.getname())
                             self.passturn()
             time_passed = self.clock.tick(30)
 

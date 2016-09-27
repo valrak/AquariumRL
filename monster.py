@@ -396,6 +396,10 @@ class Monster(thing.Thing):
         return True
 
     def pick(self, ite):
+        if self.player is not True:
+            self.gameengine.gameevent.report(self.getname()+" picked up a " + ite.getname())
+        else:
+            self.gameengine.gameevent.report("picked up a " + ite.getname())
         if self.getitem(ite.getname()) is not None and ite.isstackable():
             self.getitem(ite.getname()).addtostack(ite)
         else:
