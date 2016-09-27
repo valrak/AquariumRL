@@ -606,7 +606,6 @@ class MapField(object):
                 self.monsters.remove(fdel)
             fdel.destroy()
 
-
         # remove effects with overdo ttl
         found = []
         for effect in self.effects:

@@ -129,7 +129,7 @@ class GameEngine(object):
         player.player = True
         player.setposition(self.mapfield.getrandompassable())
         for x in range(0, 5):
-            player.pick(Item(self.iteinfo['harpoon'], self))
+            player.pick(Item(self.iteinfo['harpoon'], self), True)
         self.mapfield.addmonster(player)
         return player
 
@@ -338,10 +338,18 @@ class GameEngine(object):
     def deathscreen(self):
         loop = True
         while loop:
-            for event in pygame.event.get():
-                self.universalevents(event)
-                if event.type == pg.KEYDOWN:
-                    return None
+            if self.state == "finallook":
+                for event in pygame.event.get():
+                    self.universalevents(event)
+                    if event.type == pg.KEYDOWN:
+                        self.state = "reset"
+                self.graphicshandler.drawboard(self.mapfield.terrain)
+            else:
+                for event in pygame.event.get():
+                    if event.type == pg.KEYDOWN and event.key in self.examinekey:
+                        self.state = "finallook"
+                    elif event.type == pg.KEYDOWN:
+                        return None
             self.clock.tick(30)
 
     def endgame(self):

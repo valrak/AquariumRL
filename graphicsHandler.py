@@ -106,19 +106,21 @@ class GraphicsHandler(object):
             logposadd += 20
         self.screen.blit(logbackgr, LOGWINDOWPOS)
 
-        if self.gameengine.mapfield.getplayer is None:
-            self.gameengine.state = "reset"
-
         if self.gameengine.state == "help":
             self.displayhelpscreen()
             self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
             pygame.display.flip()
             return
 
+        if self.gameengine.state == "win":
+            player = self.gameengine.mapfield.getplayer()
+            self.displaywin(player.score, player.killslist)
+            pygame.display.flip()
+            return
+
         if self.gameengine.state == "reset":
             player = self.gameengine.mapfield.getplayer()
             if player is not None and int(player.getparam("level")) >= self.gameengine.LASTLEVEL:
-                player.win()
                 self.displaywin(player.score, player.killslist)
             else:
                 self.displaydeath(str(self.gameengine.lastscore), self.gameengine.lastplayer.killslist)
@@ -126,114 +128,115 @@ class GraphicsHandler(object):
             pygame.display.flip()
             return
 
-        # Status
-        self.displayhelp()
-        watchimage = self.uiparttileeng.getcustomtile(0, 0, 168, 315)
+        if self.gameengine.mapfield.getplayer() is not None:
+            # Status
+            self.displayhelp()
+            watchimage = self.uiparttileeng.getcustomtile(0, 0, 168, 315)
 
-        player = self.gameengine.mapfield.getplayer()
-        maxhp = str(player.getparam("maxhp"))
-        curhp = str(player.getparam("hp"))
-        score = str(player.score)
-        level = str(player.getparam("level"))
-        combo = str(player.combo)
+            player = self.gameengine.mapfield.getplayer()
+            maxhp = str(player.getparam("maxhp"))
+            curhp = str(player.getparam("hp"))
+            score = str(player.score)
+            level = str(player.getparam("level"))
+            combo = str(player.combo)
 
-        maxweight = str(player.getparam("weight limit"))
-        weight = str(player.gettotalweight())
+            maxweight = str(player.getparam("weight limit"))
+            weight = str(player.gettotalweight())
 
-        tcolor = "green"
-        if (int(curhp) - int(maxhp) / 5) <= 0:
-            tcolor = "red"
-        text = self.statusfont.render("H "+curhp+" / "+maxhp, 1, (pygame.Color(tcolor)))
-        watchimage.blit(text, (40, 113))
-        text = self.statusfont.render("S "+score, 1, (pygame.Color("green")))
-        watchimage.blit(text, (40, 133))
+            tcolor = "green"
+            if (int(curhp) - int(maxhp) / 5) <= 0:
+                tcolor = "red"
+            text = self.statusfont.render("H "+curhp+" / "+maxhp, 1, (pygame.Color(tcolor)))
+            watchimage.blit(text, (40, 113))
+            text = self.statusfont.render("S "+score, 1, (pygame.Color("green")))
+            watchimage.blit(text, (40, 133))
 
-        tcolor = "green"
-        if (self.gameengine.getrequiredkillcount() - player.killcount) <= 0:
-            tcolor = "red"
-        text = self.statusfont.render("L " + level + " / " +
-                                str(self.gameengine.getrequiredkillcount() - player.killcount),
-                                1, (pygame.Color(tcolor)))
-        watchimage.blit(text, (40, 153))
+            tcolor = "green"
+            if (self.gameengine.getrequiredkillcount() - player.killcount) <= 0:
+                tcolor = "red"
+            text = self.statusfont.render("L " + level + " / " +
+                                    str(self.gameengine.getrequiredkillcount() - player.killcount),
+                                    1, (pygame.Color(tcolor)))
+            watchimage.blit(text, (40, 153))
 
-        tcolor = "green"
-        if int(weight) > int(maxweight):
-            tcolor = "red"
-        text = self.statusfont.render("W " + weight + " / " + maxweight, 1, (pygame.Color(tcolor)))
-        watchimage.blit(text, (40, 173))
+            tcolor = "green"
+            if int(weight) > int(maxweight):
+                tcolor = "red"
+            text = self.statusfont.render("W " + weight + " / " + maxweight, 1, (pygame.Color(tcolor)))
+            watchimage.blit(text, (40, 173))
 
-        tcolor = "green"
-        if int(combo) >= self.gameengine.COMBO_ITEM:
-            tcolor = "red"
-        text = self.statusfont.render("C " + combo, 1, (pygame.Color(tcolor)))
-        watchimage.blit(text, (64, 193))
+            tcolor = "green"
+            if int(combo) >= self.gameengine.COMBO_ITEM:
+                tcolor = "red"
+            text = self.statusfont.render("C " + combo, 1, (pygame.Color(tcolor)))
+            watchimage.blit(text, (64, 193))
 
-        self.screen.blit(watchimage, WATCHPOS)
+            self.screen.blit(watchimage, WATCHPOS)
 
-        # Special modes
-        if self.gameengine.state == "fire":
-            statusbackgr = pygame.Surface((100, 20))
-            statusbackgr = statusbackgr.convert()
-            text = self.statusfont.render("Firing", 1, (pygame.Color("grey70")))
-            # display fire range
-            pointerimage = self.uitileeng.getcustomtile(32, 0, 32, 32)
-            weapon = self.gameengine.mapfield.getplayer().rangedpreference
-            wrange = None
-            if weapon is not None:
-                wrange = self.gameengine.mapfield.getplayer().rangedpreference.getparam("range")
-            possible = []
-            if wrange is not None:
-                for direction in pathfinder.neighbors:
-                    temppos = self.gameengine.mapfield.getplayer().getposition()
-                    for i in range(0, wrange):
-                        if weapon.getflag("beam"):
-                            if weapon.geteffect() is not None:
-                                temppos = pathfinder.alterposition(temppos, direction)
-                                # if weapon hits obstacle
-                                if not self.gameengine.mapfield.isnonsolid(temppos):
-                                    break
-                                possible.append(temppos)
-                        else:
-                            oldpos = temppos
-                            temppos = pathfinder.alterposition(temppos, direction)
-                            monsterat = self.gameengine.mapfield.getoccupants(temppos)
-                            if not self.gameengine.mapfield.isnonsolid(temppos):
-                                possible.append(oldpos)
-                                break
-                            # if weapon hits any monster
-                            if monsterat is not None:
-                                possible.append(temppos)
-                                break
-                            # if weapon hits obstacle
-                            elif not self.gameengine.mapfield.ispassable(temppos):
-                                break
-                            # if not, it flies to its maximum range
-                            else:
-                                if i == wrange-1:
+            # Special modes
+            if self.gameengine.state == "fire":
+                statusbackgr = pygame.Surface((100, 20))
+                statusbackgr = statusbackgr.convert()
+                text = self.statusfont.render("Firing", 1, (pygame.Color("grey70")))
+                # display fire range
+                pointerimage = self.uitileeng.getcustomtile(32, 0, 32, 32)
+                weapon = self.gameengine.mapfield.getplayer().rangedpreference
+                wrange = None
+                if weapon is not None:
+                    wrange = self.gameengine.mapfield.getplayer().rangedpreference.getparam("range")
+                possible = []
+                if wrange is not None:
+                    for direction in pathfinder.neighbors:
+                        temppos = self.gameengine.mapfield.getplayer().getposition()
+                        for i in range(0, wrange):
+                            if weapon.getflag("beam"):
+                                if weapon.geteffect() is not None:
+                                    temppos = pathfinder.alterposition(temppos, direction)
+                                    # if weapon hits obstacle
+                                    if not self.gameengine.mapfield.isnonsolid(temppos):
+                                        break
                                     possible.append(temppos)
-            for location in possible:
-                self.screen.blit(pointerimage, (location[0]*TILESIZE+MAPPOSX,
-                                                location[1]*TILESIZE+MAPPOSY))
-            statusbackgr.blit(text, (1, 1))
-            self.screen.blit(statusbackgr, (830, 20))
-        if self.gameengine.state == "look":
-            statusbackgr = pygame.Surface((100, 20))
-            statusbackgr = statusbackgr.convert()
-            text = self.statusfont.render("Looking", 1, (pygame.Color("grey70")))
-            statusbackgr.blit(text, (1, 1))
-            self.screen.blit(statusbackgr, (830, 20))
-            cursorimage = self.uitileeng.getcustomtile(0, 0, 32, 32)
-            self.screen.blit(cursorimage, (self.gameengine.cursorcoord[0]*TILESIZE+MAPPOSX,
-                                           self.gameengine.cursorcoord[1]*TILESIZE+MAPPOSY))
-            infotext = self.infoview(self.gameengine.cursorcoord)
-            if infotext is not None:
-                self.drawwindow(infotext, self.gameengine.cursorcoord)
-        else:
-            if self.mousetile is not None:
-                infotext = self.infoview(self.mousetile)
+                            else:
+                                oldpos = temppos
+                                temppos = pathfinder.alterposition(temppos, direction)
+                                monsterat = self.gameengine.mapfield.getoccupants(temppos)
+                                if not self.gameengine.mapfield.isnonsolid(temppos):
+                                    possible.append(oldpos)
+                                    break
+                                # if weapon hits any monster
+                                if monsterat is not None:
+                                    possible.append(temppos)
+                                    break
+                                # if weapon hits obstacle
+                                elif not self.gameengine.mapfield.ispassable(temppos):
+                                    break
+                                # if not, it flies to its maximum range
+                                else:
+                                    if i == wrange-1:
+                                        possible.append(temppos)
+                for location in possible:
+                    self.screen.blit(pointerimage, (location[0]*TILESIZE+MAPPOSX,
+                                                    location[1]*TILESIZE+MAPPOSY))
+                statusbackgr.blit(text, (1, 1))
+                self.screen.blit(statusbackgr, (830, 20))
+            if self.gameengine.state == "look":
+                statusbackgr = pygame.Surface((100, 20))
+                statusbackgr = statusbackgr.convert()
+                text = self.statusfont.render("Looking", 1, (pygame.Color("grey70")))
+                statusbackgr.blit(text, (1, 1))
+                self.screen.blit(statusbackgr, (830, 20))
+                cursorimage = self.uitileeng.getcustomtile(0, 0, 32, 32)
+                self.screen.blit(cursorimage, (self.gameengine.cursorcoord[0]*TILESIZE+MAPPOSX,
+                                               self.gameengine.cursorcoord[1]*TILESIZE+MAPPOSY))
+                infotext = self.infoview(self.gameengine.cursorcoord)
                 if infotext is not None:
-                    self.drawwindow(infotext, self.mousetile)
-        self.displaypops()
+                    self.drawwindow(infotext, self.gameengine.cursorcoord)
+            else:
+                if self.mousetile is not None:
+                    infotext = self.infoview(self.mousetile)
+                    if infotext is not None:
+                        self.drawwindow(infotext, self.mousetile)
+            self.displaypops()
         self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
         pygame.display.flip()
 
@@ -508,7 +511,6 @@ class GraphicsHandler(object):
 
     def displaydeath(self, score, killlist):
         kills = self.killliststrings(killlist)
-        ysize = 150
         deathlines = []
         deathlines.append("")
         deathlines.append(" You are dead.")
@@ -518,23 +520,19 @@ class GraphicsHandler(object):
             deathlines.append("")
             deathlines.append(" Kill list: ")
             for kill in kills:
-                deathlines.append(" " + kill)
-                ysize += 25
+                deathlines.append("  " + kill)
         deathlines.append("")
+        deathlines.append(" Press 'x' to look on the final screen.")
         deathlines.append(" Press any key to continue.")
-        logposadd = 0
-        logbackgr = pygame.Surface((400, ysize))
-        logbackgr = logbackgr.convert()
-        logbackgr.fill(pygame.Color("black"))
+
+        tempsurface = pygame.Surface((1, 1), pygame.SRCALPHA)
         for line in deathlines:
-            text = self.logfont.render(line, 1, (120, 120, 120))
-            logbackgr.blit(text, (10, 0 + logposadd))
-            logposadd += 20
-        self.screen.blit(logbackgr, (200, 100))
+            linesurface = self.logfont.render(line, 1, (pygame.Color("grey80")))
+            tempsurface = self.gluebelow(tempsurface, linesurface)
+        self.drawwindow(tempsurface, (1, 1))
 
     def displaywin(self, score, killlist):
         kills = self.killliststrings(killlist)
-        ysize = 200
         deathlines = []
         deathlines.append("")
         deathlines.append(" Congratulations! ")
@@ -546,19 +544,16 @@ class GraphicsHandler(object):
             deathlines.append("")
             deathlines.append(" Kill list: ")
             for kill in kills:
-                deathlines.append(" " + kill)
-                ysize += 25
+                deathlines.append("  " + kill)
         deathlines.append("")
+        deathlines.append(" Press 'x' to look on the final screen.")
         deathlines.append(" Press any key to continue.")
-        logposadd = 0
-        logbackgr = pygame.Surface((400, ysize))
-        logbackgr = logbackgr.convert()
-        logbackgr.fill(pygame.Color("black"))
+
+        tempsurface = pygame.Surface((1, 1), pygame.SRCALPHA)
         for line in deathlines:
-            text = self.logfont.render(line, 1, (120, 120, 120))
-            logbackgr.blit(text, (10, 0 + logposadd))
-            logposadd += 20
-        self.screen.blit(logbackgr, (200, 100))
+            linesurface = self.logfont.render(line, 1, (pygame.Color("grey80")))
+            tempsurface = self.gluebelow(tempsurface, linesurface)
+        self.drawwindow(tempsurface, (1, 1))
 
     def killliststrings(self, killlist):
         if len(killlist) == 0:

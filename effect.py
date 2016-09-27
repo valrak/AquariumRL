@@ -144,10 +144,11 @@ class Effect(thing.Thing):
                     self.gameengine.gameevent.report("Merfolk are ecstatic!")
                     if goldscore_add > 0:
                         self.gameengine.gameevent.report("You got "+str(goldscore_add)+" points for the gold items brought to gate.")
-                    self.gameengine.gameevent.report("Choose your reward!")
                     if int(occupant.getparam("level")) >= self.gameengine.LASTLEVEL:
+                        occupant.win()
                         self.gameengine.state = "reset"
                     else:
+                        self.gameengine.gameevent.report("Choose your reward!")
                         self.gameengine.newmap()
                         self.gameengine.itemsgenerated = 0
                         self.gameengine.mapfield.getplayer().killcount = 0

@@ -2,6 +2,7 @@ v 0.4
 + monster: harpoon thief
 + settings file
 + depth visual effect (optional, selectable in settings file)
++ you can now view final situation before death or winning
 % fixed positioning of info window
 % message log change
 % color coded health change popup of player
