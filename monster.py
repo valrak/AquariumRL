@@ -224,7 +224,7 @@ class Monster(thing.Thing):
                             for witem in localitems:
                                 if witem.getflag("harpoon"):
                                     self.pick(witem)
-                            actions += 1
+                                    actions += 1
                             continue
                         for lookeditem in self.gameengine.mapfield.items:
                             if lookeditem.getflag("harpoon"):
@@ -232,10 +232,11 @@ class Monster(thing.Thing):
                                     itemnear = True
                                     # item will not fall, go directly to it
                                     if self.gameengine.mapfield.isgrounded(lookeditem.getposition()):
-                                        goto = self.gameengine.mapfield.findpath(self.getposition(), lookeditem.getposition())
+                                        goto = self.gameengine.mapfield.findpath(self.getposition(),
+                                                                                 lookeditem.getposition())
                                     # item will fail, go below
                                     else:
-                                        downpos = lookeditem.x, lookeditem.y - 1
+                                        downpos = lookeditem.x, lookeditem.y + 1
                                         # will fall on me, wait
                                         if downpos == self.getposition():
                                             actions += 1
@@ -245,7 +246,8 @@ class Monster(thing.Thing):
                                             goto = self.gameengine.mapfield.findpath(self.getposition(), downpos)
                                         # will fall too far, go for previous position first
                                         else:
-                                            goto = self.gameengine.mapfield.findpath(self.getposition(), lookeditem.getposition())
+                                            goto = self.gameengine.mapfield.findpath(self.getposition(),
+                                                                                     lookeditem.getposition())
                                     self.action(goto)
                                     actions += 1
                                     break
@@ -254,12 +256,36 @@ class Monster(thing.Thing):
                             continue
                     # i am standard monster and want to kill the diver or wander randomly
                     if self.canact(actions):
+                        goto = None
                         if self.lastseen == position:
                             self.lastseen = None
                         if self.gameengine.mapfield.cansee(position, playerpos):
                             # I will remember where I've seen target
                             self.lastseen = playerpos
-                            goto = self.gameengine.mapfield.findpath(position, playerpos)
+                            # i am coward, i won't go near player
+                            if self.getflag("coward"):
+                                # player is already nearby find safe place if possible
+                                if pathfinder.isnear(position, playerpos):
+                                    safepos = []
+                                    for n in self.gameengine.mapfield.getneighbors(position[0], position[1]):
+                                        if not pathfinder.isnear(n, playerpos):
+                                            if self.gameengine.mapfield.ispassable(n):
+                                                safepos.append(n)
+                                    if len(safepos) > 0:
+                                        goto = self.gameengine.mapfield.findpath(position, safepos[
+                                            random.randint(0, len(safepos)-1)])
+                                    else:
+                                        self.action(self.gameengine.mapfield.getrandomnearby(position))
+                                # player is still distant
+                                else:
+                                    goto = self.gameengine.mapfield.findpath(position, playerpos)
+                                    # too close!
+                                    if goto is not None:
+                                        if pathfinder.isnear(playerpos, goto):
+                                            actions += 1
+                                            continue
+                            else:
+                                goto = self.gameengine.mapfield.findpath(position, playerpos)
                             if goto is not None:
                                 self.action(goto)
                             else:  # wander randomly
@@ -269,8 +295,8 @@ class Monster(thing.Thing):
                             goto = self.gameengine.mapfield.findpath(position, self.lastseen)
                             if goto is not None:
                                 self.action(goto)
-                            # can't see target even here, where I've last seen him
-                        else: # wander randomly
+                                # can't see target even here, where I've last seen him
+                        else:  # wander randomly
                             self.action(self.gameengine.mapfield.getrandomnearby(position))
                     actions += 1
                 # can move only on ground
