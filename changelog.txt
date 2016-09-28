@@ -1,5 +1,7 @@
 v 0.4
 + monster: harpoon thief
++ monster: big fish
++ huge monsters tile support
 + settings file
 + depth visual effect (optional, selectable in settings file)
 + you can now view final situation before death or winning

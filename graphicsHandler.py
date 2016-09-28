@@ -11,8 +11,10 @@ LOGWINDOWSIZE = (700, 150)
 MAPPOSX = 10
 MAPPOSY = 10
 TILESIZE = 32
+BIGTILESIZE = 50
 MAXLOGLINES = 6
 
+bigtilestep = BIGTILESIZE - TILESIZE
 
 class GraphicsHandler(object):
     loglines = []
@@ -26,12 +28,14 @@ class GraphicsHandler(object):
         self.gameengine = gameengine
         self.maptiles = pygame.image.load("resources/img/MapTiles.png")
         self.montiles = pygame.image.load("resources/img/CreatureTiles.png")
+        self.bigmontiles = pygame.image.load("resources/img/BigCreatureTiles.png")
         self.efftiles = pygame.image.load("resources/img/EffectTiles.png")
         self.itetiles = pygame.image.load("resources/img/ItemTiles.png")
         self.uitiles = pygame.image.load("resources/img/UI.png")
         self.uiparts = pygame.image.load("resources/img/watch.png")
         self.maptileeng = TileEngine(self.maptiles, gameengine.mapinfo, TILESIZE)
         self.montileeng = TileEngine(self.montiles, gameengine.moninfo, TILESIZE)
+        self.bigmontileeng = TileEngine(self.bigmontiles, gameengine.moninfo, BIGTILESIZE)
         self.efftileeng = TileEngine(self.efftiles, gameengine.effinfo, TILESIZE)
         self.itetileeng = TileEngine(self.itetiles, gameengine.iteinfo, TILESIZE)
         self.uitileeng = TileEngine(self.uitiles, gameengine.iteinfo, TILESIZE)
@@ -73,8 +77,15 @@ class GraphicsHandler(object):
 
         # display all monsters
         for monster in self.gameengine.mapfield.monsters:
-            monsterimage = self.montileeng.gettile(monster.parameters["id"])
-            self.screen.blit(monsterimage, c(monster.getvisualpos(TILESIZE)))
+            # huge monsters has another tileset and are huge
+            if monster.getflag("huge"):
+                monsterimage = self.bigmontileeng.gettile(monster.parameters["id"])
+                position = c(monster.getvisualpos(TILESIZE))
+                position = (position[0] - bigtilestep / 2, position[1] - bigtilestep / 2)
+                self.screen.blit(monsterimage, position)
+            else:
+                monsterimage = self.montileeng.gettile(monster.parameters["id"])
+                self.screen.blit(monsterimage, c(monster.getvisualpos(TILESIZE)))
 
         # display all effects
         for effect in self.gameengine.mapfield.effects:
