@@ -487,11 +487,22 @@ class Monster(thing.Thing):
                     itemlist.append(ite)
             return itemlist
 
-    def drop(self, ite):
+    def drop(self, ite, amount=None):
         ite.setposition(self.getposition())
         if ite.isstackable:
-            self.throwaway(ite, True)
-            self.gameengine.mapfield.items.append(ite)
+            if amount is not None and amount > 0:
+                itestack = 0
+                if amount > ite.stack:
+                    amount = ite.stack
+                for i in range(amount):
+                    itestack += 1
+                    newitem = self.throwaway(ite, False)
+                newitem.setposition(self.getposition())
+                newitem.stack = itestack
+                self.gameengine.mapfield.items.append(newitem)
+            else:
+                self.throwaway(ite, True)
+                self.gameengine.mapfield.items.append(ite)
         else:
             ite.setposition(self.getposition())
             self.inventory.remove(ite)
@@ -560,7 +571,7 @@ class Monster(thing.Thing):
         bestitem = None
         bestdamage = 0
         for ite in self.inventory:
-            # search for preffered weapons (harpoons)f
+            # search for preffered weapons (harpoons)
             if ite.getflag("preffered") and \
                             ite.getparam("damage") is not None and ite.getparam("damage") > bestdamage:
                 bestitem = ite

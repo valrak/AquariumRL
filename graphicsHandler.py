@@ -4,7 +4,7 @@ import pathfinder
 from tileEngine import *
 from pygame.locals import *
 
-WATCHPOS = (830, 100)
+WATCHPOS = (830, 10)
 LOGWINDOWPOS = (10, 500)
 LOGWINDOWSIZE = (700, 150)
 
@@ -23,6 +23,7 @@ class GraphicsHandler(object):
     gameengine = None
     size = None
     mousetile = None
+    advhelplines = []
 
     def __init__(self, gameengine):
         self.gameengine = gameengine
@@ -142,6 +143,7 @@ class GraphicsHandler(object):
         if self.gameengine.mapfield.getplayer() is not None:
             # Status
             self.displayhelp()
+            self.displayadvancedhelp()
             watchimage = self.uiparttileeng.getcustomtile(0, 0, 168, 315)
 
             player = self.gameengine.mapfield.getplayer()
@@ -259,6 +261,16 @@ class GraphicsHandler(object):
             self.loglines.pop(0)
         self.loglines.append(logline)
 
+    def displaytypednumber(self, number):
+        numbers = pygame.Surface((23, 23))
+        numbers = numbers.convert()
+        numbers.fill(pygame.Color("black"))
+        text = self.helpfont.render(number, 1, (200, 200, 200))
+        numbers.blit(text, (2, 2))
+        self.screen.blit(numbers, (55, 82))
+        self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
+        pygame.display.flip()
+
     def displayitemlist(self, itemlist, fromitem=0, selected=None):
         allitemsface = pygame.Surface((1, 1), pygame.SRCALPHA)
         i = 0
@@ -266,6 +278,7 @@ class GraphicsHandler(object):
         if fromitem >= len(itemlist):
             fromitem = 0
         for item in itemlist:
+            addendum = ""
             underscore = None
             if fromitem > lastitem:
                 lastitem += 1
@@ -274,11 +287,16 @@ class GraphicsHandler(object):
             if i >= len(self.gameengine.ALPHABET):
                 break
             if selected is not None and item in selected:
+                amount = selected.get(item)
+                if amount > item.stack:
+                    amount = item.stack
+                if amount > 0:
+                    addendum = " - dropping " + str(amount) + "x "
                 underscore = True
             if item.isstackable():
-                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i], underscore)
+                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i], underscore, addendum)
             else:
-                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i], underscore)
+                itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i], underscore, addendum)
             i += 1
             lastitem += 1
             allitemsface = self.gluebelow(allitemsface, itemface)
@@ -317,12 +335,12 @@ class GraphicsHandler(object):
         self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
         pygame.display.flip()
 
-    def itemdisplay(self, item, letter=None, fontflag=None):
+    def itemdisplay(self, item, letter=None, fontflag=None, addendum=""):
         weighttile = self.uitileeng.getcustomtile(0, 64, 16, 16)
         arrowtile = self.uitileeng.getcustomtile(0, 32+16, 16, 16)
         timetile = self.uitileeng.getcustomtile(16, 32 + 16, 16, 16)
         rangetile = self.uitileeng.getcustomtile(16, 32 + 32, 16, 16)
-        textname = item.getname()
+        textname = item.getname() + addendum
         textdesc = item.getparam("description")
         if item.isstackable():
             if item.stack > 1:
@@ -464,12 +482,16 @@ class GraphicsHandler(object):
         if x >= 0 and x < self.gameengine.MAPMAXX and y >= 0 and y < self.gameengine.MAPMAXY:
             return x, y
 
-    def drawwindow(self, drawing, coord):
+    def drawwindow(self, drawing, coord, realcoord=False):
         step = 50
         size = drawing.get_size()
         size = (size[0] + 6, size[1] + 6)
-        x = coord[0] * TILESIZE
-        y = coord[1] * TILESIZE
+        if realcoord:
+            x = coord[0]
+            y = coord[1]
+        else:
+            x = coord[0] * TILESIZE
+            y = coord[1] * TILESIZE
         if size[0] + x > self.size[0]:
             x = x - size[0] - step
         else:
@@ -586,6 +608,13 @@ class GraphicsHandler(object):
             logbackgr.blit(text, (10, 0 + logposadd))
             logposadd += 20
         self.screen.blit(logbackgr, (830, 430))
+
+    def displayadvancedhelp(self):
+        tempsurface = pygame.Surface((1, 1), pygame.SRCALPHA)
+        for line in self.advhelplines:
+            linesurface = self.helpfont.render(line, 1, (pygame.Color("grey80")))
+            tempsurface = self.gluebelow(tempsurface, linesurface)
+        self.drawwindow(tempsurface, (788, 280), True)
 
     def displayhelpscreen(self):
         helplines = self.gameengine.helpscreentext

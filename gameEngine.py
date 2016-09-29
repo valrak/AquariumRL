@@ -73,6 +73,7 @@ class GameEngine(object):
         self.settings = jsonInit.loadjson("config/settings.jsn")
 
         self.inventorykey = utils.populatekeys(self.keystrokes.get("inventory"))
+        self.numberskey = utils.populatekeys(self.keystrokes.get("numbers"))
         self.standkey = utils.populatekeys(self.keystrokes.get("stand"))
         self.applykey = utils.populatekeys(self.keystrokes.get("apply"))
         self.firekey = utils.populatekeys(self.keystrokes.get("fire"))
@@ -187,8 +188,15 @@ class GameEngine(object):
                         self.state = "game"
                         if selecteditems is not None and len(selecteditems) > 0:
                             for droppeditem in selecteditems:
-                                self.gameevent.report("dropped " + droppeditem.getname())
-                                player.drop(droppeditem)
+                                amount = selecteditems.get(droppeditem)
+                                if droppeditem.isstackable():
+                                    if amount > droppeditem.stack or amount == 0:
+                                        amount = droppeditem.stack
+                                    self.gameevent.report("dropped " + droppeditem.getname() + " " + str(amount) + "x")
+                                else:
+                                    self.gameevent.report("dropped " + droppeditem.getname())
+                                player.drop(droppeditem, amount)
+
                             self.passturn()
                     elif self.state == "use":
                         self.universalevents(event)
@@ -456,33 +464,54 @@ class GameEngine(object):
                     return self.ALPHABET.index(pygame.key.name(event.key))  # returns corresponding key alphabet index
             self.clock.tick(30)
 
-    def displayselectableinventory(self, requiredflag=None):
-        items = self.mapfield.getplayer().getinventory(requiredflag)
+    def displayselectableinventory(self, requiredflag=None, inputitems=None):
+        if inputitems is None:
+            items = self.mapfield.getplayer().getinventory(requiredflag)
         if len(items) == 0:
             return None
         originallastitem = 0
         lastitem = self.graphicshandler.displayitemlist(items)
         loop = True
-        selected = []
+        selected = {}
+        number = ""
         while loop:
             for event in pygame.event.get():
                 self.universalevents(event)
                 # cancel
                 if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                     return None
+                # number handling
+                if event.type == pg.KEYDOWN and event.key in self.numberskey:
+                    # number larger than two digits, reset it
+                    if len(number) >= 2:
+                        number = pygame.key.name(event.key)
+                    else:
+                        number += pygame.key.name(event.key)
+                if event.type == pg.KEYDOWN and event.key == pg.K_BACKSPACE:
+                    number = ""
+                    self.graphicshandler.displaytypednumber(number)
+                if number != "":
+                    self.graphicshandler.displaytypednumber(number)
+                # next page
                 if event.type == pg.KEYDOWN and event.key in self.nextkey:
                     self.draw()
                     originallastitem = lastitem
                     lastitem = self.graphicshandler.displayitemlist(items, lastitem, selected)
+                # select item
                 if event.type == pg.KEYDOWN and pygame.key.name(event.key) in self.ALPHABET:
                     keyindex = self.ALPHABET.index(pygame.key.name(event.key))
                     if keyindex <= len(self.mapfield.getplayer().getinventory()) - 1:
                         sitem = self.mapfield.getplayer().getinventory()[keyindex]
                         if sitem in selected:
-                            selected.remove(sitem)
+                            selected.pop(sitem)
                         else:
-                            selected.append(sitem)
+                            if number == "" or number == "0":
+                                selected[sitem] = 0
+                            else:
+                                selected[sitem] = int(number)
                     self.graphicshandler.displayitemlist(items, originallastitem, selected)
+                    number = ""
+                    self.graphicshandler.displaytypednumber(number)
                 if event.type == pg.KEYDOWN and event.key in self.confirmkey:
                     return selected
 

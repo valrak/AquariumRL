@@ -1,4 +1,5 @@
 v 0.4
++ you can now drop specific amount of items from item stack
 + monster: harpoon thief
 + monster: big fish
 + huge monsters tile support
