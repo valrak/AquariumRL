@@ -23,7 +23,6 @@ class GraphicsHandler(object):
     gameengine = None
     size = None
     mousetile = None
-    advhelplines = []
 
     def __init__(self, gameengine):
         self.gameengine = gameengine
@@ -100,12 +99,16 @@ class GraphicsHandler(object):
         # Special effects
         if self.gameengine.deepblue == 1:
             alpha = 0
+            fcolor = (0, 36, 56)
+            # if self.gameengine.noscore:
+            #     fcolor = (255, 0, 0)
             for y in range(self.maplayer.get_height()):
                 s = pygame.Surface((self.maplayer.get_width(), 1))
                 s.set_alpha(int(alpha))
-                s.fill((0, 36, 56))
+                s.fill(fcolor)
                 self.screen.blit(s, (MAPPOSX, MAPPOSY + y))
                 alpha += 0.2
+
 
         # Log
         logposadd = 0
@@ -143,7 +146,7 @@ class GraphicsHandler(object):
         if self.gameengine.mapfield.getplayer() is not None:
             # Status
             self.displayhelp()
-            self.displayadvancedhelp()
+
             watchimage = self.uiparttileeng.getcustomtile(0, 0, 168, 315)
 
             player = self.gameengine.mapfield.getplayer()
@@ -262,16 +265,19 @@ class GraphicsHandler(object):
         self.loglines.append(logline)
 
     def displaytypednumber(self, number):
-        numbers = pygame.Surface((23, 23))
-        numbers = numbers.convert()
-        numbers.fill(pygame.Color("black"))
-        text = self.helpfont.render(number, 1, (200, 200, 200))
-        numbers.blit(text, (2, 2))
-        self.screen.blit(numbers, (55, 82))
-        self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
-        pygame.display.flip()
+        if number != "" or number != '0':
+            numbers = pygame.Surface((23, 23))
+            numbers = numbers.convert()
+            numbers.fill(pygame.Color("black"))
+            text = self.helpfont.render(number, 1, (200, 200, 200))
+            numbers.blit(text, (2, 2))
+            self.screen.blit(numbers, (55, 82))
+            self.finalscreen.blit(pygame.transform.smoothscale(self.screen, self.correctratio(self.size)), (0, 0))
+            pygame.display.flip()
 
     def displayitemlist(self, itemlist, fromitem=0, selected=None):
+        self.drawboard(self.gameengine.mapfield.terrain)
+        self.displayadvancedhelp(['number - amount', 'letter - item', 'enter - confirm', 'space - next page', 'escape - cancel'])
         allitemsface = pygame.Surface((1, 1), pygame.SRCALPHA)
         i = 0
         lastitem = 0
@@ -291,7 +297,7 @@ class GraphicsHandler(object):
                 if amount > item.stack:
                     amount = item.stack
                 if amount > 0:
-                    addendum = " - dropping " + str(amount) + "x "
+                    addendum = " - " + str(amount) + "x "
                 underscore = True
             if item.isstackable():
                 itemface = self.itemdisplay(item, self.gameengine.ALPHABET[i], underscore, addendum)
@@ -609,12 +615,13 @@ class GraphicsHandler(object):
             logposadd += 20
         self.screen.blit(logbackgr, (830, 430))
 
-    def displayadvancedhelp(self):
+    def displayadvancedhelp(self, advhelplines):
         tempsurface = pygame.Surface((1, 1), pygame.SRCALPHA)
-        for line in self.advhelplines:
+        for line in advhelplines:
             linesurface = self.helpfont.render(line, 1, (pygame.Color("grey80")))
             tempsurface = self.gluebelow(tempsurface, linesurface)
         self.drawwindow(tempsurface, (788, 280), True)
+        pygame.display.flip()
 
     def displayhelpscreen(self):
         helplines = self.gameengine.helpscreentext

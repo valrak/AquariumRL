@@ -258,22 +258,6 @@ class MapField(object):
                         return x, y
         return None
 
-        #
-        # for i in range(100):
-        #     coord = (random.randint(0, self.maxx), random.randint(0, self.maxy))
-        #     if self.ispassable(coord):
-        #         if notnearplayer and self.getplayer() is not None:
-        #             if not pathfinder.isnear(coord, self.getplayer().getposition()):
-        #                 return coord
-        #         else:
-        #             return coord
-        # # failed to obtain passable
-        # for y in range(self.maxy):
-        #     for x in range(self.maxx):
-        #         if self.ispassable((x, y)):
-        #             return coord
-        # return None
-
     def getrandomfree(self):
         listfree = []
         for y in range(self.maxy):

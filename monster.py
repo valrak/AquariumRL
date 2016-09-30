@@ -395,20 +395,34 @@ class Monster(thing.Thing):
             return False
         return True
 
-    def pick(self, ite, silently=False):
+    def pick(self, ite, silently=False, amount=0):
         if self.player is not True and not silently:
             self.gameengine.gameevent.report(self.getname()+" picked up a " + ite.getname())
         else:
             if not silently:
                 self.gameengine.gameevent.report("picked up a " + ite.getname())
-        if self.getitem(ite.getname()) is not None and ite.isstackable():
-            self.getitem(ite.getname()).addtostack(ite)
-        else:
+        # defuse the dynamite
+        if ite.getname() is not None and ite.getparam("fuse") is not None:
+            ite.setparam("fuse", -1)
+        if ite.getname() is not None and not ite.isstackable():
             self.inventory.append(ite)
             if self.gameengine.mapfield.items.__contains__(ite):
                 self.gameengine.mapfield.items.remove(ite)
-                if ite.getparam("fuse") is not None:
-                    ite.setparam("fuse", -1)
+        elif amount == 0 or ite.stack <= amount:
+            if self.getitem(ite.getname()) is not None and ite.isstackable():
+                self.getitem(ite.getname()).addtostack(ite)
+            else:
+                self.inventory.append(ite)
+            if self.gameengine.mapfield.items.__contains__(ite):
+                self.gameengine.mapfield.items.remove(ite)
+        else:
+            for i in range(0, amount):
+                if self.getitem(ite.getname()) is not None and ite.isstackable():
+                    self.getitem(ite.getname()).addtostack(ite, 1)
+                    ite.subtostack(ite, 1)
+                else:
+                    self.inventory.append(ite)
+
 
     def fire(self, direction, what=None):
         weapon = what

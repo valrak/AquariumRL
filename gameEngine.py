@@ -196,7 +196,31 @@ class GameEngine(object):
                                 else:
                                     self.gameevent.report("dropped " + droppeditem.getname())
                                 player.drop(droppeditem, amount)
-
+                            self.passturn()
+                    elif self.state == "pick":
+                        self.universalevents(event)
+                        # cancel
+                        if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
+                            self.state = "game"
+                            self.draw()
+                            break
+                        sitems = self.mapfield.getitems(player.getposition())
+                        if len(sitems) == 1 and (not sitems[0].isstackable() or sitems[0].stack == 1):
+                            self.mapfield.getplayer().pick(sitems[0])
+                            self.passturn()
+                            self.state = "game"
+                            self.draw()
+                            break
+                        selecteditems = self.displayselectableinventory(None, sitems)
+                        self.draw()
+                        self.state = "game"
+                        if selecteditems is not None and len(selecteditems) > 0:
+                            for pickeditem in selecteditems:
+                                amount = selecteditems.get(pickeditem)
+                                if pickeditem.isstackable():
+                                    if amount > pickeditem.stack or amount == 0:
+                                        amount = pickeditem.stack
+                                player.pick(pickeditem, False, amount)
                             self.passturn()
                     elif self.state == "use":
                         self.universalevents(event)
@@ -321,9 +345,7 @@ class GameEngine(object):
                         if event.type == pg.KEYDOWN and event.key in self.pickkey:
                             # pick up item
                             citems = self.mapfield.getitems(player.getposition())
-                            for item in citems:
-                                player.pick(item)
-                            self.passturn()
+                            self.state = "pick"
             time_passed = self.clock.tick(30)
 
     def newmap(self):
@@ -467,6 +489,8 @@ class GameEngine(object):
     def displayselectableinventory(self, requiredflag=None, inputitems=None):
         if inputitems is None:
             items = self.mapfield.getplayer().getinventory(requiredflag)
+        else:
+            items = inputitems
         if len(items) == 0:
             return None
         originallastitem = 0
@@ -500,8 +524,8 @@ class GameEngine(object):
                 # select item
                 if event.type == pg.KEYDOWN and pygame.key.name(event.key) in self.ALPHABET:
                     keyindex = self.ALPHABET.index(pygame.key.name(event.key))
-                    if keyindex <= len(self.mapfield.getplayer().getinventory()) - 1:
-                        sitem = self.mapfield.getplayer().getinventory()[keyindex]
+                    if keyindex <= len(items) - 1:
+                        sitem = items[keyindex]
                         if sitem in selected:
                             selected.pop(sitem)
                         else:
@@ -511,7 +535,7 @@ class GameEngine(object):
                                 selected[sitem] = int(number)
                     self.graphicshandler.displayitemlist(items, originallastitem, selected)
                     number = ""
-                    self.graphicshandler.displaytypednumber(number)
+                    #self.graphicshandler.displaytypednumber(number)
                 if event.type == pg.KEYDOWN and event.key in self.confirmkey:
                     return selected
 
