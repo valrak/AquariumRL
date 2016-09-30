@@ -217,9 +217,6 @@ class GameEngine(object):
                         if selecteditems is not None and len(selecteditems) > 0:
                             for pickeditem in selecteditems:
                                 amount = selecteditems.get(pickeditem)
-                                if pickeditem.isstackable():
-                                    if amount > pickeditem.stack or amount == 0:
-                                        amount = pickeditem.stack
                                 player.pick(pickeditem, False, amount)
                             self.passturn()
                     elif self.state == "use":
@@ -504,6 +501,11 @@ class GameEngine(object):
                 # cancel
                 if event.type == pg.KEYDOWN and (event.key == pg.K_ESCAPE):
                     return None
+                # pick all
+                if event.type == pg.KEYDOWN and (event.key in self.pickkey):
+                    for sitem in items:
+                        selected[sitem] = 0
+                    return selected
                 # number handling
                 if event.type == pg.KEYDOWN and event.key in self.numberskey:
                     # number larger than two digits, reset it

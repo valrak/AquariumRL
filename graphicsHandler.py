@@ -277,7 +277,7 @@ class GraphicsHandler(object):
 
     def displayitemlist(self, itemlist, fromitem=0, selected=None):
         self.drawboard(self.gameengine.mapfield.terrain)
-        self.displayadvancedhelp(['number - amount', 'letter - item', 'enter - confirm', 'space - next page', 'escape - cancel'])
+        self.displayadvancedhelp(['number - amount', 'letter - item', 'enter - confirm', '_p_ or _,_ - all', 'space - next page', 'escape - cancel'])
         allitemsface = pygame.Surface((1, 1), pygame.SRCALPHA)
         i = 0
         lastitem = 0
@@ -613,14 +613,14 @@ class GraphicsHandler(object):
             text = self.helpfont.render(line, 1, (200, 200, 200))
             logbackgr.blit(text, (10, 0 + logposadd))
             logposadd += 20
-        self.screen.blit(logbackgr, (830, 430))
+        self.screen.blit(logbackgr, (830, 440))
 
     def displayadvancedhelp(self, advhelplines):
         tempsurface = pygame.Surface((1, 1), pygame.SRCALPHA)
         for line in advhelplines:
             linesurface = self.helpfont.render(line, 1, (pygame.Color("grey80")))
             tempsurface = self.gluebelow(tempsurface, linesurface)
-        self.drawwindow(tempsurface, (788, 280), True)
+        self.drawwindow(tempsurface, (788, 277), True)
         pygame.display.flip()
 
     def displayhelpscreen(self):
