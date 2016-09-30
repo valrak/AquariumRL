@@ -153,7 +153,13 @@ class Monster(thing.Thing):
         if not self.player:
             # not applicable for player
             actions = 0
+            # failsafe for monsters which can't decide
+            maxactions = 100
+            iterations = 0
             while self.canact(actions):
+                iterations += 1
+                if iterations > maxactions:
+                    break
                 if self.gameengine.mapfield.getplayer() is None:
                     return
                 playerpos = self.gameengine.mapfield.getplayer().getposition()
@@ -396,11 +402,16 @@ class Monster(thing.Thing):
         return True
 
     def pick(self, ite, silently=False, amount=0):
+        amountstring = ""
+        if amount > 0:
+            amountstring += " (x" + str(amount) + ")"
+        elif ite.isstackable and ite.stack > 1:
+            amountstring += " (x" + str(ite.stack) + ")"
         if self.player is not True and not silently:
-            self.gameengine.gameevent.report(self.getname()+" picked up a " + ite.getname())
+            self.gameengine.gameevent.report(self.getname()+" picked up a " + ite.getname() + amountstring)
         else:
             if not silently:
-                self.gameengine.gameevent.report("picked up a " + ite.getname())
+                self.gameengine.gameevent.report("picked up a " + ite.getname() + amountstring)
         # defuse the dynamite
         if ite.getname() is not None and ite.getparam("fuse") is not None:
             ite.setparam("fuse", -1)

@@ -91,16 +91,15 @@ class Item(thing.Thing):
             self.stack += item.stack
         else:
             self.stack += amount
-        if self.gameengine.mapfield.items.__contains__(item):
-            self.gameengine.mapfield.items.remove(item)
 
     def subtostack(self, item, amount=None):
         if amount is None:
             self.stack -= item.stack
         else:
             self.stack -= amount
-        if self.gameengine.mapfield.items.__contains__(item):
-            self.gameengine.mapfield.items.remove(item)
+        if item.stack <= 0:
+            if self.gameengine.mapfield.items.__contains__(item):
+                self.gameengine.mapfield.items.remove(item)
 
     def isstackable(self):
         if self.getparam("stackable") == "true":
