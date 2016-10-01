@@ -1,5 +1,6 @@
 v 0.4
 + you can now drop specific amount of items from item stack
++ pick up as well
 + monster: harpoon thief
 + monster: big fish
 + huge monsters tile support
@@ -9,6 +10,7 @@ v 0.4
 % fixed positioning of info window
 % message log change
 % color coded health change popup of player
+% monster ai should not cause infinite cycle any more
 
 v 0.3
 + inventory pages
